@@ -1,3 +1,5 @@
 tmp_eventdump.txt
 EnergyResolution/output
 EnergyResolution/plots
+*.pyc
+__init__*
