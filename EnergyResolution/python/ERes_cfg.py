@@ -8,14 +8,16 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 process = cms.Process('HFNose')
 
 options = VarParsing ('analysis')
-
-pt=1
+options.register ('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+                    "(type: string) pt value of the photon")
+options.parseArguments()
 
 OUTPUT_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/EnergyResolution/output/'
 INPUT_DIR = 'file:/data/t3home000/kyoon/gendata/photon_2026D47/'
-options.outputFile = OUTPUT_DIR + 'ERes_pt{}.root'.format(pt)
-options.inputFiles = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(pt)
-options.parseArguments()
+# options.outputFile = OUTPUT_DIR + 'ERes_pt{}.root'.format(pt)
+# options.inputFiles = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(pt)
+outputfile = OUTPUT_DIR + 'ERes_pt{}.root'.format(options.pt)
+inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 # Important to load geometry configs because they are part of EventSetup
@@ -27,7 +29,7 @@ process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi')
 process.load('Geometry.ForwardGeometry.HFNoseGeometryESProducer_cfi')
 
 process.source = cms.Source('PoolSource',
-    fileNames = cms.untracked.vstring(options.inputFiles)
+    fileNames = cms.untracked.vstring(inputfile)
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -39,7 +41,7 @@ process.analysis = cms.EDAnalyzer('EnergyResolution',
 )
 
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string(options.outputFile)
+    fileName = cms.string(outputfile)
 )
 
 process.p = cms.Path(process.analysis)
