@@ -4,7 +4,7 @@
 
 from ROOT import *
 from math import sqrt, sinh
-from numpy import zeros, array
+from numpy import zeros, array, linspace
 import os
 
 # PyConfig.IgnoreCommandLineOptions = True # Don't pass argv into TApplication
@@ -20,13 +20,38 @@ def addQuad (*args):
         ans_squared += arg**2
     return sqrt(ans_squared)
     
+
+def addQuadExpression (*args):
+    # type: str, [str, ] -> str
+    " Math expression (string) of addition in quadrature. "
+    ans_squared = ""
+    nterms = len(args)
+    for i in range(nterms):
+        if i < nterms - 1:
+            ans_squared += "(%s)**2 + " % (args[i])
+        else:
+            ans_squared += "(%s)**2" % (args[i])
+    return "sqrt(%s)" % (ans_squared)
     
-def getMathEResolution (tgrapherrors, mode='num'):
-    # type: TGraphErrors -> dict('key': 'float') (mode='num')
-    # type: TGraphErrors -> TGraphErrors (mode='obj')
-    # type: TGraphErrors -> (TGraphErrors, dict) (mode='all')
+    
+def getMathEResolution (graph):
+    # type: TGraphErrors -> TFitResult
     " Fit dE/E to TGraphErrors. "
     
+    Xaxis = graph.GetXaxis()
+    Yaxis = graph.GetYaxis()
+    
+    function = addQuadExpression("[0]/sqrt(x)", "[1]")
+    fit = TF1('EResFit', function, 0, 150)
+    fit.SetParameters(7,7)
+    fitresult = graph.Fit('EResFit', 'QS')
+    
+    n = dict()
+    n['stochastic_term'] = fitresult.Parameter(0)
+    n['constant_term'] = fitresult.Parameter(1)
+    
+    return n
+
 
 def fitGaussian (hist, mode='num'):
     # type: TH1 -> TCanvas (mode='draw')
@@ -68,8 +93,6 @@ def fitGaussian (hist, mode='num'):
         
     else:
         raise Exception(" Correct mode not provided in function \'fitGaussian\'. Valid modes are \'draw\', \'num\', \'raw\', and \'all\'.")
-        
-        
 
 
         
@@ -286,6 +309,17 @@ def plotEResolutionFit (hits_ERes, clusters_ERes, TOP_DIR):
     
     setTGraphStyle(hits_ERes, "Energy Resolution (hits): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
     setTGraphStyle(clusters_ERes, "Energy Resolution (clusters): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
+    
+    # Get FitResult
+    clusters_fit = getMathEResolution (clusters_ERes)
+        
+    s, c = clusters_fit['stochastic_term'], clusters_fit['constant_term']   
+    formula_display = TPaveText(.6, .76, .88, .88, 'NDC')
+    formula_display.SetFillColor(kWhite)
+    formula_display.SetTextFont(43)
+    formula_display.SetTextSize(14) # in pixels
+    formula_display.SetTextColor(kRed+1)
+    formula_display.AddText("#frac{#sigma_{E}}{E} = #frac{%.1f%%}{#sqrt{E}} #oplus %.1f%%" % (s, c))
         
     c1 = TCanvas("ERes_hits_TGraphErrors")
     hits_ERes.Draw('AP')
@@ -293,6 +327,9 @@ def plotEResolutionFit (hits_ERes, clusters_ERes, TOP_DIR):
     c2 = TCanvas("ERes_clusters_TGraphErrors")
     c2.cd()
     clusters_ERes.Draw('AP')
+    #clusters_fit.Draw('SAME')
+    formula_display.Draw('SAME')
+    c2.Update()
     
     c1.SaveAs(TOP_DIR + '/ERes_plots/EResolution_hits.png')
     c2.SaveAs(TOP_DIR + '/ERes_plots/EResolution_clusters.png')
