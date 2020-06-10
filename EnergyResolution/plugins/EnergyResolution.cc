@@ -277,13 +277,13 @@ void EnergyResolution::beginJob ()
     histContainer_["EDist_clusters_layer8"] = fs->make<TH1F>("EDist_clusters_layer8", "Energy Distribution Layer 8 (clusters)", 200, 0, 200);
     
     histContainer_["num_clusters_layer1"] = fs->make<TH1F>("num_clusters_layer1", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer2"] = fs->make<TH1F>("num_clusters_layer2", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer3"] = fs->make<TH1F>("num_clusters_layer3", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer4"] = fs->make<TH1F>("num_clusters_layer4", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer5"] = fs->make<TH1F>("num_clusters_layer5", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer6"] = fs->make<TH1F>("num_clusters_layer6", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer7"] = fs->make<TH1F>("num_clusters_layer7", "Number of Clusters Layer 1", 30, 0, 30);
-    histContainer_["num_clusters_layer8"] = fs->make<TH1F>("num_clusters_layer8", "Number of Clusters Layer 1", 30, 0, 30);
+    histContainer_["num_clusters_layer2"] = fs->make<TH1F>("num_clusters_layer2", "Number of Clusters Layer 2", 30, 0, 30);
+    histContainer_["num_clusters_layer3"] = fs->make<TH1F>("num_clusters_layer3", "Number of Clusters Layer 3", 30, 0, 30);
+    histContainer_["num_clusters_layer4"] = fs->make<TH1F>("num_clusters_layer4", "Number of Clusters Layer 4", 30, 0, 30);
+    histContainer_["num_clusters_layer5"] = fs->make<TH1F>("num_clusters_layer5", "Number of Clusters Layer 5", 30, 0, 30);
+    histContainer_["num_clusters_layer6"] = fs->make<TH1F>("num_clusters_layer6", "Number of Clusters Layer 6", 30, 0, 30);
+    histContainer_["num_clusters_layer7"] = fs->make<TH1F>("num_clusters_layer7", "Number of Clusters Layer 7", 30, 0, 30);
+    histContainer_["num_clusters_layer8"] = fs->make<TH1F>("num_clusters_layer8", "Number of Clusters Layer 8", 30, 0, 30);
 }
 
 void EnergyResolution::endJob ()

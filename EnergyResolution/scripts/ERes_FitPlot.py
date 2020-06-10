@@ -4,7 +4,7 @@
 
 from ROOT import *
 from math import sqrt, sinh
-from numpy import zeros, array, linspace
+import numpy as np
 import os
 
 # PyConfig.IgnoreCommandLineOptions = True # Don't pass argv into TApplication
@@ -178,17 +178,17 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
     num_points = len(tuple_filenames)
 
     # Container for truth
-    truth_mean_array, truth_mean_error_array = zeros(num_points), zeros(num_points)
+    truth_mean_array, truth_mean_error_array = np.zeros(num_points), np.zeros(num_points)
     
     # Container for hits method
     hits_draw_gauss = [] # list of histograms
-    hits_mean_array, hits_mean_error_array = zeros(num_points), zeros(num_points)
-    hits_ERes_array, hits_ERes_error_array = zeros(num_points), zeros(num_points)
+    hits_mean_array, hits_mean_error_array = np.zeros(num_points), np.zeros(num_points)
+    hits_ERes_array, hits_ERes_error_array = np.zeros(num_points), np.zeros(num_points)
     
     # Container for clusters method
     clusters_draw_gauss = [] # list of histograms
-    clusters_mean_array, clusters_mean_error_array = zeros(num_points), zeros(num_points)
-    clusters_ERes_array, clusters_ERes_error_array = zeros(num_points), zeros(num_points)
+    clusters_mean_array, clusters_mean_error_array = np.zeros(num_points), np.zeros(num_points)
+    clusters_ERes_array, clusters_ERes_error_array = np.zeros(num_points), np.zeros(num_points)
     
     
     for i in range(num_points): # Should not do this but put it under a bigger umbrella
@@ -196,7 +196,6 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
         filename = tuple_filenames[i]
         pt = tuple_pt[i]
         infile = TFile.Open(filename, 'READ')
-        print (filename)
         tree = infile.Get('analysis')
         
         # Get summary histograms
@@ -209,9 +208,9 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
         truth_EDist.SetDirectory(0)
         
         # Get detailed histograms
-        tuple_layer_hits_EDist = zeros(8)
-        tuple_layer_clusters_EDist = zeros(8)
-        tuple_layer_clusters_num = zeros(8)
+        tuple_layer_hits_EDist = np.zeros(8)
+        tuple_layer_clusters_EDist = np.zeros(8)
+        tuple_layer_clusters_num = np.zeros(8)
 
         # Modify some TH1 params
         hits_EDist.SetTitle("Energy Distribution (hits, scalar sum): p_{T}=%s" % (pt))
@@ -254,6 +253,7 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
         clusters_mean_array[i] = clusters_mean
         clusters_mean_error_array[i] = clusters_mean_error
         
+        infile.Close()
         
     # Set dictionary for containing the return plots
     dict_plots = dict()
@@ -267,12 +267,79 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
     dict_plots['clusters_ERes_graph'] = TGraphErrors(num_points, clusters_mean_array, clusters_ERes_array*100, clusters_mean_error_array, clusters_ERes_error_array*100)
     
     # Mean Energy Plots
-    array_pt = array([float(i) for i in tuple_pt])
+    array_pt = np.array([float(i) for i in tuple_pt])
     dict_plots['hits_EMean_graph'] = TGraph(num_points, array_pt, hits_mean_array)
     dict_plots['clusters_EMean_graph'] = TGraph(num_points, array_pt, clusters_mean_array)
     dict_plots['truth_EMean_graph'] = TGraph(num_points, array_pt, truth_mean_array)
+    dict_plots['hits_to_truth_EMean_graph'] = TGraph(num_points, array_pt, np.divide(hits_mean_array, truth_mean_array))
+    dict_plots['clusters_to_truth_EMean_graph'] = TGraph(num_points, array_pt, np.divide(clusters_mean_array, truth_mean_array))
     
     return dict_plots
+    
+    
+def saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR):
+    # (str, str) -> None
+    " Save all plots that are related to individual layers. "
+
+    num_points = len(tuple_filenames)
+    
+    for i in range(num_points): # Should not do this but put it under a bigger umbrella
+    
+        filename = tuple_filenames[i]
+        pt = tuple_pt[i]
+        infile = TFile.Open(filename, 'READ')
+        tree = infile.Get('analysis')
+        
+        # Set save directory
+        save_dir = TOP_DIR + '/layer_plots/pt_%s' % (pt)
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+            
+        EDist_hits_layer = []
+        EDist_clusters_layer = []
+        num_clusters_layer = []
+        
+        maxbin1 = -1
+        maxbin2 = -1
+        maxbin3 = -1
+        
+        for layer in range(8):
+            EDist_hits_layer.append( tree.Get('EDist_hits_layer%s' % (layer+1)) )
+            EDist_clusters_layer.append( tree.Get('EDist_clusters_layer%s' % (layer+1)) )
+            num_clusters_layer.append( tree.Get('num_clusters_layer%s' % (layer+1)) )
+            
+            # Get max bins
+            if EDist_hits_layer[layer].FindLastBinAbove(0) > maxbin1:
+                maxbin1 = EDist_hits_layer[layer].FindLastBinAbove(0)
+            if EDist_clusters_layer[layer].FindLastBinAbove(0) > maxbin2:
+                maxbin2 = EDist_clusters_layer[layer].FindLastBinAbove(0)
+            if num_clusters_layer[layer].FindLastBinAbove(0) > maxbin3:
+                maxbin3 = num_clusters_layer[layer].FindLastBinAbove(0)
+        
+        for layer in range(8): # Must iterate again to set uniform max bin range
+            EDist_hits_layer[layer].GetXaxis().SetRange(0, maxbin1)
+            EDist_clusters_layer[layer].GetXaxis().SetRange(0, maxbin2)
+            num_clusters_layer[layer].GetXaxis().SetRange(0, maxbin3)
+        
+            c1 = TCanvas()
+            c2 = TCanvas()
+            c3 = TCanvas()
+            
+            c1.cd()
+            EDist_hits_layer[layer].Draw()
+            c1.SaveAs(save_dir + '/EDist_hits_layer%s.png' % (layer+1))
+            
+            c2.cd()
+            EDist_clusters_layer[layer].Draw()
+            c2.SaveAs(save_dir + '/EDist_clusters_layer%s.png' % (layer+1))
+            
+            c3.cd()
+            num_clusters_layer[layer].Draw()
+            c3.SaveAs(save_dir + '/num_clusters_layer%s.png' % (layer+1))
+            
+        infile.Close()
+        
+    return
     
 
 def plotPerPT (hits_EDist, hits_fit, clusters_EDist, clusters_fit, pt, TOP_DIR):
@@ -348,27 +415,27 @@ def plotEMean (hits_EMean, clusters_EMean, truth_EMean, TOP_DIR):
     group = 1 # group will later disappear
     
     
-    setTGraphStyle(hits_EMean, "hits", preset='EMean_1')
-    setTGraphStyle(clusters_EMean, "clusters", preset='EMean_2')
-    setTGraphStyle(truth_EMean, "truth", preset='EMean_3')
+    setTGraphStyle(hits_EMean, "#bar{E_{hits}}/#bar{E_{truth}}", preset='EMean_1')
+    setTGraphStyle(clusters_EMean, "#bar{E_{clusters}}/#bar{E_{truth}}", preset='EMean_2')
+    #setTGraphStyle(truth_EMean, "truth", preset='EMean_3')
         
     c = TCanvas("EMean_TMultigraph")
     mg = TMultiGraph()
-    mg.Add(truth_EMean)
+    #mg.Add(truth_EMean)
     mg.Add(hits_EMean)
     mg.Add(clusters_EMean)
     mg.Draw('ALP')
     
-    mg.SetTitle("Mean Energy Comparison")
+    mg.SetTitle("Mean Energy Ratio Comparison")
     mg.GetXaxis().SetTitle('p_{T} [GeV/c]')
     mg.GetXaxis().SetLimits(0, 10)
-    mg.GetYaxis().SetTitle('E [GeV]')
+    mg.GetYaxis().SetTitle('Ratio to truth')
     mg.SetMinimum(0)
-    mg.SetMaximum(150)
+    mg.SetMaximum(10)
     
     c.Update()
     c.BuildLegend()
-    c.SaveAs(TOP_DIR + '/EMean_plots/EMean_compare.png')
+    c.SaveAs(TOP_DIR + '/EMean_plots/EMean_ratio_compare.png')
     
     return
     
@@ -380,13 +447,15 @@ def main():
     # File names
     tuple_pt = ('.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9')
     tuple_filenames = tuple('output/ERes_pt%s.root' % (i) for i in tuple_pt)
+    
+    # Top save directory
+    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/EnergyResolution/plots'
+
+    saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR)
         
     # Get the comprehensive dictionary of plots
     dict_plots = getPlotsEResolutionComprehensive(tuple_filenames, tuple_pt)
-    
-    # Save directory
-    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/EnergyResolution/plots'
-    
+        
     # Save Energy Distribution TCanvas that shows fitted histograms
     for i in range(len(tuple_pt)):
         plotPerPT (dict_plots['hits_EDist_draw_list'][i][0], dict_plots['hits_EDist_draw_list'][i][1], dict_plots['clusters_EDist_draw_list'][i][0], dict_plots['clusters_EDist_draw_list'][i][1], tuple_pt[i], TOP_DIR)
@@ -395,7 +464,7 @@ def main():
     plotEResolutionFit (dict_plots['hits_ERes_graph'], dict_plots['clusters_ERes_graph'], TOP_DIR)
 
     # Save Mean Energy plots
-    plotEMean (dict_plots['hits_EMean_graph'], dict_plots['clusters_EMean_graph'], dict_plots['truth_EMean_graph'], TOP_DIR)
+    plotEMean (dict_plots['hits_to_truth_EMean_graph'], dict_plots['clusters_to_truth_EMean_graph'], dict_plots['truth_EMean_graph'], TOP_DIR)
 
 
 if __name__=='__main__':
