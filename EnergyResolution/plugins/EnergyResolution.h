@@ -54,8 +54,6 @@ class EnergyResolution : public edm::EDAnalyzer
     edm::InputTag tag_GenParticle_;
     // edm::InputTag tag_CaloParticle_MergedCaloTruth_;
     
-    // Output Stats
-    
     // Others
     Int_t   select_PID_;
     Float_t select_EtaLow_;

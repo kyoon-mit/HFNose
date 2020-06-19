@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include <cmath> // Switch to TMath.h if you need more physics-related functions
-// #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -30,9 +29,6 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
-// ROOT headers
-
-using namespace edm;
 
 EnergyResolution::EnergyResolution ( const edm::ParameterSet& iConfig ) :
 
@@ -67,23 +63,26 @@ EnergyResolution::~EnergyResolution ()
 
 void EnergyResolution::analyze ( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
-    // Get hits
+    // Get HGCRecHits
     edm::Handle<HGCRecHitCollection> handle_HGCRecHits;
     iEvent.getByToken ( token_HGCRecHits_, handle_HGCRecHits );
 
-    // Get Geometry
-    edm::ESHandle<HGCalGeometry> handle_HGCalGeometry;
-    iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalGeometry );
-    // const HGCalGeometry* geom_HGCal = handle_HGCalGeometry.product();
-    
+    // Get CaloClusters
     edm::Handle<std::vector<reco::CaloCluster>> handle_HGCalLayerClustersHFNose;
     iEvent.getByToken ( token_HGCalLayerClustersHFNose_, handle_HGCalLayerClustersHFNose ); 
 
-    // Get MC truth (maybe consider using a separate function if code becomes too long)
-    // edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth_;
-    // iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth_ );
+    // Get CaloParticles: CaloTruth
+//    edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth_;
+//    iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth_ );
+
+    // Get GenParticles
     edm::Handle<reco::GenParticleCollection> handle_GenParticle;
     iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
+
+    // Get HGCalGeometry
+    edm::ESHandle<HGCalGeometry> handle_HGCalGeometry;
+    iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalGeometry );
+    // const HGCalGeometry* geom_HGCal = handle_HGCalGeometry.product();
     
     if ( handle_HGCRecHits.isValid() && handle_GenParticle.isValid() && handle_HGCalLayerClustersHFNose.isValid() )
     {
@@ -211,9 +210,8 @@ void EnergyResolution::fillHist_CaloClustersEnergy_coneR ( const math::XYZTLoren
     for ( auto const& cl : Clusters )
     {
         // Get Layer # (also, get how many total clusters in layer)
-        HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions().at(0).first );
+        HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions()[0].first );
         sum_E_layer[cl_DetId.layer()-1]++;
-        num_layer[cl_DetId.layer()-1]++;
         
         // Cone reconstruction
         Float_t dR = reco::deltaR ( cl.eta(), cl.phi(), truth.eta(), truth.phi() );
@@ -224,6 +222,7 @@ void EnergyResolution::fillHist_CaloClustersEnergy_coneR ( const math::XYZTLoren
 
             sum_E += cl_energy;
             sum_E_layer[cl_DetId.layer()-1] += cl_energy;
+            num_layer[cl_DetId.layer()-1]++;
             //sum_E_vector += math::PtEtaPhiELorentzVectorF ( cl.eta(), cl.phi(), cl_energy );
         }
     }
@@ -285,6 +284,7 @@ void EnergyResolution::beginJob ()
     histContainer_["num_clusters_layer7"] = fs->make<TH1F>("num_clusters_layer7", "Number of Clusters Layer 7", 30, 0, 30);
     histContainer_["num_clusters_layer8"] = fs->make<TH1F>("num_clusters_layer8", "Number of Clusters Layer 8", 30, 0, 30);
 }
+
 
 void EnergyResolution::endJob ()
 {

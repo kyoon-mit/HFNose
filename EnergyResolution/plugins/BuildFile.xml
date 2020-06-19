@@ -10,6 +10,8 @@
 <use name="DataFormats/CaloRecHit"/>
 <use name="DataFormats/GeometryVector"/>
 
+<use name="SimDataFormats/CaloHit">
+
 <use name="Geometry/Records"/>
 <use name="Geometry/HGCalGeometry"/>
 <use name="Geometry/CaloGeometry"/>
