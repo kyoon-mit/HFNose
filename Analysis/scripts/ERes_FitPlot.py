@@ -449,7 +449,7 @@ def main():
     tuple_filenames = tuple('output/ERes_pt%s.root' % (i) for i in tuple_pt)
     
     # Top save directory
-    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/EnergyResolution/plots'
+    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Single_Photon_Analyses/plots'
 
     saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR)
         

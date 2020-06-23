@@ -1,6 +1,7 @@
 #include "EnergyResolution.h"
 
 #include <iostream>
+#include <array>
 
 #include <cmath> // Switch to TMath.h if you need more physics-related functions
 #include "DataFormats/Math/interface/deltaR.h"
@@ -11,8 +12,11 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-// test #include "FWCore/ParameterSet/interface/ParameterSet.h"
-// #include "FWCore/MessageLogger/interface/MessageLogger.h" ??
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+
+// Physics objects
+#include "DataFormats/CaloRecHit/interface/CaloCluster.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 // HFNose (forward + HGCal)
 #include "DataFormats/ForwardDetId/interface/HFNoseDetId.h"
@@ -25,10 +29,14 @@
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 
 // Detector Geometry
+#include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
 #include "Geometry/Records/interface/IdealGeometryRecord.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
+// ROOT headers
+
+using namespace edm;
 
 EnergyResolution::EnergyResolution ( const edm::ParameterSet& iConfig ) :
 
@@ -63,26 +71,23 @@ EnergyResolution::~EnergyResolution ()
 
 void EnergyResolution::analyze ( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
-    // Get HGCRecHits
+    // Get hits
     edm::Handle<HGCRecHitCollection> handle_HGCRecHits;
     iEvent.getByToken ( token_HGCRecHits_, handle_HGCRecHits );
 
-    // Get CaloClusters
-    edm::Handle<std::vector<reco::CaloCluster>> handle_HGCalLayerClustersHFNose;
-    iEvent.getByToken ( token_HGCalLayerClustersHFNose_, handle_HGCalLayerClustersHFNose ); 
-
-    // Get CaloParticles: CaloTruth
-//    edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth_;
-//    iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth_ );
-
-    // Get GenParticles
-    edm::Handle<reco::GenParticleCollection> handle_GenParticle;
-    iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
-
-    // Get HGCalGeometry
+    // Get Geometry
     edm::ESHandle<HGCalGeometry> handle_HGCalGeometry;
     iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalGeometry );
     // const HGCalGeometry* geom_HGCal = handle_HGCalGeometry.product();
+    
+    edm::Handle<std::vector<reco::CaloCluster>> handle_HGCalLayerClustersHFNose;
+    iEvent.getByToken ( token_HGCalLayerClustersHFNose_, handle_HGCalLayerClustersHFNose ); 
+
+    // Get MC truth (maybe consider using a separate function if code becomes too long)
+    // edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth_;
+    // iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth_ );
+    edm::Handle<reco::GenParticleCollection> handle_GenParticle;
+    iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
     
     if ( handle_HGCRecHits.isValid() && handle_GenParticle.isValid() && handle_HGCalLayerClustersHFNose.isValid() )
     {
@@ -127,7 +132,7 @@ void EnergyResolution::fillHist_HGCalRecHitsEnergy_coneR ( const math::XYZTLoren
 // Also does this for individual silicon layer in HGCal detector
 
     Float_t sum_E = 0;
-    Float_t sum_E_layer[8];
+    Float_t sum_E_layer[8] = {0};
     
     for ( auto const& hit : hits )
     {
@@ -203,15 +208,16 @@ void EnergyResolution::fillHist_HGCalRecHitsEnergy_coneR ( const math::XYZTLoren
 void EnergyResolution::fillHist_CaloClustersEnergy_coneR ( const math::XYZTLorentzVectorF & truth, const std::vector<reco::CaloCluster> & Clusters )
 {
     Float_t sum_E = 0;
-    Float_t sum_E_layer[8];
-    Float_t num_layer[8];
+    Float_t sum_E_layer[8] = {0};
+    Float_t num_layer[8] = {0};
     //auto sum_E_vector = math::PtEtaPhiELorentzVectorF (0., 0., 0., 0.);
     
     for ( auto const& cl : Clusters )
     {
         // Get Layer # (also, get how many total clusters in layer)
-        HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions()[0].first );
-        sum_E_layer[cl_DetId.layer()-1]++;
+        HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions().at(0).first );
+        Int_t layer = cl_DetId.layer();
+        num_layer[layer-1]++;
         
         // Cone reconstruction
         Float_t dR = reco::deltaR ( cl.eta(), cl.phi(), truth.eta(), truth.phi() );
@@ -221,13 +227,12 @@ void EnergyResolution::fillHist_CaloClustersEnergy_coneR ( const math::XYZTLoren
             Float_t cl_energy = cl.energy();
 
             sum_E += cl_energy;
-            sum_E_layer[cl_DetId.layer()-1] += cl_energy;
-            num_layer[cl_DetId.layer()-1]++;
+            sum_E_layer[layer-1] += cl_energy;
             //sum_E_vector += math::PtEtaPhiELorentzVectorF ( cl.eta(), cl.phi(), cl_energy );
         }
     }
             
-    histContainer_["EDist_clusters_scaler_sum"]->Fill ( sum_E );
+    histContainer_["EDist_clusters_scalar_sum"]->Fill ( sum_E );
     //histContainer_["EDist_clusters_vector_sum"]->Fill ( sum_E_vector.energy() );
     histContainer_["EDist_clusters_layer1"]->Fill( sum_E_layer[0] );
     histContainer_["EDist_clusters_layer2"]->Fill( sum_E_layer[1] );
@@ -264,7 +269,7 @@ void EnergyResolution::beginJob ()
     histContainer_["EDist_hits_layer7"] = fs->make<TH1F>("EDist_hits_layer7", "Energy Distribution Layer 7 (hits)", 200, 0, 200);
     histContainer_["EDist_hits_layer8"] = fs->make<TH1F>("EDist_hits_layer8", "Energy Distribution Layer 8 (hits)", 200, 0, 200);
 
-    histContainer_["EDist_clusters_scalar_sum"] = fs->make<TH1F>("EDist_clusters_scalar_sum", "Energy Distribution (clusters--scaler sum)", 200, 0, 200);
+    histContainer_["EDist_clusters_scalar_sum"] = fs->make<TH1F>("EDist_clusters_scalar_sum", "Energy Distribution (clusters, scaler sum)", 200, 0, 200);
     //histContainer_["EDist_clusters_vector_sum"] = fs->make<TH1F>("EDist_clusters_vector_sum", "Energy Distribution (clusters--vector sum)", 200, 0, 200);
     histContainer_["EDist_clusters_layer1"] = fs->make<TH1F>("EDist_clusters_layer1", "Energy Distribution Layer 1 (clusters)", 200, 0, 200);
     histContainer_["EDist_clusters_layer2"] = fs->make<TH1F>("EDist_clusters_layer2", "Energy Distribution Layer 2 (clusters)", 200, 0, 200);
@@ -284,7 +289,6 @@ void EnergyResolution::beginJob ()
     histContainer_["num_clusters_layer7"] = fs->make<TH1F>("num_clusters_layer7", "Number of Clusters Layer 7", 30, 0, 30);
     histContainer_["num_clusters_layer8"] = fs->make<TH1F>("num_clusters_layer8", "Number of Clusters Layer 8", 30, 0, 30);
 }
-
 
 void EnergyResolution::endJob ()
 {

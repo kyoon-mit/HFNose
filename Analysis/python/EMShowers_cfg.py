@@ -5,18 +5,18 @@
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-process = cms.Process('HFNose')
+process = cms.Process('HGCNose')
 
 options = VarParsing ('analysis')
 options.register ('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                     "(type: string) pt value of the photon")
 options.parseArguments()
 
-OUTPUT_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/EnergyResolution/output/'
+OUTPUT_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/output/'
 INPUT_DIR = 'file:/data/t3home000/kyoon/gendata/photon_2026D47/'
 # options.outputFile = OUTPUT_DIR + 'ERes_pt{}.root'.format(pt)
 # options.inputFiles = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(pt)
-outputfile = OUTPUT_DIR + 'ERes_pt{}.root'.format(options.pt)
+outputfile = OUTPUT_DIR + 'EMShowers_pt{}.root'.format(options.pt)
 inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
@@ -36,12 +36,17 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
 
-process.analysis = cms.EDAnalyzer('EnergyResolution',
-    TAG_HGCHFNoseRecHits = cms.untracked.InputTag('HGCalRecHit', 'HGCHFNoseRecHits')
+process.Analysis_EMShowers = cms.EDAnalyzer('EMShowerStudies',
+    #TAG_HGCHFNoseRecHits = cms.untracked.InputTag('HGCalRecHit', 'HGCHFNoseRecHits')
 )
 
 process.TFileService = cms.Service('TFileService',
     fileName = cms.string(outputfile)
 )
 
-process.p = cms.Path(process.analysis)
+process.Timing = cms.Service("Timing",
+  summaryOnly = cms.untracked.bool(True),
+  useJobReport = cms.untracked.bool(True)
+)
+
+process.p = cms.Path(process.Analysis_EMShowers)

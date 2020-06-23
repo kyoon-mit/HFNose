@@ -7,19 +7,26 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <TH1.h>
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/CaloRecHit/interface/CaloCluster.h"
-#include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
+
 // #include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 
+// Forward declarations
+class TH1F;
 
+class HGCalGeometry;
+
+namespace reco
+{
+    class GenParticle;
+    typedef std::vector<GenParticle> GenParticleCollection;
+    class CaloCluster;
+}
 
 class EnergyResolution : public edm::EDAnalyzer
 {
