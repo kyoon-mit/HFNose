@@ -446,10 +446,10 @@ def plotEMean (hits_EMean, clusters_EMean, truth_EMean, TOP_DIR):
 def main():
     # File names
     tuple_pt = ('.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-    tuple_filenames = tuple('output/ERes_pt%s.root' % (i) for i in tuple_pt)
+    tuple_filenames = tuple('/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/output/ERes_pt%s.root' % (i) for i in tuple_pt)
     
     # Top save directory
-    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Single_Photon_Analyses/plots'
+    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/plots/ERes_Single_Photon'
 
     saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR)
         

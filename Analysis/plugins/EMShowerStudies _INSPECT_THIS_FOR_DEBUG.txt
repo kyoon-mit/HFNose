@@ -6,9 +6,6 @@
 
 #include <TH1.h>
 #include <TH2.h>
-#include <TF1.h>
-#include <TGraph.h>
-#include <TCanvas.h>
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -55,12 +52,9 @@ EMShowerStudies::EMShowerStudies ( const edm::ParameterSet& iConfig ) :
     select_PID_ ( 22 ),
     select_EtaLow_ ( 3.49 ),
     select_EtaHigh_ ( 3.51 ),
-    max_iter_R_ ( 0.5 ),
-    steps_iter_R_ ( 80 )
+    select_coneR_ ( 0.5 )
     
 {
-    // consumes: frequent request of additional data | mayConsume: infrequent
-    // token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
     token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
     
     token_g4SimHits_HFNoseHits_ = consumes<std::vector<PCaloHit>> ( tag_g4SimHits_HFNoseHits_ );
@@ -104,124 +98,20 @@ void EMShowerStudies::analyze ( const edm::Event & iEvent, const edm::EventSetup
     // const HGCalGeometry* geom_HGCal = handle_HGCalGeometry.product();  
     
     
-    // Find position and energy of the maximum E deposit HGCRecHit
-    // const FrontBackEtaPhiE_perLayer MaxE_RecHits = find_EtaPhiE_Reference_perLayer ( *handle_HGCRecHits.product(), handle_HGCalGeometry.product() ); // Why not pointer?
+    // Find position and energy of the maximum E deposit CaloCluster
     const FrontBackEtaPhiE_perLayer MaxE_CaloClusters = find_EtaPhiE_Reference_perLayer ( *handle_GenParticle.product(), handle_HGCalGeometry.product() );
     
     // Plot position of above
     plot_maxEtaPhi ( MaxE_CaloClusters );
     
     // Calculate sum of E deposit of SimHits in each layer 
-    // const FrontBackEtaPhiE_perLayer SumE_SimHits = get_SumEDeposit_perLayer ( *handle_g4SimHits_HFNoseHits.product(), handle_HGCalGeometry.product() );
-    // const FrontBackEtaPhiE_perLayer SumE_SimHits = get_SumEDeposit_perLayer ( (const HGCRecHitCollection &) *handle_HGCRecHits.product(), handle_HGCalGeometry.product() );
     const FrontBackEtaPhiE_perLayer SumE_Clusters = get_SumEDeposit_perLayer ( *handle_HGCalLayerClustersHFNose.product(), handle_HGCalGeometry.product() );
-    
-    // Validate sum
-//    std::array<bool, 2> bool_check_sums = check_SumEDeposit_allLayers ( *handle_GenParticle.product(), SumE_Clusters );
-//    std::cout << std::boolalpha
-//              << "Sum validation results (5%): " << bool_check_sums[0] << ", "
-//              << bool_check_sums[1] << std::endl;
     
     // Plot sum of SimHits
     plot_sum_TotalE_perLayer ( SumE_Clusters );
 
     // Construct radii with HGCRecHits
     iterative_R_search ( *handle_HGCalLayerClustersHFNose.product(), handle_HGCalGeometry.product(), MaxE_CaloClusters, SumE_Clusters );
-}
-
-
-EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::find_EtaPhiE_Reference_perLayer ( const HGCRecHitCollection & hits, const HGCalGeometry * geom )
-{ // Find (eta, phi, energy) of HGCRecHit with maximum energy deposit in the calorimeter for each layer. (1 of 3 overloaded methods)
-
-    // Containers to hold maximum energy in each layer, for comparison
-    std::array<Float_t, HGCNose_NLayers_> max_E_deposit_front;
-    std::array<Float_t, HGCNose_NLayers_> max_E_deposit_back;
-    max_E_deposit_front.fill(0.);
-    max_E_deposit_back.fill(0.);
-    
-    // Container to return
-    FrontBackEtaPhiE_perLayer EtaPhiE_MaximumEDeposit;
-    
-    for ( const auto& hit : hits )
-    {
-        // Get layer number of the hit
-        HFNoseDetId hit_DetId = HFNoseDetId ( hit.id() );
-        Int_t layer = hit_DetId.layer();
-        
-        // Get position of the hit
-        const GlobalPoint & hit_globalPosition = geom->getPosition(hit.id());
-        
-        // Troubleshoot: if index out of range, doublecheck HGCNose_NLayers_ value in constructor.
-        
-        if ( hit_globalPosition.eta() > 0 ) // +z scenario
-        {   // Compare with maximum energy in same layer
-            if ( max_E_deposit_front[layer-1] < hit.energy() )
-            {
-                max_E_deposit_front[layer-1] = hit.energy();
-                EtaPhiE_MaximumEDeposit[layer-1][0] = hit_globalPosition.eta();
-                EtaPhiE_MaximumEDeposit[layer-1][1] = hit_globalPosition.phi();
-                EtaPhiE_MaximumEDeposit[layer-1][2] = hit.energy();
-            } 
-        }
-        else // -z scenario
-        {
-            if ( max_E_deposit_back[layer-1] < hit.energy() )
-            {
-                max_E_deposit_back[layer-1] = hit.energy();
-                EtaPhiE_MaximumEDeposit[layer-1][3] = hit_globalPosition.eta();
-                EtaPhiE_MaximumEDeposit[layer-1][4] = hit_globalPosition.phi();
-                EtaPhiE_MaximumEDeposit[layer-1][5] = hit.energy();
-            }
-        }
-    }
-    
-    return EtaPhiE_MaximumEDeposit;
-}
-
-
-EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::find_EtaPhiE_Reference_perLayer ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom )
-{ // Find (eta, phi, energy) of CaloClusters with maximum energy deposit in the calorimeter for each layer. (2 of 3 overloaded methods)
-
-    // Containers to hold maximum energy in each layer, for comparison
-    std::array<Float_t, HGCNose_NLayers_> max_E_deposit_front;
-    std::array<Float_t, HGCNose_NLayers_> max_E_deposit_back;
-    max_E_deposit_front.fill(0.);
-    max_E_deposit_back.fill(0.);
-    
-    // Container to return
-    FrontBackEtaPhiE_perLayer EtaPhiE_MaximumEDeposit;
-    
-    for ( const auto& cl : Clusters )
-    {
-        // Get layer number of the cl
-        HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions().at(0).first );
-        Int_t layer = cl_DetId.layer();
-                
-        // Troubleshoot: if index out of range, doublecheck HGCNose_NLayers_ value in constructor.
-        
-        if ( cl.eta() > 0 ) // +z scenario
-        {   // Compare with maximum energy in same layer
-            if ( max_E_deposit_front[layer-1] < cl.energy() )
-            {
-                max_E_deposit_front[layer-1] = cl.energy();
-                EtaPhiE_MaximumEDeposit[layer-1][0] = cl.eta();
-                EtaPhiE_MaximumEDeposit[layer-1][1] = cl.phi();
-                EtaPhiE_MaximumEDeposit[layer-1][2] = cl.energy();
-            } 
-        }
-        else // -z scenario
-        {
-            if ( max_E_deposit_back[layer-1] < cl.energy() )
-            {
-                max_E_deposit_back[layer-1] = cl.energy();
-                EtaPhiE_MaximumEDeposit[layer-1][3] = cl.eta();
-                EtaPhiE_MaximumEDeposit[layer-1][4] = cl.phi();
-                EtaPhiE_MaximumEDeposit[layer-1][5] = cl.energy();
-            }
-        }
-    }
-    
-    return EtaPhiE_MaximumEDeposit;
 }
 
 
@@ -267,57 +157,6 @@ EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::find_EtaPhiE_Referen
     
     return EtaPhiE_MaximumEDeposit;
 }
-
-
-
-/* Temporarily not using overloaded method with CaloParticles until it is figured out how to generate them properly
-
-const std::array<std::array<Float_t, 3>, HGCNose_NLayers_> EMShowerStudies::find_PtEtaPhiE_MaximumEDeposit ( const std::vector<CaloParticle> & CaloParticles, const HGCalGeometry * geom )
-{ // Find (eta, phi, energy) of CaloParticle with maximum energy deposit in the calorimeter for each layer. (1 of 2 overloaded methods)
-    
-    std::array<Float_t, HGCNose_NLayers_> max_E_deposit;
-    max_E_deposit.fill(0.);
-
-    std::array<CaloParticle, HGCNose_NLayers_> theseHits;
-    std::array<std::array<Float_t, 3>, HGCNose_NLayers_> return_container;
-    
-    for ( const auto& cl : CaloParticles )
-    {
-        const SimClusterRefVector& simClusters = cl.simClusters();
-        if ( cl.SimClusters().size() == 0) continue; // SimCluster must form around CaloTruth
-        
-        // Get layer number of the simClusters
-        HFNoseDetId sc_DetId = HFNoseDetId( simClusters[0].hits_and_fractions()[0].first ); // ?????
-        Int_t layer = detId.layer();
-        
-        // Troubleshoot: if index out of range, doublecheck HGCNose_NLayers_ value in constructor.
-        
-        // Compare with maximum energy in same layer
-        if ( max_E_deposit[layer-1] < hit.energy() )
-        {
-            max_E_deposit[layer-1] = hit.energy();
-            theseHits[layer-1] = hit;
-        }
-    }
-
-    for ( int layer = 1; layer <= HGCNose_NLayers_; layer++ )
-    { // Using index rather than iterator because need to access index in return_container
-        thisHit = theseHits[layer-1];
-        
-        // Get coordinate of hit
-        const GlobalPoint & thisHit_globalPosition = geom->getPosition(thisHit.id());
-        
-        // Fill return container with (eta, phi, energy)
-        return_container[layer-1] = { { thisHit_globalPosition.eta(), thisHit_globalPosition.phi(), thisHit.energy() } };
-    }
-    
-    return const_cast<std::array<std::array<Float_t, 3>, HGCNose_NLayers_>> return_container;
-    
-    if ( max_E_deposit < 0 ) std::cout << "findEtaPhi_CaloParticle_MaximumEDeposit: No hit found with positive energy deposit. Please revise!" << std::endl;
-    
-    return const_cast<CaloParticle> cl;
-}
-*/
 
 
 void EMShowerStudies::plot_maxEtaPhi ( const FrontBackEtaPhiE_perLayer max_EtaPhiE_layer )
@@ -473,57 +312,10 @@ void EMShowerStudies::plot_sum_TotalE_perLayer ( const FrontBackEtaPhiE_perLayer
 }
 
 
-std::array<bool, 2> EMShowerStudies::check_SumEDeposit_allLayers ( const reco::GenParticleCollection & GenParticles, const FrontBackEtaPhiE_perLayer SumEDeposit_perLayer, const Float_t fractional_error )
-{ // Check if the sum of sim hits in each layer really add up to the GenParticle energy
+void EMShowerStudies::iterative_R_search ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer TotalE_perLayer )
+{ // Iteratively expand dR from the reference and add all the CaloClusters' energies within it. Save to TH2F histograms. (2 of 2 overloaded methods.)
 
-    std::array<bool, 2> return_bool;
-    return_bool.fill(false);
-    
-//    auto lambda_sum_E = [SumEDeposit_perLayer] (int i)
-//                 {
-//                     Float_t s = 0;
-//                     for ( const auto& iter: SumEDeposit_perLayer ) s += iter[i];
-//                     return s;
-//                 };
-    
-//     Sum of energies in all layers
-//    Float_t sum_EDeposit_front = lambda_sum_E(2);
-    Float_t sum_EDeposit_front = 0;
-    for ( int i = 0; i < HGCNose_NLayers_; i++ )
-    {
-        sum_EDeposit_front += SumEDeposit_perLayer[i][2];
-    }
-                                 
-//    Float_t sum_EDeposit_back = lambda_sum_E(5);
-    Float_t sum_EDeposit_back = 0;
-    for ( int i = 0; i < HGCNose_NLayers_; i++ )
-    {
-        sum_EDeposit_back += SumEDeposit_perLayer[i][5];
-    }
-
-    for ( const auto& gen: GenParticles )
-    {
-        if ( gen.pdgId() == select_PID_ )
-        { // Select by pdgId first
-            if ( gen.eta() > select_EtaLow_ && gen.eta() < select_EtaHigh_ )
-            { // Select by eta in the +z direction
-                if ( abs(sum_EDeposit_front - gen.energy()) / gen.energy() < fractional_error ) return_bool[0] = true;
-            }
-            else if ( gen.eta() > -select_EtaHigh_ && gen.eta() < -select_EtaLow_ )
-            { // Select by eta in the -z direction
-                if ( abs(sum_EDeposit_back - gen.energy()) / gen.energy() < fractional_error ) return_bool[1] = true;
-            }
-        }
-    }
-    
-    return return_bool;
-}
-
-
-void EMShowerStudies::iterative_R_search ( const HGCRecHitCollection & HFNose_RecHits, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer TotalE_perLayer )
-{ // Iteratively expand dR from the reference and add all the HGCRecHits' energies within it. Save to TH2F histograms. (1 of 2 overloaded methods.)
-
-    for ( float R = 0.; R < max_iter_R_; R += max_iter_R_/steps_iter_R_ )
+    for ( float R = 0.; R < 0.5; R += 0.025 )
     {
         // Containers for energy deposit within R
         std::array<Float_t, HGCNose_NLayers_> R_EDeposit_layer_front;
@@ -534,39 +326,54 @@ void EMShowerStudies::iterative_R_search ( const HGCRecHitCollection & HFNose_Re
         if ( R == 0 )
         {
             for ( int layer = 1; layer <= HGCNose_NLayers_; layer++ )
-            {   // Sum is equal to the energy of the "central" hit (i.e. hit with max E)
+            {   // Sum is equal to the energy of the "central" cluster (i.e. cluster with max E)
                 R_EDeposit_layer_front[layer-1] = maxE_centers[layer-1][2];
                 R_EDeposit_layer_back[layer-1]  = maxE_centers[layer-1][5];
             }
         }
         else
         {
-            for ( const auto& hit: HFNose_RecHits )
+            for ( const auto& cl: Clusters )
             {
-                // Get layer number of the hit
-                HFNoseDetId hit_DetId = HFNoseDetId ( hit.id() );
-                Int_t layer = hit_DetId.layer();
+                // Get layer number of the cluster
+                HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions().at(0).first );
+                Int_t layer = cl_DetId.layer();
                 
-                // Get position of the hit
-                const GlobalPoint & hit_globalPosition = geom->getPosition(hit.id());
-                
-                if ( hit_globalPosition.eta() > 0 )
+                if ( cl.eta() > 0 )
                 { // +z position
-                    Float_t dR = reco::deltaR ( hit_globalPosition.eta(), hit_globalPosition.phi(),  maxE_centers[layer-1][0], maxE_centers[layer-1][1]);
+                    Float_t dR = reco::deltaR ( cl.eta(), cl.phi(),  maxE_centers[layer-1][0], maxE_centers[layer-1][1]);
 
-                    if ( dR < R ) R_EDeposit_layer_front[layer-1] += hit.energy();
+                    if ( dR < R ) R_EDeposit_layer_front[layer-1] += cl.energy();
 
                 }
                             
                 else
                 { // -z position
-                    Float_t dR = reco::deltaR ( hit_globalPosition.eta(), hit_globalPosition.phi(), maxE_centers[layer-1][3], maxE_centers[layer-1][4]);
+                    Float_t dR = reco::deltaR ( cl.eta(), cl.phi(), maxE_centers[layer-1][3], maxE_centers[layer-1][4]);
 
-                    if ( dR < R ) R_EDeposit_layer_back[layer-1] += hit.energy();
+                    if ( dR < R ) R_EDeposit_layer_back[layer-1] += cl.energy();
 
                 }
             }
         }
+        
+//        std::cout << "R = " << R << " depo: " << R_EDeposit_layer_front[0] <<
+//                                        " " << R_EDeposit_layer_front[1] <<
+//                                        " " << R_EDeposit_layer_front[2] <<
+//                                        " " << R_EDeposit_layer_front[3] <<
+//                                        " " << R_EDeposit_layer_front[4] <<
+//                                        " " << R_EDeposit_layer_front[5] <<
+//                                        " " << R_EDeposit_layer_front[6] <<
+//                                        " " << R_EDeposit_layer_front[7] << std::endl;
+//                            
+//        std::cout << "R = " << R << " depo: " << R_EDeposit_layer_back[0] <<
+//                                        " " << R_EDeposit_layer_back[1] <<
+//                                        " " << R_EDeposit_layer_back[2] <<
+//                                        " " << R_EDeposit_layer_back[3] <<
+//                                        " " << R_EDeposit_layer_back[4] <<
+//                                        " " << R_EDeposit_layer_back[5] <<
+//                                        " " << R_EDeposit_layer_back[6] <<
+//                                        " " << R_EDeposit_layer_back[7] << std::endl;
         
         // Fill TH2 histograms
         TH2_Container_["R_frac_containment_layer1"]->Fill( R, R_EDeposit_layer_front[0] / TotalE_perLayer[0][2] );
@@ -585,106 +392,7 @@ void EMShowerStudies::iterative_R_search ( const HGCRecHitCollection & HFNose_Re
         TH2_Container_["R_frac_containment_layer7"]->Fill( R, R_EDeposit_layer_back[6] / TotalE_perLayer[6][5] );
         TH2_Container_["R_frac_containment_layer8"]->Fill( R, R_EDeposit_layer_front[7] / TotalE_perLayer[7][2] );
         TH2_Container_["R_frac_containment_layer8"]->Fill( R, R_EDeposit_layer_back[7] / TotalE_perLayer[7][5] );
-        
-        TH2_Container_["R_containment_layer1"]->Fill( R, 1 );
-        TH2_Container_["R_containment_layer1"]->Fill( R, R_EDeposit_layer_back[0] );
-        TH2_Container_["R_containment_layer2"]->Fill( R, R_EDeposit_layer_front[1] );
-        TH2_Container_["R_containment_layer2"]->Fill( R, R_EDeposit_layer_back[1] );
-        TH2_Container_["R_containment_layer3"]->Fill( R, R_EDeposit_layer_front[2] );
-        TH2_Container_["R_containment_layer3"]->Fill( R, R_EDeposit_layer_back[2] );
-        TH2_Container_["R_containment_layer4"]->Fill( R, R_EDeposit_layer_front[3] );
-        TH2_Container_["R_containment_layer4"]->Fill( R, R_EDeposit_layer_back[3] );
-        TH2_Container_["R_containment_layer5"]->Fill( R, R_EDeposit_layer_front[4] );
-        TH2_Container_["R_containment_layer5"]->Fill( R, R_EDeposit_layer_back[4] );
-        TH2_Container_["R_containment_layer6"]->Fill( R, R_EDeposit_layer_front[5] );
-        TH2_Container_["R_containment_layer6"]->Fill( R, R_EDeposit_layer_back[5] );
-        TH2_Container_["R_containment_layer7"]->Fill( R, R_EDeposit_layer_front[6] );
-        TH2_Container_["R_containment_layer7"]->Fill( R, R_EDeposit_layer_back[6] );
-        TH2_Container_["R_containment_layer8"]->Fill( R, R_EDeposit_layer_front[7] );
-        TH2_Container_["R_containment_layer8"]->Fill( R, R_EDeposit_layer_back[7] );
     }
-}
-
-
-Float_t EMShowerStudies::getContainmentR ( const std::vector<Float_t> iter_R, const std::vector<Float_t> R_frac_EDeposit, const Float_t FracContainment )
-{ // Return R at which energy contained is a specific fraction of the total E deposit.
-
-    TGraph gr = TGraph ( steps_iter_R_, &iter_R[0], &R_frac_EDeposit[0] );
-    TF1 fit = TF1 ( "R_containment_fit", "1 - exp(-[0] * x^2)", 0, max_iter_R_ );
-    gr.Fit ( "R_containment_fit", "QS" );
-    std::cout << "Points: ";
-    for ( auto const& it: R_frac_EDeposit ) std::cout << it << ' ';
-    std::cout << std::endl;
-    std::cout << fit.GetParameter(0) << std::endl;
-    Float_t result = fit.GetX ( FracContainment, 0, 5, 500 );
-    return result;
-}
-
-
-void EMShowerStudies::iterative_R_search ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer TotalE_perLayer )
-{ // Iteratively expand dR from the reference and add all the CaloClusters' energies within it. Save to TH2F histograms. (2 of 2 overloaded methods.)
-
-    // Containers for energy deposit within R
-    Float_t increment = max_iter_R_/steps_iter_R_;
-    std::array<std::vector<Float_t>, HGCNose_NLayers_> R_EDeposit_layer_front;
-    std::array<std::vector<Float_t>, HGCNose_NLayers_> R_EDeposit_layer_back;
-    
-    // R values to iterate over
-    std::vector<Float_t> iter_R ( steps_iter_R_ );
-    
-    // Fill container with zeros
-    for ( int layer = 1; layer <= HGCNose_NLayers_; layer++ )
-    {
-        R_EDeposit_layer_front[layer-1].resize( steps_iter_R_, 0. );
-        R_EDeposit_layer_back[layer-1].resize( steps_iter_R_, 0. );
-    }
-
-    for ( int step = 1; step <= steps_iter_R_; step++ )
-    {    
-        Float_t R = step * increment;
-        iter_R[step-1] = R;
-        
-        for ( const auto& cl: Clusters )
-        {
-            // Get layer number of the cluster
-            HFNoseDetId cl_DetId = HFNoseDetId( cl.hitsAndFractions().at(0).first );
-            Int_t layer = cl_DetId.layer();
-            
-            if ( cl.eta() > 0 )
-            { // +z position
-                Float_t dR = reco::deltaR ( cl.eta(), cl.phi(),  maxE_centers[layer-1][0], maxE_centers[layer-1][1]);
-
-                if ( dR < R ) R_EDeposit_layer_front[layer-1][step-1] += cl.energy();
-            }
-            else
-            { // -z position
-                Float_t dR = reco::deltaR ( cl.eta(), cl.phi(), maxE_centers[layer-1][3], maxE_centers[layer-1][4]);
-
-                if ( dR < R ) R_EDeposit_layer_back[layer-1][step-1] += cl.energy();
-            }
-        }
-    }
-    
-    
-    for ( int layer = 1; layer <= HGCNose_NLayers_; layer++ )
-    {
-        std::vector<Float_t> R_frac_EDeposit_front;
-        std::vector<Float_t> R_frac_EDeposit_back;
-        for ( auto const& it: R_EDeposit_layer_front[layer-1] )
-        {
-            R_frac_EDeposit_front.emplace_back( it / TotalE_perLayer[layer-1][2] );
-        }
-        
-        for ( auto const& it: R_EDeposit_layer_back[layer-1] )
-        {
-            R_frac_EDeposit_back.emplace_back( it / TotalE_perLayer[layer-1][5] );
-        }
-        
-        Float_t Ninety_Percent_R_front = getContainmentR ( iter_R, R_frac_EDeposit_front, 0.9 );
-        Float_t Ninety_Percent_R_back = getContainmentR ( iter_R, R_frac_EDeposit_back, 0.9 );
-        std::cout << "Layer " << layer << ". Front: " << Ninety_Percent_R_front << ". Back: " << Ninety_Percent_R_back << std::endl;
-    }
-    
 }
 
 
@@ -720,14 +428,14 @@ void EMShowerStudies::beginJob ()
     TH2_Container_["maxEtaPhi_layer8"]->GetYaxis()->SetTitle("#phi");
     
     // TH2 histograms of FRACTION of energy included within cylinder radius
-    TH2_Container_["R_frac_containment_layer1"] = fs->make<TH2F>("R_frac_containment_layer1", "E_{reco}/E_{gen} contained per #Delta R in layer1", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer2"] = fs->make<TH2F>("R_frac_containment_layer2", "E_{reco}/E_{gen} contained per #Delta R in layer2", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer3"] = fs->make<TH2F>("R_frac_containment_layer3", "E_{reco}/E_{gen} contained per #Delta Rin layer3", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer4"] = fs->make<TH2F>("R_frac_containment_layer4", "E_{reco}/E_{gen} contained per #Delta R in layer4", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer5"] = fs->make<TH2F>("R_frac_containment_layer5", "E_{reco}/E_{gen} contained per #Delta R in layer5", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer6"] = fs->make<TH2F>("R_frac_containment_layer6", "E_{reco}/E_{gen} contained per #Delta R in layer6", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer7"] = fs->make<TH2F>("R_frac_containment_layer7", "E_{reco}/E_{gen} contained per #Delta R in layer7", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
-    TH2_Container_["R_frac_containment_layer8"] = fs->make<TH2F>("R_frac_containment_layer8", "E_{reco}/E_{gen} contained per #Delta R in layer8", steps_iter_R_, 0., max_iter_R_, 100, 0., 2.);
+    TH2_Container_["R_frac_containment_layer1"] = fs->make<TH2F>("R_frac_containment_layer1", "E_{reco}/E_{gen} contained per #Delta R in layer1", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer2"] = fs->make<TH2F>("R_frac_containment_layer2", "E_{reco}/E_{gen} contained per #Delta R in layer2", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer3"] = fs->make<TH2F>("R_frac_containment_layer3", "E_{reco}/E_{gen} contained per #Delta Rin layer3", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer4"] = fs->make<TH2F>("R_frac_containment_layer4", "E_{reco}/E_{gen} contained per #Delta R in layer4", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer5"] = fs->make<TH2F>("R_frac_containment_layer5", "E_{reco}/E_{gen} contained per #Delta R in layer5", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer6"] = fs->make<TH2F>("R_frac_containment_layer6", "E_{reco}/E_{gen} contained per #Delta R in layer6", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer7"] = fs->make<TH2F>("R_frac_containment_layer7", "E_{reco}/E_{gen} contained per #Delta R in layer7", 20, 0., 0.5, 100, 0., 1.);
+    TH2_Container_["R_frac_containment_layer8"] = fs->make<TH2F>("R_frac_containment_layer8", "E_{reco}/E_{gen} contained per #Delta R in layer8", 20, 0., 0.5, 100, 0., 1.);
     
     TH2_Container_["R_frac_containment_layer1"]->GetXaxis()->SetTitle("#Delta R");
     TH2_Container_["R_frac_containment_layer1"]->GetYaxis()->SetTitle("E_{reco, #Delta R}/E_{gen}");
@@ -747,14 +455,14 @@ void EMShowerStudies::beginJob ()
     TH2_Container_["R_frac_containment_layer8"]->GetYaxis()->SetTitle("E_{reco, #Delta R}/E_{gen}");
     
     // TH2 histograms of energy included within cylinder radius
-    TH2_Container_["R_containment_layer1"] = fs->make<TH2F>("R_containment_layer1", "E_{reco} contained per #Delta R in layer1", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer2"] = fs->make<TH2F>("R_containment_layer2", "E_{reco} contained per #Delta R in layer2", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer3"] = fs->make<TH2F>("R_containment_layer3", "E_{reco} contained per #Delta Rin layer3", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer4"] = fs->make<TH2F>("R_containment_layer4", "E_{reco} contained per #Delta R in layer4", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer5"] = fs->make<TH2F>("R_containment_layer5", "E_{reco} contained per #Delta R in layer5", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer6"] = fs->make<TH2F>("R_containment_layer6", "E_{reco} contained per #Delta R in layer6", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer7"] = fs->make<TH2F>("R_containment_layer7", "E_{reco} contained per #Delta R in layer7", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
-    TH2_Container_["R_containment_layer8"] = fs->make<TH2F>("R_containment_layer8", "E_{reco} contained per #Delta R in layer8", steps_iter_R_, 0., max_iter_R_, 100, 0., 100);
+    TH2_Container_["R_containment_layer1"] = fs->make<TH2F>("R_containment_layer1", "E_{reco} contained per #Delta R in layer1", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer2"] = fs->make<TH2F>("R_containment_layer2", "E_{reco} contained per #Delta R in layer2", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer3"] = fs->make<TH2F>("R_containment_layer3", "E_{reco} contained per #Delta Rin layer3", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer4"] = fs->make<TH2F>("R_containment_layer4", "E_{reco} contained per #Delta R in layer4", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer5"] = fs->make<TH2F>("R_containment_layer5", "E_{reco} contained per #Delta R in layer5", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer6"] = fs->make<TH2F>("R_containment_layer6", "E_{reco} contained per #Delta R in layer6", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer7"] = fs->make<TH2F>("R_containment_layer7", "E_{reco} contained per #Delta R in layer7", 20, 0., 0.5, 100, 0., 100);
+    TH2_Container_["R_containment_layer8"] = fs->make<TH2F>("R_containment_layer8", "E_{reco} contained per #Delta R in layer8", 20, 0., 0.5, 100, 0., 100);
     
     TH2_Container_["R_containment_layer1"]->GetXaxis()->SetTitle("#Delta R");
     TH2_Container_["R_containment_layer1"]->GetYaxis()->SetTitle("E_{reco, #Delta R}");
@@ -782,16 +490,6 @@ void EMShowerStudies::beginJob ()
     TH1_Container_["Total_EDeposit_layer6"] = fs->make<TH1F>("Total_EDeposit_layer6", "Total E Deposit by Total in layer 6", 40, 0, 200);
     TH1_Container_["Total_EDeposit_layer7"] = fs->make<TH1F>("Total_EDeposit_layer7", "Total E Deposit by Total in layer 7", 40, 0, 200);
     TH1_Container_["Total_EDeposit_layer8"] = fs->make<TH1F>("Total_EDeposit_layer8", "Total E Deposit by Total in layer 8", 40, 0, 200);
-    
-    // TH1 histograms of total RecHits energy per layer
-//    TH1_Container_["RecHits_EDeposit_layer1"] = fs->make<TH1F>("RecHits_EDeposit_layer1", "Total E Deposit by RecHits in layer 1", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer2"] = fs->make<TH1F>("RecHits_EDeposit_layer2", "Total E Deposit by RecHits in layer 2", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer3"] = fs->make<TH1F>("RecHits_EDeposit_layer3", "Total E Deposit by RecHits in layer 3", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer4"] = fs->make<TH1F>("RecHits_EDeposit_layer4", "Total E Deposit by RecHits in layer 4", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer5"] = fs->make<TH1F>("RecHits_EDeposit_layer5", "Total E Deposit by RecHits in layer 5", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer6"] = fs->make<TH1F>("RecHits_EDeposit_layer6", "Total E Deposit by RecHits in layer 6", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer7"] = fs->make<TH1F>("RecHits_EDeposit_layer7", "Total E Deposit by RecHits in layer 7", 40, 0, 200);
-//    TH1_Container_["RecHits_EDeposit_layer8"] = fs->make<TH1F>("RecHits_EDeposit_layer8", "Total E Deposit by RecHits in layer 8", 40, 0, 200);
 }
 
 
