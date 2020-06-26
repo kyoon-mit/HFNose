@@ -4,6 +4,7 @@
 #include <RtypesCore.h>
 #endif
 
+// Standard libraries
 #include <map>
 #include <string>
 #include <array>
@@ -50,12 +51,8 @@ class EMShowerStudies : public edm::EDAnalyzer
 
     // Functions
     // Rule for ordering parameters: 1. Event related, 2. EventSetup related, 3. others
-    FrontBackEtaPhiE_perLayer find_EtaPhiE_Reference_perLayer ( const HGCRecHitCollection &, const HGCalGeometry * );
-    FrontBackEtaPhiE_perLayer find_EtaPhiE_Reference_perLayer ( const std::vector<reco::CaloCluster> &, const HGCalGeometry * );
     FrontBackEtaPhiE_perLayer find_EtaPhiE_Reference_perLayer ( const reco::GenParticleCollection &, const HGCalGeometry * );
     
-    FrontBackEtaPhiE_perLayer get_SumEDeposit_perLayer ( const std::vector<PCaloHit> &, const HGCalGeometry * );
-    FrontBackEtaPhiE_perLayer get_SumEDeposit_perLayer ( const HGCRecHitCollection &, const HGCalGeometry * );
     FrontBackEtaPhiE_perLayer get_SumEDeposit_perLayer ( const std::vector<reco::CaloCluster> &, const HGCalGeometry * );
     
     void plot_maxEtaPhi ( const FrontBackEtaPhiE_perLayer );
@@ -66,7 +63,10 @@ class EMShowerStudies : public edm::EDAnalyzer
     
     Float_t getContainmentR ( const std::vector<Float_t>, const std::vector<Float_t>, const Float_t = 0.9 );
     
-    void iterative_R_search ( const HGCRecHitCollection &, const HGCalGeometry *, const FrontBackEtaPhiE_perLayer, const FrontBackEtaPhiE_perLayer);
+    std::array<Int_t, 2> getContainmentLayer ( const FrontBackEtaPhiE_perLayer, const FrontBackEtaPhiE_perLayer, Float_t FracContainment = 0.9 );
+    
+    FrontBackEtaPhiE_perLayer getContainedEnergy ( const std::vector<reco::CaloCluster> &, const HGCalGeometry *, const FrontBackEtaPhiE_perLayer, const FrontBackEtaPhiE_perLayer );
+    
     void iterative_R_search ( const std::vector<reco::CaloCluster> &, const HGCalGeometry *, const FrontBackEtaPhiE_perLayer, const FrontBackEtaPhiE_perLayer);
     
     // Container
