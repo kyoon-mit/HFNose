@@ -56,7 +56,7 @@ EMShowerStudies::EMShowerStudies ( const edm::ParameterSet& iConfig ) :
     select_EtaLow_ ( 3.49 ),
     select_EtaHigh_ ( 3.51 ),
     max_iter_R_ ( 200 ),
-    steps_iter_R_ ( 40 )
+    steps_iter_R_ ( 100 )
     
 {
     // consumes: frequent request of additional data | mayConsume: infrequent
@@ -320,7 +320,7 @@ Float_t EMShowerStudies::getContainmentR ( const std::vector<Float_t> iter_R, co
     else
     { // Standard procedure when all things valid
         TGraph gr = TGraph ( steps_iter_R_, &iter_R[0], &R_frac_EDeposit[0] );
-        TF1 fit = TF1 ( "R_containment_fit", "pol12", 0, max_iter_R_ );
+        TF1 fit = TF1 ( "R_containment_fit", "pol10", 0, max_iter_R_ );
         gr.Fit ( "R_containment_fit", "QS" );
         Float_t result = fit.GetX ( FracContainment, 0, 200, 1.E-8, 500 );
         return result;

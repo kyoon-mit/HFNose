@@ -191,27 +191,23 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
     clusters_ERes_array, clusters_ERes_error_array = np.zeros(num_points), np.zeros(num_points)
     
     
-    for i in range(num_points): # Should not do this but put it under a bigger umbrella
+    for i in range(num_points):
     
         filename = tuple_filenames[i]
         pt = tuple_pt[i]
         infile = TFile.Open(filename, 'READ')
         tree = infile.Get('analysis')
         
-        # Get summary histograms
+        ### Get summary histograms
         hits_EDist = tree.Get('EDist_hits')
         clusters_EDist = tree.Get('EDist_clusters_scaler_sum') # typo in original hist name
         truth_EDist = tree.Get('truthEDist')
         
+        # Extend scope of histograms
         hits_EDist.SetDirectory(0)
         clusters_EDist.SetDirectory(0)
         truth_EDist.SetDirectory(0)
         
-        # Get detailed histograms
-        tuple_layer_hits_EDist = np.zeros(8)
-        tuple_layer_clusters_EDist = np.zeros(8)
-        tuple_layer_clusters_num = np.zeros(8)
-
         # Modify some TH1 params
         hits_EDist.SetTitle("Energy Distribution (hits, scalar sum): p_{T}=%s" % (pt))
         hits_EDist.GetXaxis().SetTitle("E [GeV]")
@@ -220,6 +216,8 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
         clusters_EDist.SetTitle("Energy Distribution (clusters, scalar sum): p_{T}=%s" % (pt))
         clusters_EDist.GetXaxis().SetTitle("E [GeV]")
         clusters_EDist.GetYaxis().SetTitle("count")
+        
+        ### Get detailed histograms
 
         # For truths
         truth_stats = fitGaussian(truth_EDist, mode='num')
