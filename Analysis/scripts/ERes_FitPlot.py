@@ -196,11 +196,11 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
         filename = tuple_filenames[i]
         pt = tuple_pt[i]
         infile = TFile.Open(filename, 'READ')
-        tree = infile.Get('analysis')
+        tree = infile.Get('Analysis_ERes')
         
         ### Get summary histograms
         hits_EDist = tree.Get('EDist_hits')
-        clusters_EDist = tree.Get('EDist_clusters_scaler_sum') # typo in original hist name
+        clusters_EDist = tree.Get('EDist_clusters_scalar_sum') # typo in original hist name
         truth_EDist = tree.Get('truthEDist')
         
         # Extend scope of histograms
@@ -275,7 +275,7 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_pt):
     return dict_plots
     
     
-def saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR):
+def saveLayerPlots (tuple_filenames, tuple_pt, top_save_dir):
     # (str, str) -> None
     " Save all plots that are related to individual layers. "
 
@@ -286,10 +286,10 @@ def saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR):
         filename = tuple_filenames[i]
         pt = tuple_pt[i]
         infile = TFile.Open(filename, 'READ')
-        tree = infile.Get('analysis')
+        tree = infile.Get('Analysis_ERes')
         
         # Set save directory
-        save_dir = TOP_DIR + '/layer_plots/pt_%s' % (pt)
+        save_dir = top_save_dir + '/layer_plots/pt_%s' % (pt)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
             
@@ -340,34 +340,34 @@ def saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR):
     return
     
 
-def plotPerPT (hits_EDist, hits_fit, clusters_EDist, clusters_fit, pt, TOP_DIR):
+def plotPerPT (hits_EDist, hits_fit, clusters_EDist, clusters_fit, pt, top_save_dir):
     # (TH1, TF1, TH1, TF1) -> None
     " Plot per pt "
     
-    if not os.path.exists(TOP_DIR + '/pt_plots'):
-        os.makedirs(TOP_DIR + '/pt_plots')
+    if not os.path.exists(top_save_dir + '/pt_plots'):
+        os.makedirs(top_save_dir + '/pt_plots')
     
     ch = TCanvas()
     ch.cd()
     hits_EDist.Draw()
     hits_fit.Draw('SAME')
-    ch.SaveAs(TOP_DIR + '/pt_plots/hits_EDist_pt%s.png' % (pt))
+    ch.SaveAs(top_save_dir + '/pt_plots/hits_EDist_pt%s.png' % (pt))
     
     cc = TCanvas()
     cc.cd()
     clusters_EDist.Draw()
     clusters_fit.Draw('SAME')
-    cc.SaveAs(TOP_DIR + '/pt_plots/clusters_EDist_pt%s.png' % (pt))
+    cc.SaveAs(top_save_dir + '/pt_plots/clusters_EDist_pt%s.png' % (pt))
     
     return
     
 
-def plotEResolutionFit (hits_ERes, clusters_ERes, TOP_DIR):
+def plotEResolutionFit (hits_ERes, clusters_ERes, top_save_dir):
     # (TH1, TH1) -> None
     " Plot energy resolution + fit"
         
-    if not os.path.exists(TOP_DIR + '/ERes_plots'):
-        os.makedirs(TOP_DIR + '/ERes_plots')
+    if not os.path.exists(top_save_dir + '/ERes_plots'):
+        os.makedirs(top_save_dir + '/ERes_plots')
         
     # Set style
     group = 1 # group will later disappear
@@ -396,18 +396,18 @@ def plotEResolutionFit (hits_ERes, clusters_ERes, TOP_DIR):
     formula_display.Draw('SAME')
     c2.Update()
     
-    c1.SaveAs(TOP_DIR + '/ERes_plots/EResolution_hits.png')
-    c2.SaveAs(TOP_DIR + '/ERes_plots/EResolution_clusters.png')
+    c1.SaveAs(top_save_dir + '/ERes_plots/EResolution_hits.png')
+    c2.SaveAs(top_save_dir + '/ERes_plots/EResolution_clusters.png')
     
     return
     
     
-def plotEMean (hits_EMean, clusters_EMean, truth_EMean, TOP_DIR):
+def plotEMean (hits_EMean, clusters_EMean, truth_EMean, top_save_dir):
     # (TH1, TH1) -> None
     " Plot mean energy per pt "
         
-    if not os.path.exists(TOP_DIR + '/EMean_plots'):
-        os.makedirs(TOP_DIR + '/EMean_plots')
+    if not os.path.exists(top_save_dir + '/EMean_plots'):
+        os.makedirs(top_save_dir + '/EMean_plots')
         
     # Set style
     group = 1 # group will later disappear
@@ -433,7 +433,7 @@ def plotEMean (hits_EMean, clusters_EMean, truth_EMean, TOP_DIR):
     
     c.Update()
     c.BuildLegend()
-    c.SaveAs(TOP_DIR + '/EMean_plots/EMean_ratio_compare.png')
+    c.SaveAs(top_save_dir + '/EMean_plots/EMean_ratio_compare.png')
     
     return
     
@@ -442,27 +442,32 @@ def plotEMean (hits_EMean, clusters_EMean, truth_EMean, TOP_DIR):
 # ---- Main -----
 
 def main():
+    # Set open and save diretories
+    if not 'DIRTOP_HGCNOSE' in os.environ:
+        raise Exception ('DIRTOP_HGCNOSE not set. Please first run config.sh which is in your top-level directory.')
+    if not 'DIRANALYSIS_HGCNOSE' in os.environ:
+        raise Exception ('DIRANALYSIS_HGCNOSE not set. Please first run config.sh which is in your top-level directory.')
+    input_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/output'
+    top_save_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/plots/ERes_Single_Photon'
+
     # File names
     tuple_pt = ('.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-    tuple_filenames = tuple('/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/output/ERes_pt%s.root' % (i) for i in tuple_pt)
-    
-    # Top save directory
-    TOP_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/plots/ERes_Single_Photon'
+    tuple_filenames = tuple(input_dir + '/ERes_pt%s.root' % (i) for i in tuple_pt)
 
-    saveLayerPlots (tuple_filenames, tuple_pt, TOP_DIR)
+    saveLayerPlots (tuple_filenames, tuple_pt, top_save_dir)
         
     # Get the comprehensive dictionary of plots
     dict_plots = getPlotsEResolutionComprehensive(tuple_filenames, tuple_pt)
         
     # Save Energy Distribution TCanvas that shows fitted histograms
     for i in range(len(tuple_pt)):
-        plotPerPT (dict_plots['hits_EDist_draw_list'][i][0], dict_plots['hits_EDist_draw_list'][i][1], dict_plots['clusters_EDist_draw_list'][i][0], dict_plots['clusters_EDist_draw_list'][i][1], tuple_pt[i], TOP_DIR)
+        plotPerPT (dict_plots['hits_EDist_draw_list'][i][0], dict_plots['hits_EDist_draw_list'][i][1], dict_plots['clusters_EDist_draw_list'][i][0], dict_plots['clusters_EDist_draw_list'][i][1], tuple_pt[i], top_save_dir)
     
     # Save Energy Resolution plots
-    plotEResolutionFit (dict_plots['hits_ERes_graph'], dict_plots['clusters_ERes_graph'], TOP_DIR)
+    plotEResolutionFit (dict_plots['hits_ERes_graph'], dict_plots['clusters_ERes_graph'], top_save_dir)
 
     # Save Mean Energy plots
-    plotEMean (dict_plots['hits_to_truth_EMean_graph'], dict_plots['clusters_to_truth_EMean_graph'], dict_plots['truth_EMean_graph'], TOP_DIR)
+    plotEMean (dict_plots['hits_to_truth_EMean_graph'], dict_plots['clusters_to_truth_EMean_graph'], dict_plots['truth_EMean_graph'], top_save_dir)
 
 
 if __name__=='__main__':
