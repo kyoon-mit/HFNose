@@ -33,7 +33,7 @@ def set_pt (*args):
 def set_env ():
     """ Exports environment variables that are needed in this program.
     
-    DIR_DATA is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
+    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
     
     Parameters
     ----------
@@ -45,10 +45,10 @@ def set_env ():
     
     """
         
-    if not 'DIR_DATA' in os.environ:
-        raise Exception("Environment variable DIR_DATA does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIR_DATA in config.sh and running it.")
+    if not 'DIRDATA_HGCNOSE' in os.environ:
+        raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
-        print "Generated files will be stored in %s" % (os.environ['DIR_DATA'])
+        print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
         
         
 def runSteps (pt_string_list, *steps):
@@ -129,7 +129,7 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -220,7 +220,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -313,7 +313,7 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -398,7 +398,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -462,7 +462,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -544,7 +544,7 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -631,7 +631,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -676,7 +676,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RECO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -691,7 +691,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -752,7 +752,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -914,7 +914,7 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -951,7 +951,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("DQMRootSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
 )
 
 process.options = cms.untracked.PSet(

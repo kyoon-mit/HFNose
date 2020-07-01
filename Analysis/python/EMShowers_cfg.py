@@ -5,7 +5,9 @@
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-process = cms.Process('HGCNose')
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
+
+process = cms.Process('ANALYSIS_HGCNose', Phase2C10)
 
 options = VarParsing ('analysis')
 options.register ('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
@@ -19,14 +21,22 @@ INPUT_DIR = 'file:/data/t3home000/kyoon/gendata/photon_2026D47/'
 outputfile = OUTPUT_DIR + 'EMShowers_pt{}.root'.format(options.pt)
 inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
-process.load('FWCore.MessageService.MessageLogger_cfi')
-# Important to load geometry configs because they are part of EventSetup
-# Not sure why the following works
+# Process load
+process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+
 process.load('Geometry.ForwardCommonData.hfnoseXML_cfi')
 process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi')
 process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi')
 process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi')
 process.load('Geometry.ForwardGeometry.HFNoseGeometryESProducer_cfi')
+
+process.load('FWCore.MessageService.MessageLogger_cfi')
+process.options = cms.untracked.PSet (
+    wantSummary = cms.untracked.bool(False),
+    numberOfThreads = cms.untracked.uint32(12),
+    numberOfStreams = cms.untracked.uint32(12)
+)
 
 process.source = cms.Source('PoolSource',
     fileNames = cms.untracked.vstring(inputfile)
