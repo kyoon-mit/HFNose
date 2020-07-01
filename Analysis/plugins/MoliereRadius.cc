@@ -1,4 +1,4 @@
-#include "EMShowerStudies.h"
+#include "MoliereRadius.h"
 
 #include <iostream>
 #include <cmath> // Switch to TMath.h if you need more physics-related functions
@@ -34,7 +34,7 @@
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
 
-EMShowerStudies::EMShowerStudies ( const edm::ParameterSet& iConfig ) :
+MoliereRadius::MoliereRadius ( const edm::ParameterSet& iConfig ) :
 
     TH1_Container_ (),
     TH2_Container_ (),
@@ -70,13 +70,13 @@ EMShowerStudies::EMShowerStudies ( const edm::ParameterSet& iConfig ) :
 }
 
 
-EMShowerStudies::~EMShowerStudies ()
+MoliereRadius::~MoliereRadius ()
 {
     // Deconstructor
 }
 
 
-void EMShowerStudies::analyze ( const edm::Event & iEvent, const edm::EventSetup & iSetup )
+void MoliereRadius::analyze ( const edm::Event & iEvent, const edm::EventSetup & iSetup )
 {
     // Get HGCRecHits
     edm::Handle<HGCRecHitCollection> handle_HGCRecHits;
@@ -129,7 +129,7 @@ void EMShowerStudies::analyze ( const edm::Event & iEvent, const edm::EventSetup
 }
 
 
-EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::find_EtaPhiE_Reference_perLayer ( const reco::GenParticleCollection & GenParticles, const HGCalGeometry * geom )
+MoliereRadius::FrontBackEtaPhiE_perLayer MoliereRadius::find_EtaPhiE_Reference_perLayer ( const reco::GenParticleCollection & GenParticles, const HGCalGeometry * geom )
 { // Find (eta, phi, energy) of CaloClusters with maximum energy deposit in the calorimeter for each layer. (3 of 3 overloaded methods)
     
     // Container to return
@@ -173,7 +173,7 @@ EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::find_EtaPhiE_Referen
 }
 
 
-void EMShowerStudies::plot_maxEtaPhi ( const FrontBackEtaPhiE_perLayer max_EtaPhiE_layer )
+void MoliereRadius::plot_maxEtaPhi ( const FrontBackEtaPhiE_perLayer max_EtaPhiE_layer )
 { // Plot the (eta, phi) positions of maximum HGCRecHit on TH2F
 
     TH2_Container_["maxEtaPhi_layer1"]->Fill( max_EtaPhiE_layer[0][0], max_EtaPhiE_layer[0][1] );
@@ -203,7 +203,7 @@ void EMShowerStudies::plot_maxEtaPhi ( const FrontBackEtaPhiE_perLayer max_EtaPh
 }
 
 
-EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::get_SumEDeposit_perLayer ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom )
+MoliereRadius::FrontBackEtaPhiE_perLayer MoliereRadius::get_SumEDeposit_perLayer ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom )
 { // Sum all the energies of the CaloClusters in each layer (3 of 3 overloaded methods)
     
     // Container to return
@@ -232,7 +232,7 @@ EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::get_SumEDeposit_perL
 }
 
 
-void EMShowerStudies::plot_sum_TotalE_perLayer ( const FrontBackEtaPhiE_perLayer SumEDeposit_perLayer )
+void MoliereRadius::plot_sum_TotalE_perLayer ( const FrontBackEtaPhiE_perLayer SumEDeposit_perLayer )
 { // Plot sum of jet energy deposits per layer on TH1F histograms
 
     TH1_Container_["Total_EDeposit_layer1"]->Fill( SumEDeposit_perLayer[0][2] );
@@ -262,7 +262,7 @@ void EMShowerStudies::plot_sum_TotalE_perLayer ( const FrontBackEtaPhiE_perLayer
 }
 
 
-std::array<bool, 2> EMShowerStudies::check_SumEDeposit_allLayers ( const reco::GenParticleCollection & GenParticles, const FrontBackEtaPhiE_perLayer SumEDeposit_perLayer, const Float_t fractional_error )
+std::array<bool, 2> MoliereRadius::check_SumEDeposit_allLayers ( const reco::GenParticleCollection & GenParticles, const FrontBackEtaPhiE_perLayer SumEDeposit_perLayer, const Float_t fractional_error )
 { // Check if the sum of sim hits in each layer really add up to the GenParticle energy
 
     std::array<bool, 2> return_bool;
@@ -300,7 +300,7 @@ std::array<bool, 2> EMShowerStudies::check_SumEDeposit_allLayers ( const reco::G
 }
 
 
-Float_t EMShowerStudies::getContainmentR ( const std::vector<Float_t> iter_R, const std::vector<Float_t> R_frac_EDeposit, const Float_t FracContainment )
+Float_t MoliereRadius::getContainmentR ( const std::vector<Float_t> iter_R, const std::vector<Float_t> R_frac_EDeposit, const Float_t FracContainment )
 { // Return R at which energy contained is a specific fraction of the total E deposit.
 
     // Check validity of vector
@@ -328,7 +328,7 @@ Float_t EMShowerStudies::getContainmentR ( const std::vector<Float_t> iter_R, co
 }
 
 
-EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::getContainedEnergy ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer frac_R )
+MoliereRadius::FrontBackEtaPhiE_perLayer MoliereRadius::getContainedEnergy ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer frac_R )
 { // Get the total energy within the R given by the fraction of containment
 
     FrontBackEtaPhiE_perLayer EDeposit_layer;
@@ -367,7 +367,7 @@ EMShowerStudies::FrontBackEtaPhiE_perLayer EMShowerStudies::getContainedEnergy (
 }
 
 
-std::array<Int_t, 2> EMShowerStudies::getContainmentLayer ( const FrontBackEtaPhiE_perLayer EDeposit_layer, const FrontBackEtaPhiE_perLayer frac_R, Float_t FracContainment )
+std::array<Int_t, 2> MoliereRadius::getContainmentLayer ( const FrontBackEtaPhiE_perLayer EDeposit_layer, const FrontBackEtaPhiE_perLayer frac_R, Float_t FracContainment )
 { // Get layer which cumulatively contains x % of the total deposited energy
 
     // Get sum
@@ -407,7 +407,7 @@ std::array<Int_t, 2> EMShowerStudies::getContainmentLayer ( const FrontBackEtaPh
 
 
 
-void EMShowerStudies::iterative_R_search ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer TotalE_perLayer )
+void MoliereRadius::iterative_R_search ( const std::vector<reco::CaloCluster> & Clusters, const HGCalGeometry * geom, const FrontBackEtaPhiE_perLayer maxE_centers, const FrontBackEtaPhiE_perLayer TotalE_perLayer )
 { // Iteratively expand dR from the reference and add all the CaloClusters' energies within it. Save to TH2F histograms. (2 of 2 overloaded methods.)
 
     // Containers for energy deposit within R
@@ -512,7 +512,7 @@ void EMShowerStudies::iterative_R_search ( const std::vector<reco::CaloCluster> 
 }
 
 
-void EMShowerStudies::beginJob ()
+void MoliereRadius::beginJob ()
 {
     edm::Service<TFileService> fs;
     
@@ -639,12 +639,12 @@ void EMShowerStudies::beginJob ()
 }
 
 
-void EMShowerStudies::endJob ()
+void MoliereRadius::endJob ()
 {   
     // Job ends
-    std::cout << "The job, EMShowerStudies, has ended. Thank you for your patience." << std::endl;
+    std::cout << "The job, MoliereRadius, has ended. Thank you for your patience." << std::endl;
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE (EMShowerStudies);
+DEFINE_FWK_MODULE (MoliereRadius);
     

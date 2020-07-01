@@ -33,7 +33,7 @@ def set_pt (*args):
 def set_env ():
     """ Exports environment variables that are needed in this program.
     
-    DIR_DATA is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
+    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
     
     Parameters
     ----------
@@ -45,10 +45,10 @@ def set_env ():
     
     """
         
-    if not 'DIR_DATA' in os.environ:
-        raise Exception("Environment variable DIR_DATA does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIR_DATA in config.sh and running it.")
+    if not 'DIRDATA_HGCNOSE' in os.environ:
+        raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
-        print "Generated files will be stored in %s" % (os.environ['DIR_DATA'])
+        print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
         
         
 def runSteps (pt_string_list, *steps):
@@ -71,6 +71,9 @@ def runSteps (pt_string_list, *steps):
     """
     
     dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run):
+        os.makedirs(dir_run)
+        
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
@@ -121,15 +124,12 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step1_config'):
-            os.makedirs(dir_run + '/step1_config')
+    if not os.path.exists(dir_run + '/step1_config'):
+        os.makedirs(dir_run + '/step1_config')
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -220,7 +220,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -305,15 +305,12 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step2_config'):
-            os.makedirs(dir_run + '/step2_config')
+    if not os.path.exists(dir_run + '/step2_config'):
+        os.makedirs(dir_run + '/step2_config')
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -327,50 +324,7 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
 # with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n {1} --geometry Extended2026D47 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('HLT',Phase2C10)
 
@@ -398,7 +352,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -462,7 +416,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -536,15 +490,12 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step3_config'):
-            os.makedirs(dir_run + '/step3_config')
+    if not os.path.exists(dir_run + '/step3_config'):
+        os.makedirs(dir_run + '/step3_config')
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -559,49 +510,7 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('RECO',Phase2C10)
 
@@ -631,7 +540,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -676,7 +585,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RECO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -691,7 +600,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -752,7 +661,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
+    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -906,15 +815,12 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step4_config'):
-            os.makedirs(dir_run + '/step4_config')
+    if not os.path.exists(dir_run + '/step4_config'):
+        os.makedirs(dir_run + '/step4_config')
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -951,7 +857,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("DQMRootSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
+    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
 )
 
 process.options = cms.untracked.PSet(

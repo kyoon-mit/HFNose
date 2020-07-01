@@ -15,4 +15,4 @@ pt_string_list = set_pt()
 #makeStep3ConfigFiles (pt_string_list, nevents)
 #makeStep4ConfigFiles (pt_string_list, nevents)
 
-# runSteps(): run these files in bash
+#runSteps(pt_string_list, 1, 2, 3)
