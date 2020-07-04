@@ -12,6 +12,7 @@ The default setting in CMSSW_11_1_0_pre7 will not generate calotruth in HGCNose.
   * Uncomment lines 44-51 in SimGeneral/MixingModule/python/caloTruthProducer_cfi.py
   * `cd $CMSSW_BASE/src/SimGeneral`
   * `scram b`
+  
 You may check that the module has been successfully added by running python and importing the module.
   * `python`
   * `import SimGeneral.MixingModule.python.caloTruthProducer_cfi`
