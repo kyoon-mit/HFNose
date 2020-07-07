@@ -98,7 +98,7 @@ void EnergyResolution::analyze ( const edm::Event& iEvent, const edm::EventSetup
         const std::vector<math::XYZTLorentzVectorF> truth_container = getTruthP4 ( *handle_GenParticle.product() );
         
         for ( auto const& truth: truth_container)
-        {
+        {            
             fillHist_HGCalRecHitsEnergy_coneR ( truth, *handle_HGCRecHits.product(), handle_HGCalGeometry.product() );
             fillHist_CaloClustersEnergy_coneR ( truth, *handle_HGCalLayerClustersHFNose.product() );
             histContainer_["truthEDist"]->Fill ( truth.energy() );
@@ -116,7 +116,8 @@ std::vector<math::XYZTLorentzVectorF> EnergyResolution::getTruthP4 ( const reco:
     {
         if ( gen.pdgId() == select_PID_
                 && abs(gen.eta()) > select_EtaLow_
-                && abs(gen.eta()) < select_EtaHigh_  )
+                && abs(gen.eta()) < select_EtaHigh_ 
+                && gen.isPromptFinalState() ) // Check if genparticle is final state
         {
             container.push_back ( (math::XYZTLorentzVectorF) gen.p4() );
         }

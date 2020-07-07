@@ -22,6 +22,8 @@ outputfile = OUTPUT_DIR + 'EMShowers_pt{}.root'.format(options.pt)
 inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
 # Process load
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+
 process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
 process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
 
@@ -38,14 +40,21 @@ process.options = cms.untracked.PSet (
     numberOfStreams = cms.untracked.uint32(12)
 )
 
+# Global tag
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
+
+# Input
 process.source = cms.Source('PoolSource',
     fileNames = cms.untracked.vstring(inputfile)
 )
 
+# Max events to process
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
 
+# Process
 process.Analysis_EMShowers = cms.EDAnalyzer('EMShowerStudies',
     #TAG_HGCHFNoseRecHits = cms.untracked.InputTag('HGCalRecHit', 'HGCHFNoseRecHits')
 )
@@ -54,6 +63,7 @@ process.TFileService = cms.Service('TFileService',
     fileName = cms.string(outputfile)
 )
 
+# Timing
 process.Timing = cms.Service("Timing",
   summaryOnly = cms.untracked.bool(True),
   useJobReport = cms.untracked.bool(True)

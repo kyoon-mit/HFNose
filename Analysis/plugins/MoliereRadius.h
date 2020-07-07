@@ -1,5 +1,5 @@
-#ifndef EMSHOWERSTUDIES_H
-#define EMSHOWERSTUDIES_H
+#ifndef MOLIERERADIUS_H
+#define MOLIERERADIUS_H
 #ifndef ROOT_RtypesCore
 #include <RtypesCore.h>
 #endif
@@ -30,12 +30,12 @@ namespace reco
 }
 
 
-class EMShowerStudies : public edm::EDAnalyzer
+class MoliereRadius : public edm::EDAnalyzer
 {
 
   public:
-    explicit EMShowerStudies ( const edm::ParameterSet& );
-    ~EMShowerStudies ();
+    explicit MoliereRadius ( const edm::ParameterSet& );
+    ~MoliereRadius ();
     
   private:
     virtual void beginJob () override;

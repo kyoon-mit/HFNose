@@ -9,7 +9,7 @@ Author: K.Yoon
 ## Analysis
 Here is the list of analysis modules.
 * `plugins/EnergyResolution.cc` | Returns energy resolution for a given PID and eta range. Outputs plots in `output` directory. Run using `cmsRun python/ERes_cfg.py pt=<pt value of photon>`.
-* `plugins/EMShowerStudies.cc` | (working) Outputs plots related to Moliere radius
+* `plugins/MoliereRadius.cc` | (working) Outputs plots related to Moliere radius
 
 ## Plotting
 List of plotting modules.

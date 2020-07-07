@@ -71,6 +71,9 @@ def runSteps (pt_string_list, *steps):
     """
     
     dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run):
+        os.makedirs(dir_run)
+        
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
@@ -121,11 +124,8 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step1_config'):
-            os.makedirs(dir_run + '/step1_config')
+    if not os.path.exists(dir_run + '/step1_config'):
+        os.makedirs(dir_run + '/step1_config')
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
@@ -305,11 +305,8 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step2_config'):
-            os.makedirs(dir_run + '/step2_config')
+    if not os.path.exists(dir_run + '/step2_config'):
+        os.makedirs(dir_run + '/step2_config')
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
@@ -327,50 +324,7 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
 # with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n {1} --geometry Extended2026D47 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('HLT',Phase2C10)
 
@@ -536,11 +490,8 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step3_config'):
-            os.makedirs(dir_run + '/step3_config')
+    if not os.path.exists(dir_run + '/step3_config'):
+        os.makedirs(dir_run + '/step3_config')
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
@@ -559,49 +510,7 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('RECO',Phase2C10)
 
@@ -906,11 +815,8 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step4_config'):
-            os.makedirs(dir_run + '/step4_config')
+    if not os.path.exists(dir_run + '/step4_config'):
+        os.makedirs(dir_run + '/step4_config')
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
