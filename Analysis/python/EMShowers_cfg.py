@@ -5,7 +5,9 @@
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
-process = cms.Process('HGCNose')
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
+
+process = cms.Process('ANALYSIS_HGCNose', Phase2C10)
 
 options = VarParsing ('analysis')
 options.register ('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
