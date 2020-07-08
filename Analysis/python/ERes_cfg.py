@@ -7,7 +7,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
-process = cms.Process('HGCNose', Phase2C10)
+process = cms.Process('ANALYSIS_HGCNose', Phase2C10)
 
 # Varparsing
 options = VarParsing('analysis')
