@@ -33,7 +33,7 @@ def set_E (*args):
 def set_env ():
     """ Exports environment variables that are needed in this program.
     
-    DIR_DATA is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
+    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
     
     Parameters
     ----------
@@ -45,12 +45,12 @@ def set_env ():
     
     """
         
-    if not 'DIR_DATA' in os.environ:
-        raise Exception("Environment variable DIR_DATA does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIR_DATA in config.sh and running it.")
+    if not 'DIRDATA_HGCNOSE' in os.environ:
+        raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
-        print "Generated files will be stored in %s" % (os.environ['DIR_DATA'])
-        
+        print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
     
+    return None
         
         
 def runSteps (E_string_list, *steps):
@@ -73,15 +73,18 @@ def runSteps (E_string_list, *steps):
     """
     
     dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run):
+        os.makedirs(dir_run)
+    
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
         cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D47_14TeV_electron_E{2}_eta35_cfg.py".format(dir_run, step, E) for E in E_string_list]
         bash_command = " & ".join(cmd_list)
-        p = subprocess.Popen(bash_command.split())
+        p = subprocess.Popen(bash_command, shell=True)
         p.wait()
         
-    return
+    return None
         
         
 def purge ():
@@ -100,7 +103,7 @@ def purge ():
     dir_run = os.path.abspath(__file__ + '/../run')
     subprocess.run("rm {}/*".format(dir_run))
     
-    return  
+    return None
 
 
 def makeStep1ConfigFiles (E_string_list, nevents):
@@ -122,16 +125,13 @@ def makeStep1ConfigFiles (E_string_list, nevents):
     """
     
     # Set output directory to put cfg.py files
-    dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step1_config'):
-            os.makedirs(dir_run + '/step1_config')
+    dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run + '/step1_config'):
+        os.makedirs(dir_run + '/step1_config')
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/electron_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47')
     for E in E_string_list:
         if not os.path.exists(dir_save + '/electron_E{}'.format(E)):
             os.makedirs(dir_save + '/electron_E{}'.format(E))
@@ -247,8 +247,8 @@ process.generator = cms.EDFilter("Pythia8EGun",
                 ParticleID = cms.vint32(11)
         ),
         PythiaParameters = cms.PSet(
-         parameterSets = cms.vstring()
-    ),
+                parameterSets = cms.vstring()
+        ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
     psethack = cms.string('single gamma E {0}')
@@ -308,15 +308,12 @@ def makeStep2ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step2_config'):
-            os.makedirs(dir_run + '/step2_config')
+    if not os.path.exists(dir_run + '/step2_config'):
+        os.makedirs(dir_run + '/step2_config')
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/electron_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -330,50 +327,7 @@ def makeStep2ConfigFiles (E_string_list, nevents):
 # with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n {1} --geometry Extended2026D47 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('HLT',Phase2C10)
 
@@ -539,15 +493,12 @@ def makeStep3ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step3_config'):
-            os.makedirs(dir_run + '/step3_config')
+    if not os.path.exists(dir_run + '/step3_config'):
+        os.makedirs(dir_run + '/step3_config')
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/electron_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -561,50 +512,7 @@ def makeStep3ConfigFiles (E_string_list, nevents):
 # with command line options: step3 --conditions auto:phase2_realistic_T15 -n {1} --era Phase2C10 --eventcontent FEVTDEBUGHLT,MINIAODSIM,DQM --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM --datatier GEN-SIM-RECO,MINIAODSIM,DQMIO --geometry Extended2026D47 --filein file:step2.root --fileout file:step3.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('RECO',Phase2C10)
 
@@ -909,15 +817,12 @@ def makeStep4ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step4_config'):
-            os.makedirs(dir_run + '/step4_config')
+    if not os.path.exists(dir_run + '/step4_config'):
+        os.makedirs(dir_run + '/step4_config')
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/electron_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -1005,7 +910,7 @@ process.validationprodHarvesting = cms.Path(process.hltpostvalidation_prod+proce
 process.validationHarvestingHI = cms.Path(process.postValidationHI)
 process.dqmHarvestingExtraHLT = cms.Path(process.DQMOffline_SecondStep_ExtraHLT+process.DQMOffline_Certification)
 process.alcaHarvesting = cms.Path()
-process.validationHarvestingFS = cms.Path(process.recoMuonPostProcessors+process.postValidationTracking+process.MuIsoValPostProcessor+process.calotowersPostProcessor+process.hcalSimHitsPostProcessor+process.hcaldigisPostProcessor+process.hcalrechitsPostProcessor+process.electronPostValidationSequence+process.electronPostProcessor+process.pfJetClient+process.pfMETClient+process.pfJetResClient+process.pfElectronClient+process.rpcRecHitPostValidation_step+process.makeBetterPlots+process.bTagCollectorSequenceMCbcl+process.METPostProcessor+process.L1GenPostProcessor+process.bdHadronTrackPostProcessor+process.MuonGEMHitsPostProcessors+process.MuonGEMDigisPostProcessors+process.MuonGEMRecHitsPostProcessors+process.hgcalPostProcessor+process.MuonME0DigisPostProcessors+process.MuonME0SegPostProcessors+process.trackerphase2ValidationHarvesting+process.postValidation_gen)
+process.validationHarvestingFS = cms.Path(process.recoMuonPostProcessors+process.postValidationTracking+process.MuIsoValPostProcessor+process.calotowersPostProcessor+process.hcalSimHitsPostProcessor+process.hcaldigisPostProcessor+process.hcalrechitsPostProcessor+process.electronPostValidationSequence+process.photonPostProcessor+process.pfJetClient+process.pfMETClient+process.pfJetResClient+process.pfElectronClient+process.rpcRecHitPostValidation_step+process.makeBetterPlots+process.bTagCollectorSequenceMCbcl+process.METPostProcessor+process.L1GenPostProcessor+process.bdHadronTrackPostProcessor+process.MuonGEMHitsPostProcessors+process.MuonGEMDigisPostProcessors+process.MuonGEMRecHitsPostProcessors+process.hgcalPostProcessor+process.MuonME0DigisPostProcessors+process.MuonME0SegPostProcessors+process.trackerphase2ValidationHarvesting+process.postValidation_gen)
 process.validationpreprodHarvesting = cms.Path(process.postValidation_preprod+process.hltpostvalidation_preprod+process.postValidation_gen)
 process.validationHarvestingNoHLT = cms.Path(process.postValidation+process.postValidation_gen)
 process.validationHarvesting = cms.Path(process.postValidation+process.hltpostvalidation+process.postValidation_gen)
@@ -1018,7 +923,7 @@ process.postValidationTracking_step = cms.Path(process.postValidationTracking)
 process.postValidation_muons_step = cms.Path(process.postValidation_muons)
 process.postValidation_JetMET_step = cms.Path(process.postValidation_JetMET)
 process.electronPostValidationSequence_step = cms.Path(process.electronPostValidationSequence)
-process.electronPostProcessor_step = cms.Path(process.electronPostProcessor)
+process.photonPostProcessor_step = cms.Path(process.photonPostProcessor)
 process.bTagCollectorSequenceMCbcl_step = cms.Path(process.bTagCollectorSequenceMCbcl)
 process.runTauEff_step = cms.Path(process.runTauEff)
 process.postValidation_HCAL_step = cms.Path(process.postValidation_HCAL)
