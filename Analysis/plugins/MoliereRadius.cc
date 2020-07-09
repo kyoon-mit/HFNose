@@ -10,7 +10,6 @@
 #include <TGraph.h>
 #include <TCanvas.h>
 
-#include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"

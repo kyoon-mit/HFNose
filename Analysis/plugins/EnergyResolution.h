@@ -1,19 +1,20 @@
 #ifndef ENERGYRESOLUTION_H
 #define ENERGYRESOLUTION_H
-#ifndef ROOT_RtypesCore
-#include <RtypesCore.h>
-#endif
 
+// Standard libraries
 #include <map>
 #include <string>
 #include <vector>
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
+// ROOT Rtypes
+#include <RtypesCore.h>
 
+// EDAnalyzer base class
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+// Other CMSSW includes that are needed in this header
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
-
 // #include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 
 // Forward declarations
@@ -28,6 +29,8 @@ namespace reco
     class CaloCluster;
 }
 
+
+// EnergyResolution class definition
 class EnergyResolution : public edm::EDAnalyzer
 {
 

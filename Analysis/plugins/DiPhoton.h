@@ -1,17 +1,19 @@
 #ifndef DIPHOTON_H
 #define DIPHOTON_H
-#ifndef ROOT_RtypesCore
-#include <RtypesCore.h>
-#endif
 
+// Standard libraries
 #include <map>
 #include <string>
 #include <vector>
 #include <TH1.h>
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
+// ROOT Rtypes
+#include <RtypesCore.h>
 
+// EDAnalyzer base class
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+// Other CMSSW includes that are needed in this header
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
 
@@ -31,6 +33,7 @@ namespace reco
 }
 
 
+// DiPhoton class definition
 class DiPhoton : public edm::EDAnalyzer
 {
 

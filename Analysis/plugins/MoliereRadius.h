@@ -1,8 +1,5 @@
 #ifndef MOLIERERADIUS_H
 #define MOLIERERADIUS_H
-#ifndef ROOT_RtypesCore
-#include <RtypesCore.h>
-#endif
 
 // Standard libraries
 #include <map>
@@ -10,10 +7,14 @@
 #include <array>
 #include <vector>
 
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
+// ROOT Rtypes
+#include <RtypesCore.h>
 
-#include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h" // It's just much easier to not forward declare this
+// EDAnalyzer base class
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+
+// Other CMSSW includes that are needed in this header
+#include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
 
 // Forward declarations
 class TH1F;
@@ -30,6 +31,7 @@ namespace reco
 }
 
 
+// MoliereRadius class definition
 class MoliereRadius : public edm::EDAnalyzer
 {
 
