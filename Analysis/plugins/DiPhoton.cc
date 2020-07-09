@@ -30,6 +30,9 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
+// ECal Shower Shape
+#include "RecoEcal/EgammaCoreTools/interface/ClusterShapeAlgo.h"
+
 
 DiPhoton::DiPhoton ( const edm::ParameterSet& iConfig ) :
 
@@ -133,6 +136,13 @@ std::vector<math::XYZTLorentzVectorF> DiPhoton::getCaloTruthP4 ( const std::vect
     }
     
     return truth_container;
+}
+
+
+void fillHistShowerShapeVariables ( )
+{ // Fill histograms of shower shape variables
+    
+    
 }
 
 
