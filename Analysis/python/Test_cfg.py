@@ -1,23 +1,23 @@
 #!/usr/bin/env python2
 
-# Configuration file for the EnergyResolution.h analysis
+# Configuration file for the Test.h analysis
 
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.VarParsing import VarParsing
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
-process = cms.Process('AnalysisHGCNoseERes', Phase2C10)
+process = cms.Process('ANALYSISHGCNose', Phase2C10)
 
 # Varparsing
 options = VarParsing('analysis')
-options.register('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+options.register('pt', '5', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                     "(type: string) pt value of the photon")
 options.parseArguments()
 
 OUTPUT_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/output/'
 INPUT_DIR = 'file:/data/t3home000/kyoon/gendata/photon_2026D47/'
-outputfile = OUTPUT_DIR + 'ERes_pt{}.root'.format(options.pt)
+outputfile = OUTPUT_DIR + 'Tt_pt{}.root'.format(options.pt)
 inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
 # Process load
@@ -54,7 +54,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Process
-process.Analysis_ERes = cms.EDAnalyzer('EnergyResolution',
+process.Analysis_Tt = cms.EDAnalyzer('Test',
     # TAG_HGCHFNoseRecHits = cms.untracked.InputTag('HGCalRecHit', 'HGCHFNoseRecHits')
 )
 
@@ -68,4 +68,4 @@ process.Timing = cms.Service("Timing",
   useJobReport = cms.untracked.bool(True)
 )
 
-process.p = cms.Path(process.Analysis_ERes)
+process.p = cms.Path(process.Analysis_Tt)

@@ -49,6 +49,8 @@ def set_env ():
         raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
         print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
+
+    return None
         
         
 def runSteps (pt_string_list, *steps):
@@ -79,10 +81,10 @@ def runSteps (pt_string_list, *steps):
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
         cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D47_14TeV_photon_pt{2}_eta35_cfg.py".format(dir_run, step, pt) for pt in pt_string_list]
         bash_command = " & ".join(cmd_list)
-        p = subprocess.Popen(bash_command.split())
+        p = subprocess.Popen(bash_command, shell=True)
         p.wait()
         
-    return
+    return None
         
         
 def purge ():
@@ -101,7 +103,7 @@ def purge ():
     dir_run = os.path.abspath(__file__ + '/../run')
     subprocess.run("rm {}/*".format(dir_run))
     
-    return  
+    return None
 
 
 def makeStep1ConfigFiles (pt_string_list, nevents):
@@ -130,8 +132,9 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put simulation root files
     dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    for pt in pt_string_list:
+        if not os.path.exists(dir_save + '/photon_pt{}'.format(pt)):
+            os.makedirs(dir_save + '/photon_pt{}'.format(pt))
     
     # What to write in file
     filedump_preformatted =\
@@ -220,7 +223,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step1_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -280,7 +283,7 @@ process = customiseEarlyDelete(process)
     for pt in pt_string_list:
         outfile = dir_step1 + '/step1_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
     return
         
@@ -352,7 +355,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step1_photon_pt{0}.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -416,7 +419,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step2_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -465,7 +468,7 @@ process = customiseEarlyDelete(process)
     for pt in pt_string_list:
         outfile = dir_step2 + '/step2_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
     return
 
@@ -540,7 +543,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step2_photon_pt{0}.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -585,7 +588,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RECO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -600,7 +603,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
+    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -661,7 +664,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
+    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -790,7 +793,7 @@ process = customiseEarlyDelete(process)
     for pt in pt_string_list:
         outfile = dir_step3 + '/step3_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
     return
 
@@ -857,7 +860,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("DQMRootSource",
-    fileNames = cms.untracked.vstring('file:$DIRDATA_HGCNOSE/photon_2026D47/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
+    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -959,6 +962,6 @@ process = customiseEarlyDelete(process)
     for pt in pt_string_list:
         outfile = dir_step4 + '/step4_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
     return

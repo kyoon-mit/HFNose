@@ -10,7 +10,6 @@
 #include <TGraph.h>
 #include <TCanvas.h>
 
-#include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -55,6 +54,8 @@ MoliereRadius::MoliereRadius ( const edm::ParameterSet& iConfig ) :
     select_PID_ ( 22 ),
     select_EtaLow_ ( 3.49 ),
     select_EtaHigh_ ( 3.51 ),
+    
+    // Other parameters
     max_iter_R_ ( 200 ),
     steps_iter_R_ ( 100 )
     

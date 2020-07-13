@@ -15,12 +15,12 @@ def set_E (*args):
     Returns
     -------
     list(str)
-        If no value is provided in args, it will return ['.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9'] by default. Otherwise, it will return args in the order the values were provided.
+        If no value is provided in args, it will return ['40', '80', '120', '160', '200'] by default. Otherwise, it will return args in the order the values were provided.
     
     """
     
     if len(args)==0:
-        E_string_list = ['.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        E_string_list = ['40', '80', '120', '160', '200']
         return E_string_list
     else:
         for arg in args:
@@ -33,7 +33,7 @@ def set_E (*args):
 def set_env ():
     """ Exports environment variables that are needed in this program.
     
-    DIR_DATA is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
+    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
     
     Parameters
     ----------
@@ -45,10 +45,12 @@ def set_env ():
     
     """
         
-    if not 'DIR_DATA' in os.environ:
-        raise Exception("Environment variable DIR_DATA does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIR_DATA in config.sh and running it.")
+    if not 'DIRDATA_HGCNOSE' in os.environ:
+        raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
-        print "Generated files will be stored in %s" % (os.environ['DIR_DATA'])
+        print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
+    
+    return None
         
         
 def runSteps (E_string_list, *steps):
@@ -71,12 +73,15 @@ def runSteps (E_string_list, *steps):
     """
     
     dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run):
+        os.makedirs(dir_run)
+
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
         cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D47_14TeV_pi0_diphoton_E{2}_eta35_cfg.py".format(dir_run, step, E) for E in E_string_list]
         bash_command = " & ".join(cmd_list)
-        p = subprocess.Popen(bash_command.split())
+        p = subprocess.Popen(bash_command, shell=True)
         p.wait()
         
     return
@@ -120,18 +125,16 @@ def makeStep1ConfigFiles (E_string_list, nevents):
     """
     
     # Set output directory to put cfg.py files
-    dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step1_config'):
-            os.makedirs(dir_run + '/step1_config')
+    dir_run = os.path.abspath(__file__ + '/../run')
+    if not os.path.exists(dir_run + '/step1_config'):
+        os.makedirs(dir_run + '/step1_config')
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/pi0_diphoton_2026D47')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/pi0_diphoton_2026D47')
+    for E in E_string_list:
+    	if not os.path.exists(dir_save + '/pi0_diphoton_E{}'.format(E)):
+            os.makedirs(dir_save + '/pi0_diphoton_E{}'.format(E))
     
     # What to write in file
     filedump_preformatted =\
@@ -220,7 +223,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step1_pi0_diphoton_E{0}.root'),
+    fileName = cms.untracked.string('file:{2}/pi0_diphoton_E{0}/step1_pi0_diphoton_E{0}.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -239,13 +242,13 @@ process.generator = cms.EDFilter("Pythia8EGun",
                 MinEta = cms.double(3.4999),
                 MaxPhi = cms.double(3.14159265359),
                 MinPhi = cms.double(-3.14159265359),
-                MaxE = cms.double(40 + 0.001),
-                MinE = cms.double(40 - 0.001),
+                MaxE = cms.double({0} + 0.001),
+                MinE = cms.double({0} - 0.001),
                 ParticleID = cms.vint32(111)
         ),
         PythiaParameters = cms.PSet(
-         parameterSets = cms.vstring()
-    ),
+                parameterSets = cms.vstring()
+        ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
     psethack = cms.string('single pi0 E 40')
@@ -288,10 +291,10 @@ process = customiseEarlyDelete(process)
     """
     
     # iterate over string-formatted E values
-    for pt in E_string_list:
-        outfile = dir_step1 + '/step1_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(pt)
+    for E in E_string_list:
+        outfile = dir_step1 + '/step1_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
         
@@ -316,17 +319,15 @@ def makeStep2ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step2_config'):
-            os.makedirs(dir_run + '/step2_config')
+    if not os.path.exists(dir_run + '/step2_config'):
+        os.makedirs(dir_run + '/step2_config')
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/pi0_diphoton_2026D47')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/pi0_diphoton_2026D47')
+    for	E in E_string_list:
+        if not os.path.exists(dir_save + '/pi0_diphoton_E{}'.format(E)):
+            os.makedirs(dir_save + '/pi0_diphoton_E{}'.format(E))
     
     # What to write in file
     filedump_preformatted =\
@@ -338,50 +339,7 @@ def makeStep2ConfigFiles (E_string_list, nevents):
 # with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n {1} --geometry Extended2026D47 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('HLT',Phase2C10)
 
@@ -409,7 +367,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step1_pi0_diphoton_E{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/pi0_diphoton_E{0}/step1_pi0_diphoton_E{0}.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -473,7 +431,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step2_pi0_diphoton_E{0}.root'),
+    fileName = cms.untracked.string('file:{2}/pi0_diphoton_E{0}/step2_pi0_diphoton_E{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -519,10 +477,10 @@ process = customiseEarlyDelete(process)
     """
     
     # iterate over string-formatted E values
-    for pt in E_string_list:
-        outfile = dir_step2 + '/step2_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(pt)
+    for E in E_string_list:
+        outfile = dir_step2 + '/step2_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
 
@@ -547,17 +505,15 @@ def makeStep3ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step3_config'):
-            os.makedirs(dir_run + '/step3_config')
+    if not os.path.exists(dir_run + '/step3_config'):
+        os.makedirs(dir_run + '/step3_config')
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/pi0_diphoton_2026D47')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/pi0_diphoton_2026D47')
+    for	E in E_string_list:
+        if not os.path.exists(dir_save + '/pi0_diphoton_E{}'.format(E)):
+            os.makedirs(dir_save + '/pi0_diphoton_E{}'.format(E))
     
     # What to write in file
     filedump_preformatted =\
@@ -569,50 +525,7 @@ def makeStep3ConfigFiles (E_string_list, nevents):
 # with command line options: step3 --conditions auto:phase2_realistic_T15 -n {1} --era Phase2C10 --eventcontent FEVTDEBUGHLT,MINIAODSIM,DQM --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM --datatier GEN-SIM-RECO,MINIAODSIM,DQMIO --geometry Extended2026D47 --filein file:step2.root --fileout file:step3.root
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
-
-Phase2C10 = cms.ModifierChain(Phase2C9, phase2_hfnose)
+from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
 process = cms.Process('RECO',Phase2C10)
 
@@ -642,7 +555,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step2_pi0_diphoton_E{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/pi0_diphoton_E{0}/step2_pi0_diphoton_E{0}.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -687,7 +600,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RECO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}.root'),
+    fileName = cms.untracked.string('file:{2}/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -702,7 +615,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inMINIAODSIM.root'),
+    fileName = cms.untracked.string('file:{2}/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inMINIAODSIM.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -763,7 +676,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inDQM.root'),
+    fileName = cms.untracked.string('file:{2}/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inDQM.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -889,10 +802,10 @@ process = customiseEarlyDelete(process)
     """
     
     # iterate over string-formatted E values
-    for pt in E_string_list:
-        outfile = dir_step3 + '/step3_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(pt)
+    for E in E_string_list:
+        outfile = dir_step3 + '/step3_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
 
@@ -917,17 +830,15 @@ def makeStep4ConfigFiles (E_string_list, nevents):
     
     # Set output directory to put cfg.py files
     dir_run = os.path.abspath(__file__ + '/../run/')
-    if not os.path.exists(dir_run):
-        raise Exception ("The following directory does not exist: " + dir_run)
-    else:
-        if not os.path.exists(dir_run + '/step4_config'):
-            os.makedirs(dir_run + '/step4_config')
+    if not os.path.exists(dir_run + '/step4_config'):
+        os.makedirs(dir_run + '/step4_config')
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIR_DATA'] + '/pi0_diphoton_2026D47')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/pi0_diphoton_2026D47')
+    for	E in E_string_list:
+        if not os.path.exists(dir_save + '/pi0_diphoton_E{}'.format(E)):
+            os.makedirs(dir_save + '/pi0_diphoton_E{}'.format(E))
     
     # What to write in file
     filedump_preformatted =\
@@ -940,49 +851,6 @@ def makeStep4ConfigFiles (E_string_list, nevents):
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
-
-from Configuration.Eras.Modifier_phase2_hfnose_cff import phase2_hfnose
-from Configuration.Eras.Era_Phase2C9_cff import Phase2C9
-
-caloParticles = cms.PSet(
-	accumulatorType = cms.string('CaloTruthAccumulator'),
-#	createUnmergedCollection = cms.bool(True),
-#	createMergedBremsstrahlung = cms.bool(True),
-#	createInitialVertexCollection = cms.bool(False),
-#	alwaysAddAncestors = cms.bool(True),
-        MinEnergy = cms.double(0.5),
-        MaxPseudoRapidity = cms.double(5.0),
-        premixStage1 = cms.bool(False),
-        doHGCAL = cms.bool(True),
-	maximumPreviousBunchCrossing = cms.uint32(0),
-	maximumSubsequentBunchCrossing = cms.uint32(0),
-	simHitCollections = cms.PSet(
-            hgc = cms.VInputTag(
-                cms.InputTag('g4SimHits','HGCHitsEE'),
-                cms.InputTag('g4SimHits','HGCHitsHEfront'),
-                cms.InputTag('g4SimHits','HcalHits')
-            ),
-#            hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits')),
-#            ecal = cms.VInputTag(
-#                cms.InputTag('g4SimHits','EcalHitsEE'),
-#                cms.InputTag('g4SimHits','EcalHitsEB'),
-#                cms.InputTag('g4SimHits','EcalHitsES')
-#            )
-	),
-	simTrackCollection = cms.InputTag('g4SimHits'),
-	simVertexCollection = cms.InputTag('g4SimHits'),
-	genParticleCollection = cms.InputTag('genParticles'),
-	allowDifferentSimHitProcesses = cms.bool(False), # should be True for FastSim, False for FullSim
-	HepMCProductLabel = cms.InputTag('generatorSmeared')
-)
-
-phase2_hfnose.toModify(
-    caloParticles,
-    simHitCollections = dict(
-        hgc = caloParticles.simHitCollections.hgc + [cms.InputTag('g4SimHits','HFNoseHits')],
-        hcal = cms.VInputTag(cms.InputTag('g4SimHits','HcalHits'))
-    )
-)
 
 process = cms.Process('HARVESTING',Phase2C10)
 
@@ -1005,7 +873,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("DQMRootSource",
-    fileNames = cms.untracked.vstring('file:$DIR_DATA/pi0_diphoton_2026D47/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inDQM.root')
+    fileNames = cms.untracked.vstring('file:{2}/pi0_diphoton_E{0}/step3_pi0_diphoton_E{0}_inDQM.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -1104,9 +972,9 @@ process = customiseEarlyDelete(process)
     """
     
     # iterate over string-formatted E values
-    for pt in E_string_list:
-        outfile = dir_step4 + '/step4_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(pt)
+    for E in E_string_list:
+        outfile = dir_step4 + '/step4_2026D47_14TeV_pi0_diphoton_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
