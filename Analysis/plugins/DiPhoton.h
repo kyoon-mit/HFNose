@@ -49,9 +49,8 @@ class DiPhoton : public edm::EDAnalyzer
     std::vector<math::XYZTLorentzVectorF> getGenTruthP4 ( const reco::GenParticleCollection & );
     std::vector<math::XYZTLorentzVectorF> getCaloTruthP4 ( const std::vector<CaloParticle> & );
     
-    void fillHistShowerShapeVariables ();
-    
     // For testing
+    void fillHist_ShowerShapeVariables ( const std::vector<reco::CaloCluster> &, const HGCRecHitCollection & );
     
     //getClusters ();
     

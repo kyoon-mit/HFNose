@@ -31,7 +31,8 @@
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
 // ECal Shower Shape
-#include "RecoEcal/EgammaCoreTools/interface/ClusterShapeAlgo.h"
+#include "DataFormats/EgammaReco/interface/ClusterShape.h"
+//#include "HGCNose/Analysis/interface/HGCalClusterShapeAlgo.h"
 
 
 DiPhoton::DiPhoton ( const edm::ParameterSet& iConfig ) :
@@ -107,7 +108,7 @@ std::vector<math::XYZTLorentzVectorF> DiPhoton::getGenTruthP4 ( const reco::GenP
 {
     std::vector<math::XYZTLorentzVectorF> truth_container;
     
-    for ( auto const& gen: GenParticles )
+    for ( auto const& gen : GenParticles )
     {
         if ( gen.pdgId() == select_PID_
                 && abs(gen.eta()) > select_EtaLow_
@@ -125,7 +126,7 @@ std::vector<math::XYZTLorentzVectorF> DiPhoton::getCaloTruthP4 ( const std::vect
 {
     std::vector<math::XYZTLorentzVectorF> truth_container;
     
-    for ( auto const& clp: CaloParticles )
+    for ( auto const& clp : CaloParticles )
     {
         if ( clp.pdgId() == select_PID_
                 && abs(clp.eta()) > select_EtaLow_
@@ -139,9 +140,15 @@ std::vector<math::XYZTLorentzVectorF> DiPhoton::getCaloTruthP4 ( const std::vect
 }
 
 
-void fillHistShowerShapeVariables ( )
+void fillHist_ShowerShapeVariables ( const std::vector<reco::CaloCluster> & Clusters, const HGCRecHitCollection & hits )
 { // Fill histograms of shower shape variables
-    
+
+    for ( auto const& cl : Clusters )
+    {
+        // if ( cl.energy() > 
+        // reco::ClusterShape clustershape = HGCalClusterShapeAlgo::Calculate ( Clusters, & hits );
+        
+    }
     
 }
 
