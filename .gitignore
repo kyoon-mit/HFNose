@@ -1,0 +1,10 @@
+config_kyoon.sh
+Analysis/output
+Analysis/plots
+*.txt
+*.pyc
+__init__*
+*.png
+step*cfg.py
+*.root
+.nfs*
