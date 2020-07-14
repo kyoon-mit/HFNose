@@ -15,4 +15,4 @@ makeStep2ConfigFiles (pt_string_list, nevents)
 makeStep3ConfigFiles (pt_string_list, nevents)
 makeStep4ConfigFiles (pt_string_list, nevents)
 
-runSteps(pt_string_list, 1, 2, 3, 4)
+runSteps(pt_string_list, 2, 3, 4)
