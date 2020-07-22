@@ -1,0 +1,103 @@
+' looking for alignment labels ''.
+idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+Finds tag HCAL : 1
+Finds tag ZDC : 1
+Finds tag CASTOR : 0
+Finds tag EcalBarrel : 1
+Finds tag EcalEndcap : 0
+Finds tag EcalPreshower : 0
+Finds tag TOWER : 1
+%MSG-i HCAL:  (NoModuleName) 22-Jul-2020 10:24:43 EDT pre-events
+CaloTowerTopologyEP::CaloTowerTopologyEP
+%MSG
+%MSG-i Geometry:  (NoModuleName) DTGeometryESModule() 22-Jul-2020 10:24:43 EDT  pre-events
+Label '' looking for alignment labels ''.
+%MSG
+%MSG-i Geometry:  (NoModuleName) DTGeometryESModule() 22-Jul-2020 10:24:43 EDT  pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Alignments:  (NoModuleName) FakeAlignmentProducer()  22-Jul-2020 10:24:43 EDT pre-events
+Providing data with label 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) MTDDigiGeometryESModule()  22-Jul-2020 10:24:44 EDT pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) MTDDigiGeometryESModule()  22-Jul-2020 10:24:44 EDT pre-events
+Label '' IGNORING alignment labels ''.
+%MSG
+%MSG-i SiPixelQualityESProducer::SiPixelQualityESProducer:  (NoModuleName)  22-Jul-2020 10:24:44 EDT pre-events
+
+%MSG
+%MSG-i SiStripBackPlaneCorrectionDepESProducer:  (NoModuleName)  22-Jul-2020 10:24:44 EDT pre-events
+ctor
+%MSG
+%MSG-i SiStripLorentzAngleDepESProducer:  (NoModuleName)  22-Jul-2020 10:24:44 EDT pre-events
+ctor
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+ctor
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripDetVOffRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripDetCablingRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record RunInfoRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadChannelRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadFiberRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadModuleRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 10:24:44 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadStripRcd with tag 
+%MSG
+%MSG-i Geometry:  (NoModuleName) TrackerDigiGeometryESModule()  22-Jul-2020 10:24:44 EDT pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) TrackerDigiGeometryESModule()  22-Jul-2020 10:24:44 EDT pre-events
+Label '' IGNORING alignment labels ''.
+%MSG
+%MSG-i TRACKER:  (NoModuleName) 22-Jul-2020 10:24:44 EDT pre-events
+TrackerParametersESModule::TrackerParametersESModule
+%MSG
+%MSG-i TRACKER:  (NoModuleName) 22-Jul-2020 10:24:44 EDT pre-events
+TrackerTopologyEP::TrackerTopologyEP
+%MSG
+%MSG-i HCAL:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+HcalHardcodeCalibrations::HcalHardcodeCalibrations->...
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_phase2_T15_v0_mc" for record "SiPixelLorentzAngleRcd" and label "" with tag SiPixelLorentzAngle_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelSimLorentzAngle_phase2_T15_v0_mc" for record "SiPixelLorentzAngleSimRcd" and label "" with tag SiPixelSimLorentzAngle_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_fromAlignment_v1_mc[cms_orcon_prod/CMS_COND_31X_PIXEL]" for record "SiPixelLorentzAngleRcd" and label "fromAlignment" with tag SiPixelLorentzAngle_phase2_T15_mc_forWidthEmpty@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelTemplateDBObject_phase1_38T_2017_rereco_v9" for record "SiPixelTemplateDBObjectRcd" and label "" with tag SiPixelTemplateDBObject_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelGenErrorDBObject_phase1_38T_2017_rereco_v9" for record "SiPixelGenErrorDBObjectRcd" and label "" with tag SiPixelGenErrorDBObject_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 10:24:45 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_phase2_forWidth_T15_v0_mc" for record "SiPixelLorentzAngleRcd" and label "forWidth" with tag SiPixelLorentzAngle_phase2_T15_mc_forWidthEmpty@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i SiPixelFakeGainOfflineESSource::SiPixelFakeGainOfflineESSource:   (NoModuleName) 22-Jul-2020 10:26:36 EDT pre-events
+
+%MSG
+----- Begin Fatal Exception 22-Jul-2020 10:26:36 EDT-----------------------
+An exception of category 'TrivialFileCatalog' occurred while
+   [0] Constructing the EventProcessor
+   [1] Constructing input source of type PoolSource
+Exception Message:
+TrivialFileCatalog::connect: Unable to open trivial file catalog /osg/app/cmssoft/cms/SITECONF/T3_US_MIT/PhEDEx/storage.xml 
+----- End Fatal Exception -------------------------------------------------

@@ -8,11 +8,11 @@ set_env()
 
 # Can also set up parser
 nevents = 100
-pt_string_list = set_pt('2','5','9')
+pt_string_list = set_pt('3')
 
 makeStep1ConfigFiles (pt_string_list, nevents)
 makeStep2ConfigFiles (pt_string_list, nevents)
 makeStep3ConfigFiles (pt_string_list, nevents)
 makeStep4ConfigFiles (pt_string_list, nevents)
 
-runSteps(pt_string_list, 2, 3, 4)
+runSteps(pt_string_list, 2)

@@ -166,6 +166,31 @@ process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+process.MessageLogger = cms.Service("MessageLogger",
+       destinations   = cms.untracked.vstring(
+                                                'detailedInfo_step1',
+                                                'critical_step1'
+        ),
+       detailedInfo_step1 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+       ),
+       critical_step1     = cms.untracked.PSet(
+                threshold   = cms.untracked.PSet('ERROR')
+       )
+)
+
 process.maxEvents = cms.untracked.PSet(
         input = cms.untracked.int32({1}),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
@@ -193,8 +218,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(6),
-    numberOfThreads = cms.untracked.uint32(3),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -265,8 +290,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(6)
-process.options.numberOfStreams=cms.untracked.uint32(3)
+process.options.numberOfThreads=cms.untracked.uint32(1)
+process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 # filter all path with the production filter sequence
 for path in process.paths:
@@ -348,6 +373,31 @@ process.load('HLTrigger.Configuration.HLT_Fake2_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+process.MessageLogger = cms.Service("MessageLogger",
+       destinations   = cms.untracked.vstring(
+                                                'detailedInfo_step2',
+                                                'critical_step2'
+       ),
+       detailedInfo_step2 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+       ),
+       critical_step2     = cms.untracked.PSet(
+                threshold   = cms.untracked.PSet('ERROR')
+       )
+)
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32({1}),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
@@ -383,7 +433,7 @@ process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring(),
+    SkipEvent = cms.untracked.vstring('ProductNotFound'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     emptyRunLumiMode = cms.obsolete.untracked.string,
@@ -398,8 +448,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(6),
-    numberOfThreads = cms.untracked.uint32(3),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -448,8 +498,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(6)
-process.options.numberOfStreams=cms.untracked.uint32(3)
+process.options.numberOfThreads=cms.untracked.uint32(1)
+process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 # customisation of the process.
@@ -541,6 +591,31 @@ process.load('DQMServices.Core.DQMStoreNonLegacy_cff')
 process.load('DQMOffline.Configuration.DQMOfflineMC_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+process.MessageLogger = cms.Service("MessageLogger",
+       destinations   = cms.untracked.vstring(
+                                                'detailedInfo_step3',
+                                                'critical_step3'
+       ),
+       detailedInfo_step3 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+       ),
+       critical_step3     = cms.untracked.PSet(
+                threshold   = cms.untracked.PSet('ERROR')
+       )
+)
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32({1}),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
@@ -556,7 +631,7 @@ process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring(),
+    SkipEvent = cms.untracked.vstring('ProductNotFound'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     emptyRunLumiMode = cms.obsolete.untracked.string,
@@ -571,8 +646,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(6),
-    numberOfThreads = cms.untracked.uint32(3),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -761,8 +836,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(6)
-process.options.numberOfStreams=cms.untracked.uint32(3)
+process.options.numberOfThreads=cms.untracked.uint32(1)
+process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 # customisation of the process.
@@ -906,8 +981,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(6),
-    numberOfThreads = cms.untracked.uint32(3),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),

@@ -1,0 +1,728 @@
+' looking for alignment labels ''.
+idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+Finds tag HCAL : 1
+Finds tag ZDC : 1
+Finds tag CASTOR : 0
+Finds tag EcalBarrel : 1
+Finds tag EcalEndcap : 0
+Finds tag EcalPreshower : 0
+Finds tag TOWER : 1
+%MSG-i HCAL:  (NoModuleName) 22-Jul-2020 01:17:49 EDT pre-events
+CaloTowerTopologyEP::CaloTowerTopologyEP
+%MSG
+%MSG-i Geometry:  (NoModuleName) DTGeometryESModule() 22-Jul-2020 01:17:49 EDT  pre-events
+Label '' looking for alignment labels ''.
+%MSG
+%MSG-i Geometry:  (NoModuleName) DTGeometryESModule() 22-Jul-2020 01:17:49 EDT  pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Alignments:  (NoModuleName) FakeAlignmentProducer()  22-Jul-2020 01:17:50 EDT pre-events
+Providing data with label 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) MTDDigiGeometryESModule()  22-Jul-2020 01:17:50 EDT pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) MTDDigiGeometryESModule()  22-Jul-2020 01:17:50 EDT pre-events
+Label '' IGNORING alignment labels ''.
+%MSG
+%MSG-i SiPixelQualityESProducer::SiPixelQualityESProducer:  (NoModuleName)  22-Jul-2020 01:17:50 EDT pre-events
+
+%MSG
+%MSG-i SiStripBackPlaneCorrectionDepESProducer:  (NoModuleName)  22-Jul-2020 01:17:50 EDT pre-events
+ctor
+%MSG
+%MSG-i SiStripLorentzAngleDepESProducer:  (NoModuleName)  22-Jul-2020 01:17:50 EDT pre-events
+ctor
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+ctor
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripDetVOffRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripDetCablingRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record RunInfoRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadChannelRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadFiberRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadModuleRcd with tag 
+%MSG
+%MSG-i SiStripQualityESProducer:  (NoModuleName) 22-Jul-2020 01:17:50 EDT  pre-events
+[SiStripQualityESProducer::ctor] Going to get data from record SiStripBadStripRcd with tag 
+%MSG
+%MSG-i Geometry:  (NoModuleName) TrackerDigiGeometryESModule()  22-Jul-2020 01:17:50 EDT pre-events
+Label 'idealForDigi' IGNORING alignment labels 'fakeForIdeal'.
+%MSG
+%MSG-i Geometry:  (NoModuleName) TrackerDigiGeometryESModule()  22-Jul-2020 01:17:50 EDT pre-events
+Label '' IGNORING alignment labels ''.
+%MSG
+%MSG-i TRACKER:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+TrackerParametersESModule::TrackerParametersESModule
+%MSG
+%MSG-i TRACKER:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+TrackerTopologyEP::TrackerTopologyEP
+%MSG
+%MSG-i HCAL:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+HcalHardcodeCalibrations::HcalHardcodeCalibrations->...
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_phase2_T15_v0_mc" for record "SiPixelLorentzAngleRcd" and label "" with tag SiPixelLorentzAngle_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelSimLorentzAngle_phase2_T15_v0_mc" for record "SiPixelLorentzAngleSimRcd" and label "" with tag SiPixelSimLorentzAngle_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_fromAlignment_v1_mc[cms_orcon_prod/CMS_COND_31X_PIXEL]" for record "SiPixelLorentzAngleRcd" and label "fromAlignment" with tag SiPixelLorentzAngle_phase2_T15_mc_forWidthEmpty@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelTemplateDBObject_phase1_38T_2017_rereco_v9" for record "SiPixelTemplateDBObjectRcd" and label "" with tag SiPixelTemplateDBObject_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelGenErrorDBObject_phase1_38T_2017_rereco_v9" for record "SiPixelGenErrorDBObjectRcd" and label "" with tag SiPixelGenErrorDBObject_phase2_T15_v5_mc@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i CondDBESSource:  (NoModuleName) 22-Jul-2020 01:17:50 EDT pre-events
+Replacing tag "SiPixelLorentzAngle_phase2_forWidth_T15_v0_mc" for record "SiPixelLorentzAngleRcd" and label "forWidth" with tag SiPixelLorentzAngle_phase2_T15_mc_forWidthEmpty@[frontier://FrontierProd/CMS_CONDITIONS]"; from CondDBESSource::fillTagCollectionFromDB
+%MSG
+%MSG-i SiPixelFakeGainOfflineESSource::SiPixelFakeGainOfflineESSource:   (NoModuleName) 22-Jul-2020 01:17:55 EDT pre-events
+
+%MSG
+%MSG-i MEtoEDMConverter_MEtoEDMConverter:   MEtoEDMConverter:MEtoEDMConverter@ctor 22-Jul-2020 01:17:55 EDT pre-events
+
+===============================
+Initialized as EDProducer with parameter values:
+    Name          = MEtoEDMConverter
+    Verbosity     = 0
+    Frequency     = 50
+    Path          = 
+===============================
+
+%MSG
+%MSG-i SimG4CoreApplication:  OscarMTProducer:g4SimHits@ctor  22-Jul-2020 01:17:56 EDT pre-events
+OscarMTMasterThread: creating master thread
+%MSG
+OscarMTMasterThread: initializing RunManagerMT
+
+**************************************************************
+ Geant4 version Name: geant4-10-06-patch-01 [MT]   (14-February-2020)
+  << in Multi-threaded mode >> 
+                       Copyright : Geant4 Collaboration
+                      References : NIM A 506 (2003), 250-303
+                                 : IEEE-TNS 53 (2006), 270-278
+                                 : NIM A 835 (2016), 186-225
+                             WWW : http://geant4.org/
+**************************************************************
+Master thread: State loop, notify main thread
+Master thread: State loop, starting wait
+OscarMTMasterThread: Master thread is constructed
+SimG4Core/Generator:  Filtering out PDG ID = 21  1  2  3  4  5  6  
+SimG4Core/Generator: Rdecaycut= 2.9 cm;  Zdecaycut= 30Z_min= -354.797 cm; Z_max= 3547.97 cm;  Z_hector = 52793.8 cm
+                     ApplyCuts: 1  PCuts: 1  PtransCut: 0  EtaCut: 1  PhiCut: 0  LumiMonitorCut: 0
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record SiStripGainRcd depends on at least one Record 
+ (SiStripApvGain3Rcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record HcalRespCorrsRcd depends on at least one Record 
+ (HBHEDarkeningRecord) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record SiStripQualityRcd depends on at least one Record 
+ (SiStripDCSStatusRcd, SiStripBadModuleFedErrRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record ZDCGeometryRecord depends on at least one Record 
+ (ZDCAlignmentRcd, ZDCAlignmentErrorRcd, ZDCAlignmentErrorExtendedRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record CaloGeometryRecord depends on at least one Record 
+ (HGCalGeometryRecord, FastTimeGeometryRecord, EcalEndcapGeometryRecord, EcalPreshowerGeometryRecord) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record HcalGeometryRecord depends on at least one Record 
+ (HcalAlignmentRcd, HcalAlignmentErrorRcd, HcalAlignmentErrorExtendedRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record MuonGeometryRecord depends on at least one Record 
+ (GEMAlignmentRcd, DTAlignmentErrorRcd, CSCAlignmentErrorRcd, DDSpecParRegistryRcd, GEMAlignmentErrorRcd, GEMAlignmentErrorExtendedRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record IdealGeometryRecord depends on at least one Record 
+ (PGeometricTimingDetExtraRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record MuonNumberingRecord depends on at least one Record 
+ (DDSpecParRegistryRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i EventSetupDependency:  AfterModConstruction 22-Jul-2020 01:17:57 EDT  pre-events
+The EventSetup record CastorGeometryRecord depends on at least one Record 
+ (CastorAlignmentRcd, CastorAlignmentErrorRcd, CastorAlignmentErrorExtendedRcd) which is not present in the job.
+ This may lead to an exception begin thrown during event processing.
+ If no exception occurs during the job than it is usually safe to ignore this message.
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Getting data for record "DTMtimeRcd" to be consumed by run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Processing record "DTMtimeRcd" and label "" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Validity coming from IOV sequence for record "DTMtimeRcd" and label "": (1, 18446744073709551615) for time (type: runnumber) 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Setting validity for record "DTMtimeRcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Getting data for record "DTTtrigRcd" to be consumed by run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Processing record "DTTtrigRcd" and label "" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Validity coming from IOV sequence for record "DTTtrigRcd" and label "": (1, 18446744073709551615) for time (type: runnumber) 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Processing record "DTTtrigRcd" and label "cosmics" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Validity coming from IOV sequence for record "DTTtrigRcd" and label "cosmics": (1, 18446744073709551615) for time (type: runnumber) 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:17:59 EDT BeforeEvents
+Setting validity for record "DTTtrigRcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:00 EDT BeforeEvents
+Processing record "RPCEMapRcd" and label "" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:00 EDT BeforeEvents
+Setting validity for record "GEMELMapRcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:02 EDT BeforeEvents
+Processing record "HeavyIonRcd" and label "PixelTracksHydjet_Drum" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:02 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalGainsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+Setting validity for record "PGeometricDetExtraRcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalPFCorrsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalQIEDataRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalLUTCorrsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalMCParamsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalQIETypesRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalPedestalsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalRespCorrsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:05 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalTimeCorrsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:06 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalGainWidthsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:18:08 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalSiPMCharacteristicsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:08 EDT BeforeEvents
+Setting validity for record "HcalSiPMCharacteristicsRcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:18 EDT BeforeEvents
+Processing record "CastorChannelQualityRcd" and label "" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:34 EDT BeforeEvents
+Setting validity for record "SiStripApvGain2Rcd" and corresponding label(s): starting at run: 1 lumi: 0 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  AfterSource 22-Jul-2020 01:18:54 EDT BeforeEvents
+Processing record "AlCaRecoTriggerBitsRcd" and label "" for run: 1 lumi: 0 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i HCAL:  AfterSource 22-Jul-2020 01:19:08 EDT BeforeEvents
+HcalHardcodeCalibrations::setIntervalFor-> key: HcalFlagHFDigiTimeParamsRcd time: run: 1 lumi: 0 event: 0/1
+%MSG
+%MSG-i DDLParser:  OscarMTProducer:g4SimHits@beginRun 22-Jul-2020 01:19:13 EDT  Run: 1
+Start Parsing.  Validation is set off for the time being.
+%MSG
+OscarMTMasterThread: Signal master for BeginRun
+%MSG-i OscarMTMasterThread:  (NoModuleName) 22-Jul-2020 01:19:14 EDT pre-events
+Master thread: Woke up, state is 1
+%MSG
+%MSG-i OscarMTMasterThread:  (NoModuleName) 22-Jul-2020 01:19:14 EDT pre-events
+Master thread: Initializing Geant4
+%MSG
+RunManagerMT: start initialising of geometry DD4Hep: 0
+              cutsPerRegion: 1 cutForProton: 1
+              G4 verbosity: 0
++++ DDDWorld: initialisation of Geant4 geometry
+DDG4Builder: Reflection: eregalgo:EHAWRRotRefl t=0deg p=180deg a=0deg>>Placement d=eregalgo:EHAWR m=eregalgo:EFAW cp=2 r=eregalgo:EHAWRRotRefl
+DDG4Builder: Reflection: rotations:180RYZ t=54.7356deg p=-45deg a=0deg>>Placement d=csc:ME11Space m=mf:ME1RingN cp=1 r=rotations:180RYZ
+DDG4Builder: Reflection: rotations:R010R t=148.036deg p=-45deg a=0deg>>Placement d=csc:ME11Space m=mf:ME1RingN cp=2 r=rotations:R010R
+DDG4Builder: Reflection: rotations:180RYZ t=54.7356deg p=-45deg a=0deg>>Placement d=csc:ME12Space m=mf:ME12RingN cp=1 r=rotations:180RYZ
+DDG4Builder: Reflection: rotations:R010R t=148.036deg p=-45deg a=0deg>>Placement d=csc:ME12Space m=mf:ME12RingN cp=2 r=rotations:R010R
+DDG4Builder: Reflection: rotations:180RYZ t=54.7356deg p=-45deg a=0deg>>Placement d=csc:ME13Space m=mf:ME13RingN cp=1 r=rotations:180RYZ
+DDG4Builder: Reflection: rotations:R005R t=57.3385deg p=-45deg a=0deg>>Placement d=csc:ME21Space m=mf:ME2RingN cp=1 r=rotations:R005R
+DDG4Builder: Reflection: rotations:R025R t=57.3385deg p=-45deg a=0deg>>Placement d=csc:ME21Space m=mf:ME2RingN cp=2 r=rotations:R025R
+DDG4Builder: Reflection: rotations:180RYZ t=54.7356deg p=-45deg a=0deg>>Placement d=csc:ME22Space m=mf:ME2RingN cp=1 r=rotations:180RYZ
+DDG4Builder: Reflection: rotations:R010R t=148.036deg p=-45deg a=0deg>>Placement d=csc:ME22Space m=mf:ME2RingN cp=2 r=rotations:R010R
+DDG4Builder: dd=eregalgo:EGRID g4=EGRID_refl
+DDG4Builder: dd=ebalgo:ECLR_01 g4=ECLR_01_refl
+DDG4Builder: dd=ebalgo:ECER_03 g4=ECER_03_refl
+DDG4Builder: dd=ebalgo:EATJ_06 g4=EATJ_06_refl
+DDG4Builder: dd=ebalgo:EWAL_12 g4=EWAL_12_refl
+DDG4Builder: dd=csc:ME_FR4Skin_2_ME12Layer g4=ME_FR4Skin_2_ME12Layer_refl
+SenstiveDetectorCatalog: insert (TkAccumulatingSensitiveDetector,TrackerHitsPixelEndcap,EModule11Disc4Lower2Sactive)
+                         has     3 ROUs CaloHitsTk
+                         has     2 classes CaloTrkProcessing
+SenstiveDetectorCatalog: insert (EcalSensitiveDetector,EcalHitsEB,EBRY_12_refl)
+                         has     18 ROUs BSCHits
+                         has     11 classes BSCSensitiveDetector
+DDDWorld: worldLV: OCMS
+  num  1 regionName: ZDCRegion, the store of size 2
+DDG4ProductionCuts : regionName ZDCRegion, the store of size 2
+DDG4ProductionCuts : region ZDCRegion
+DDG4ProductionCuts : new G4Region ZDC
+  num  1 regionName: TrackerDeadRegion, the store of size 3
+DDG4ProductionCuts : regionName TrackerDeadRegion, the store of size 3
+DDG4ProductionCuts : region TrackerDeadRegion
+DDG4ProductionCuts : new G4Region Tracker
+  num  1 regionName: TrackerOuterSensRegion, the store of size 4
+DDG4ProductionCuts : regionName TrackerOuterSensRegion, the store of size 4
+  num  1 regionName: TrackerOuterSensRegion, the store of size 5
+  num  1 regionName: TrackerOuterSensRegion, the store of size 5
+  num  1 regionName: TrackerOuterSensRegion, the store of size 5
+  num  1 regionName: TrackerOuterSensRegion, the store of size 5
+  num  1 regionName: TrackerOuterSensRegion, the store of size 5
+  num  1 regionName: MuonChamber, the store of size 6
+  num  1 regionName: MuonIron, the store of size 11
+  num  1 regionName: BeamPipeVacuum, the store of size 22
+DDDWorld: initialisation of Geant4 geometry is done.
+RunManagerMT: Define cuts: 1 Geant4 run manager verbosity: 0
+###RunManagerMT: 40679 PhysVolumes; 6633 LogVolumes; 24 Regions.
+RunManagerMT: create PhysicsList
+You are using the simulation engine: FTFP_BERT_EML: 
+ Flags for EM Physics: 1; Hadronic Physics: 1; tracking cut: 0; time limit(ns)= 500
+  transition energy Bertini/FTFP from 3 to 6:12 GeV
+ParametrisedEMPhysics::ConstructProcess: bremsstrahlung threshold Eth= 0.5 GeV
+                                         verbosity= 0  fluoFlag: 0  modifyTransport: 0  Ntrials= 10
+                                         ThWarning(MeV)= 100  ThException(MeV)= 250
+RunManagerMT: start initialisation of PhysicsList for master
+RunManagerMT: PhysicsList and cuts are defined
+CMSEmStandardPhysicsLPM: EM physics is instantiated
+### FTFP_BERT : transition between BERT and FTFP is over the interval 3 to 6 GeV GeV; for pions up to 12 GeV
+Master thread: State loop, notify main thread
+Master thread: State loop, starting wait
+OscarMTMasterThread: finish BeginRun
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Getting data for record "LumiSectionDataRcd" to be consumed by run: 1 lumi: 1 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Processing record "LumiSectionDataRcd" and label "" for run: 1 lumi: 1 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Validity coming from IOV sequence for record "LumiSectionDataRcd" and label "": (4294967297, 18446744073709551615) for time (type: lumiid) 4294967297; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Setting validity for record "LumiSectionDataRcd" and corresponding label(s): starting at run: 1 lumi: 1 event: 0, timestamp: 0, ending at run: 4294967295 lumi: 4294967295 event: 18446744073709551615, timestamp: 0, for run: 1 lumi: 1 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Getting data for record "DTKeyedConfigContainerRcd" to be consumed by run: 1 lumi: 1 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostStreamBeginRun 22-Jul-2020 01:20:02 EDT  PostStreamBeginRun
+Processing record "DTKeyedConfigContainerRcd" and label "" for run: 1 lumi: 1 event: 0, timestamp: 1; from CondDBESSource::setIntervalFor
+%MSG
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:03.729 EDT
+RunManagerMTWorker::initializeThread 0
+%MSG-i MagneticField:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:03 EDT  Run: 1 Event: 1
+Current :18160 (from RunInfo DB); using map configuration with label: 3.8T
+%MSG
+%MSG-i MagneticField:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:03 EDT  Run: 1 Event: 1
+Version: grid_160812_3_8t geometryVersion: 160812 slaveFieldVersion: OAE_1103l_071212
+%MSG
+%MSG-i DDCompactViewImpl:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:07 EDT  Run: 1 Event: 1
+DDD transient representation has been destructed.
+%MSG
+### FieldStepper: <G4DormandPrince745>
+ New CMSFieldManager: LogicalVolume:      <OCMS>
+               Stepper:                   <G4DormandPrince745>
+               Field type                 <CMSIMField>
+               Field const delta           1 mm
+               MaximumLoopCounts           1000
+               MinimumEpsilonStep          1e-05
+               MaximumEpsilonStep          0.01
+               MinStep                     0.1 mm
+               MaxStep                     150 cm
+               DeltaChord                  0.001 mm
+               DeltaOneStep                0.001 mm
+               DeltaIntersection           0.0001 mm
+               EnergyThreshold             15 MeV
+               DeltaChordSimple            0.1 mm
+               DeltaOneStepSimple          0.1 mm
+               DeltaIntersectionSimple     0.01 mm
+               MaxStepInVacuum             50 cm
+ FieldBuilder::build: Global magnetic field is used
+ AttachSD: Initialising 18 SDs
+ <BSCHits> : Assigns SD to LVs  BSCPadActive BSCBottomTrapezoid BSC2Pad BSCTopTrapezoid
+ AttachSD: created a BSCSensitiveDetector with name BSCHits + tracking SD
+ <CaloHitsTk> : Assigns SD to LVs  CALO
+CaloTrkProcessing: Initailised with TestBeam = 0 Emin = 0.01:10000:5000 MeV and Flags 0 (History), 0 (Special Calorimeter)
+CaloTrkProcessing: with 7 calorimetric volumes
+CaloTrkProcessing: Calorimeter volume 0 CALO LV 0x7f5a3ddc1e40 at level 3 with 4 neighbours
+                   Element 0 BEAM LV 0x7f5a3ddc1fc0 at level 3
+                   Element 1 Tracker LV 0x7f5a3ddc1d80 at level 3
+                   Element 2 MUON LV 0x7f5a3ddc1f00 at level 3
+                   Element 3 NotFound LV 0 at level 3
+CaloTrkProcessing: Calorimeter volume 1 VCAL LV 0x7f5a3ddc25c0 at level 3 with 3 neighbours
+                   Element 0 BEAM2 LV 0x7f5a3ddc2140 at level 3
+                   Element 1 MUON LV 0x7f5a3ddc1f00 at level 3
+CaloTrkProcessing: Calorimeter volume 6 ZDC LV 0x7f5a3ddc28c0 at level 3 with 1 neighbours
+ AttachSD: created a CaloTrkProcessing with name CaloHitsTk + calo SD
+ <EcalHitsEB> : Assigns SD to LVs  EAPD_17_refl EBRY_17_refl EBRY_16_refl EATJ_15_refl EAPD_13_refl EATJ_13_refl EATJ_12_refl EBRY_12_refl EAPD_11_refl EBRY_15_refl EATJ_11_refl EBRY_11_refl EAPD_10_refl EATJ_10_refl EBRY_10_refl EBRY_12 EAPD_01_refl EAPD_11 EBRY_05_refl EBRY_07_refl EATJ_10 EAPD_08 EAPD_13 EAPD_07_refl EATJ_12 EATJ_07 EAPD_06_refl EBRY_10 EAPD_07 EATJ_06 EBRY_13_refl EAPD_08_refl EBRY_09 EAPD_05 EAPD_06 EBRY_03_refl EAPD_15_refl EAPD_05_refl EAPD_02 EATJ_06_refl EATJ_16_refl EAPD_12_refl EBRY_07 EATJ_04 EBRY_02 EBRY_15 EBRY_04_refl EAPD_03 EBRY_14 EATJ_01_refl EBRY_01 EAPD_12 EAPD_10 EBRY_08 EBRY_11 EATJ_09 EBRY_06 EATJ_14 EAPD_01 EBRY_03 EATJ_03 EBRY_05 EATJ_05 EAPD_09 EATJ_17_refl EATJ_08 EATJ_14_refl EAPD_16 EBRY_13 EATJ_13 EAPD_15 EATJ_15 EATJ_02 EBRY_17 EBRY_04 EAPD_17 EATJ_17 EBRY_01_refl EATJ_07_refl EBRY_16 EBRY_02_refl EATJ_09_refl EATJ_02_refl EAPD_02_refl EAPD_14_refl EAPD_09_refl EATJ_03_refl EAPD_03_refl EBRY_08_refl EATJ_11 EATJ_04_refl EAPD_04 EAPD_14 EAPD_04_refl EBRY_14_refl EATJ_01 EBRY_06_refl EATJ_05_refl EBRY_09_refl EAPD_16_refl EATJ_16 EATJ_08_refl
+CaloSD: Minimum energy of track for saving it 1 GeV
+        Use of HitID Map 0
+        Check last 25 before saving the hit
+        Correct TOF globally by 0 ns (Flag =0)
+        Save hits recorded before 500 ns and if energy is above 0.015 MeV (for depth 0) or 0 MeV (for nonzero depths);
+        Time Slice Unit 0.001
+Ignore TrackID Flag 0 UseFineCaloID flag 0
+%MSG-i EcalGeom:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+Creating EcalBarrelNumberingScheme
+%MSG
+EcalSD: updates numbering scheme for EcalHitsEB
+ECalSD:: Use of Birks law is set to      1        with three constants kB = 2.0803e+18, C1 = 0, C2 = 1
+         Use of L3 parametrization 1 with slope 0.253694 and cut off 0.1
+         Slope for Light yield is set to 0.02
+ECalSD:: Suppression Flag 0	protons below 30 MeV,	neutrons below 30 MeV	ions below 30 MeV
+	Depth1 Name = EAPD	Depth2 Name = EATJ
+	storeRL0:1	storeLayerTimeSim 1
+	time Granularity 0.001 ns
+ AttachSD: created a EcalSensitiveDetector with name EcalHitsEB + calo SD
+ <FastTimerHitsBarrel> : Assigns SD to LVs  BModule1Layer1Timingactive BModule33Layer1Timingactive BModule17Layer1Timingactive
+%MSG-i MtdSim:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+MtdSD: updates numbering scheme for FastTimerHitsBarrel
+%MSG
+%MSG-i MtdSim:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+New time factor = 100
+%MSG
+MtdSD: Instantiation completed for FastTimerHitsBarrel
+ AttachSD: created a MtdSensitiveDetector with name FastTimerHitsBarrel + tracking SD
+ <FastTimerHitsEndcap> : Assigns SD to LVs  EModule11Disc1Timingactive EModule10Disc1Timingactive EModule7Disc1Timingactive EModule2Disc1Timingactive EModule4Disc1Timingactive EModule6Disc1Timingactive EModule9Disc1Timingactive EModule3Disc1Timingactive EModule8Disc1Timingactive EModule1Disc1Timingactive EModule5Disc1Timingactive
+%MSG-i MtdSim:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+MtdSD: updates numbering scheme for FastTimerHitsEndcap
+%MSG
+%MSG-i MtdSim:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+New time factor = 100
+%MSG
+MtdSD: Instantiation completed for FastTimerHitsEndcap
+ AttachSD: created a MtdSensitiveDetector with name FastTimerHitsEndcap + tracking SD
+ <HFNoseHits> : Assigns SD to LVs  HGCalHFNoseSensitiveCorner16Fine HGCalHFNoseSensitiveCorner15Fine HGCalHFNoseSensitiveCorner12Fine HGCalHFNoseSensitiveCorner11Fine HGCalHFNoseSensitiveExten12Fine HGCalHFNoseSensitiveCorner13Fine HGCalHFNoseSensitiveTrunc11Fine HGCalHFNoseSensitiveTrunc12Fine HGCalHFNoseSensitiveCorner06Fine HGCalHFNoseSensitiveCorner05Fine HGCalHFNoseSensitiveCorner03Fine HGCalHFNoseSensitive4 HGCalHFNoseSensitiveTrunc02Fine HGCalHFNoseSensitive3 HGCalHFNoseSensitive1 HGCalHFNoseSensitive6 HGCalHFNoseSensitive7 HGCalHFNoseSensitive2 HGCalHFNoseSensitiveTrunc13Fine HGCalHFNoseSensitiveCorner02Fine HGCalHFNoseSensitiveExten01Fine HGCalHFNoseSensitive8 HGCalHFNoseSensitiveExten13Fine HGCalHFNoseSensitiveExten11Fine HGCalHFNoseSensitive5 HGCalHFNoseSensitiveTrunc01Fine HGCalHFNoseSensitiveFull0Fine HGCalHFNoseSensitiveCorner14Fine HGCalHFNoseSensitiveFull1Fine HGCalHFNoseSensitiveCorner04Fine HGCalHFNoseSensitiveTrunc03Fine HGCalHFNoseSensitiveExten02Fine HGCalHFNoseSensitiveExten03Fine HGCalHFNoseSensitiveCorner01Fine
+HFNoseSD:: Threshold for storing hits: 0 for HFNoseHits
+Flag for storing individual Geant4 Hits 0
+Fiducial volume cut with cut from eta/phi boundary 0 at 1
+Reject MosueBite Flag: 0 cuts along 2 axes: 90, 30
+ AttachSD: created a HFNoseSensitiveDetector with name HFNoseHits + calo SD
+ <HGCHitsEE> : Assigns SD to LVs  HGCalEESensitiveCorner16Coarse2 HGCalEESensitiveCorner15Coarse2 HGCalEESensitiveCorner14Coarse2 HGCalEESensitiveExten12Coarse2 HGCalEESensitiveExten11Coarse2 HGCalEESensitiveTrunc12Coarse2 HGCalEESensitiveTrunc11Coarse2 HGCalEESensitiveCorner06Coarse2 HGCalEESensitiveTrunc13Coarse2 HGCalEESensitiveCorner03Coarse2 HGCalEESensitiveCorner02Coarse2 HGCalEESensitiveExten03Coarse2 HGCalEESensitiveTrunc03Coarse2 HGCalEESensitiveTrunc01Coarse2 HGCalEESensitiveFull0Coarse2 HGCalEESensitiveCorner15Coarse1 HGCalEESensitiveTrunc03Fine HGCalEESensitiveExten13Fine HGCalEESensitive1 HGCalEESensitiveTrunc01Fine HGCalEESensitiveTrunc11Coarse1 HGCalEESensitive22 HGCalEESensitive27 HGCalEESensitiveCorner01Fine HGCalEESensitive6 HGCalEESensitiveTrunc12Coarse1 HGCalEESensitiveTrunc02Coarse2 HGCalEESensitive25 HGCalEESensitiveFull0Fine HGCalEESensitive19 HGCalEESensitive21 HGCalEESensitiveExten01Coarse2 HGCalEESensitive24 HGCalEESensitiveCorner12Coarse2 HGCalEESensitiveTrunc02Fine HGCalEESensitiveExten03Fine HGCalEESensitiveFull0Coarse1 HGCalEESensitiveCorner03Fine HGCalEESensitiveCorner12Coarse1 HGCalEESensitive18 HGCalEESensitiveCorner16Fine HGCalEESensitiveExten13Coarse2 HGCalEESensitive9 HGCalEESensitiveCorner16Coarse1 HGCalEESensitive2 HGCalEESensitive15 HGCalEESensitive5 HGCalEESensitive3 HGCalEESensitive23 HGCalEESensitiveExten01Fine HGCalEESensitive10 HGCalEESensitive20 HGCalEESensitive7 HGCalEESensitiveCorner03Coarse1 HGCalEESensitive11 HGCalEESensitiveCorner05Coarse1 HGCalEESensitive4 HGCalEESensitiveExten02Fine HGCalEESensitiveTrunc11Fine HGCalEESensitive14 HGCalEESensitiveCorner04Coarse2 HGCalEESensitive28 HGCalEESensitiveExten02Coarse2 HGCalEESensitive17 HGCalEESensitiveCorner01Coarse2 HGCalEESensitiveCorner04Fine HGCalEESensitive16 HGCalEESensitiveCorner02Fine HGCalEESensitiveCorner05Fine HGCalEESensitiveCorner06Fine HGCalEESensitiveFull1Fine HGCalEESensitiveExten13Coarse1 HGCalEESensitiveTrunc12Fine HGCalEESensitiveTrunc13Fine HGCalEESensitiveExten11Fine HGCalEESensitiveExten12Fine HGCalEESensitive8 HGCalEESensitiveCorner11Fine HGCalEESensitiveCorner12Fine HGCalEESensitiveTrunc01Coarse1 HGCalEESensitiveCorner05Coarse2 HGCalEESensitiveCorner13Fine HGCalEESensitiveCorner15Fine HGCalEESensitive26 HGCalEESensitiveCorner14Fine HGCalEESensitiveTrunc03Coarse1 HGCalEESensitiveCorner11Coarse2 HGCalEESensitiveExten01Coarse1 HGCalEESensitiveFull1Coarse2 HGCalEESensitiveExten02Coarse1 HGCalEESensitiveExten03Coarse1 HGCalEESensitive12 HGCalEESensitiveCorner01Coarse1 HGCalEESensitiveCorner13Coarse2 HGCalEESensitiveCorner06Coarse1 HGCalEESensitiveCorner02Coarse1 HGCalEESensitiveCorner04Coarse1 HGCalEESensitiveCorner11Coarse1 HGCalEESensitiveFull1Coarse1 HGCalEESensitiveTrunc13Coarse1 HGCalEESensitive13 HGCalEESensitiveTrunc02Coarse1 HGCalEESensitiveExten11Coarse1 HGCalEESensitiveExten12Coarse1 HGCalEESensitiveCorner13Coarse1 HGCalEESensitiveCorner14Coarse1
+HGCalSD:: Threshold for storing hits: 0 for HGCalEESensitive detector 8
+Flag for storing individual Geant4 Hits 0
+Fiducial volume cut with cut from eta/phi boundary 0 at 1
+Reject MosueBite Flag: 0 cuts along 2 axes: 90, 30
+ AttachSD: created a HGCalSensitiveDetector with name HGCHitsEE + calo SD
+ <HGCHitsHEback> : Assigns SD to LVs  HGCalHEScintillatorSensitive22 HGCalHEScintillatorSensitive20 HGCalHEScintillatorSensitive15 HGCalHEScintillatorSensitive16 HGCalHEScintillatorSensitive10 HGCalHEScintillatorSensitive21 HGCalHEScintillatorSensitive9 HGCalHEScintillatorSensitive19 HGCalHEScintillatorSensitive11 HGCalHEScintillatorSensitive17 HGCalHEScintillatorSensitive12 HGCalHEScintillatorSensitive14 HGCalHEScintillatorSensitive18 HGCalHEScintillatorSensitive13
+HGCScintSD:: Threshold for storing hits: 0 for HGCalHEScintillatorSensitive detector 10
+Flag for storing individual Geant4 Hits 0
+Fiducial volume cut with cut from eta/phi boundary 0 at 1
+Use of Birks law is set to      1  with three constants kB = 3.24559e+17, C1 = 0.142, C2 = 1.75
+ AttachSD: created a HGCScintillatorSensitiveDetector with name HGCHitsHEback + calo SD
+ <HGCHitsHEfront> : Assigns SD to LVs  HGCalHESiliconSensitive22 HGCalHESiliconSensitive21 HGCalHESiliconSensitive19 HGCalHESiliconSensitive16 HGCalHESiliconSensitive14 HGCalHESiliconSensitive13 HGCalHESiliconSensitive12 HGCalHESiliconSensitive11 HGCalHESiliconSensitive9 HGCalHESensitiveCorner06Coarse2 HGCalHESensitiveCorner03Coarse2 HGCalHESensitiveCorner01Coarse2 HGCalHESiliconSensitive18 HGCalHESensitiveExten03Coarse2 HGCalHESensitiveExten02Coarse2 HGCalHESiliconSensitive20 HGCalHESensitiveExten01Coarse2 HGCalHESensitiveTrunc03Coarse2 HGCalHESensitiveCorner02Coarse2 HGCalHESensitiveTrunc02Coarse2 HGCalHESensitiveExten03Fine HGCalHESiliconSensitive15 HGCalHESensitiveExten03Coarse1 HGCalHESensitiveCorner01Fine HGCalHESensitiveTrunc03Coarse1 HGCalHESensitiveTrunc01Fine HGCalHESensitiveExten02Fine HGCalHESensitiveCorner06Coarse1 HGCalHESensitiveCorner04Coarse2 HGCalHESiliconSensitive7 HGCalHESensitiveCorner06Fine HGCalHESensitiveTrunc03Fine HGCalHESiliconSensitive2 HGCalHESensitiveTrunc01Coarse1 HGCalHESiliconSensitive10 HGCalHESiliconSensitive3 HGCalHESensitiveExten01Coarse1 HGCalHESiliconSensitive1 HGCalHESensitiveCorner01Coarse1 HGCalHESensitiveExten01Fine HGCalHESensitiveFull0Fine HGCalHESiliconSensitive6 HGCalHESensitiveCorner02Fine HGCalHESensitiveCorner05Coarse2 HGCalHESiliconSensitive4 HGCalHESiliconSensitive5 HGCalHESensitiveCorner03Fine HGCalHESiliconSensitive17 HGCalHESensitiveCorner04Fine HGCalHESensitiveCorner05Fine HGCalHESensitiveFull0Coarse1 HGCalHESensitiveExten02Coarse1 HGCalHESiliconSensitive8 HGCalHESensitiveCorner02Coarse1 HGCalHESensitiveCorner03Coarse1 HGCalHESensitiveCorner04Coarse1 HGCalHESensitiveTrunc02Coarse1 HGCalHESensitiveCorner05Coarse1 HGCalHESensitiveTrunc01Coarse2 HGCalHESensitiveTrunc02Fine HGCalHESensitiveFull0Coarse2
+HGCalSD:: Threshold for storing hits: 0 for HGCalHESiliconSensitive detector 9
+Flag for storing individual Geant4 Hits 0
+ AttachSD: created a HGCalSensitiveDetector with name HGCHitsHEfront + calo SD
+ <HcalHits> : Assigns SD to LVs  FibreBundle13 FibreBundle1 FibreBundle7 FibreBundle11 FibreBundle2 FibreBundle4 FibreBundle6 FibreBundle8 FibreBundle10 FibreBundle12 VcalElecCathode VcalFibreBundleR1 VcalFibreBundleR3 VcalFibreBundleR5 HBScintillatorLayer1In1 VcalFibreBundleR2 HTS0_T1 HBScintillatorLayer14In1 HBScintillatorLayer13In1 HBScintillatorLayer12In1 HBScintillatorLayer11In2 HTS1C_T1 HBScintillatorLayer9In1 HBScintillatorLayer8In2 HBScintillatorLayer2In2 HBScintillatorLayer2In1 HTS1_T5 HBScintillatorLayer7In1 HTS0_T2 HBScintillatorLayer11In1 VcalFibreBundleL9 FibreBundle3 HBScintillatorLayer16In1 HTS1C_T6 HTS1_T6_S HBScintillatorLayer12In2 HBScintillatorLayer0In1 HBScintillatorLayer3In1 HBScintillatorLayer7In2 HBScintillatorLayer3In2 HTS1C_T5 HBScintillatorLayer4In1 HBScintillatorLayer5In1 HBScintillatorLayer14In2 HBScintillatorLayer5In2 HBScintillatorLayer15In2 HBScintillatorLayer6In2 VcalFibreBundleR12 HTS1C_T4 HBScintillatorLayer6In1 HBScintillatorLayer1In2 HBScintillatorLayer10In1 HBScintillatorLayer4In2 HTS0_T3 VcalFibreBundleL11 HBScintillatorLayer9In2 HBScintillatorLayer16In2 HTS0_T4 HBScintillatorLayer8In1 VcalFibreBundleL4 HTS0_T5 HTS1_T1 HTS1C_T2 VcalFibreBundleL1 HBScintillatorLayer13In2 HTS1_T2 HTS1_T3 HTS1_T3_S HBScintillatorLayer10In2 VcalFibreBundleL3 FibreBundle9 HTS1_T4_S HTS1_T5_S HTS1_T6 HVQX VcalFibreBundleR4 VcalFibreBundleL7 VcalFibreBundleL5 VcalFibreBundleL10 VcalFibreBundleL8 VcalFibreBundleR10 VcalFibreBundleL6 FibreBundle5 VcalFibreBundleL2 VcalFibreBundleL0 VcalFibreBundleR8 HBScintillatorLayer15In1 HBScintillatorLayer0In2 VcalFibreBundleR6 HTS1C_T3 VcalFibreBundleR0 HTS0_T6 VcalFibreBundleR9 HTS1_T4 VcalFibreBundleR7
+HCalSD:: Use of HF code is set to 1
+Use of shower parametrization set to 0
+Use of shower library is set to 1
+Use PMT Hit is set to 0 with beta Threshold 0.7
+USe of FibreBundle Hit set to 0
+         Use of Birks law is set to      1  with three constants kB = 3.74491e+17, C1 = 0.142, C2 = 1.75
+HCalSD:: Suppression Flag 0 protons below 30 MeV, neutrons below 30 MeV and ions below 30 MeV
+         Threshold for storing hits in HB: 0 HE: 0 HO: 0 HF: 0
+Delivered luminosity for Darkening 5000 Flag (HE) 0 Flag (HB) 0 Flag (HF) 0
+Application of Fiducial Cut 1Flag for test number|neutral density filter 1 0
+%MSG-i HCalGeom:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:08 EDT  Run: 1 Event: 1
+HcalParametersESModule::produce(const HcalParametersRcd& iRecord)
+%MSG
+Benchmark 'HcalSimParametersFromDD::fillPMTs' took 0.005456 millis
+
+Benchmark 'HcalSimParametersFromDD::fillPMTs' took 0.001193 millis
+
+Creating HcalNumberingScheme
+Creating HcalTestNumberingScheme with TB Flag 0
+HCalSD: updates numbering scheme for HcalHits
+HFShowerLibrary: opening /cvmfs/cms.cern.ch/slc7_amd64_gcc820/cms/cmssw/CMSSW_11_2_0_pre2/external/slc7_amd64_gcc820/data/SimG4CMS/Calo/data/HFShowerLibrary_npmt_noatt_eta4_16en_v4.root successfully
+HFFibre:: Speed of light in fibre 149.896 m/ns
+HFShower:: Maximum probability cut off 0.5 Check flag 0
+HFCherenkov:: initialised with ref_index 1.459 lambda1/lambda2 (cm) 2.8e-05|7e-05 aperture(total/trapped) 0.943981|0.9755|0.5 Check photon survival in HF 0 Gain 0.33 useNewPMT 0 FibreR 0.3
+HFFibre:: Speed of light in fibre 149.896 m/ns
+HCalSD: 0 names to be tested for Volume <HFFibre>:
+HCalSD: 1 names to be tested for Volume <HFPMT>:
+  VcalElecCathode
+HCalSD: 13 names to be tested for Volume <HFFibreBundleStraight>:
+  FibreBundle12  FibreBundle10  FibreBundle8  FibreBundle6  FibreBundle4  FibreBundle2  FibreBundle11  FibreBundle9  FibreBundle7  FibreBundle5
+  FibreBundle3  FibreBundle1  FibreBundle13
+HCalSD: 24 names to be tested for Volume <HFFibreBundleConical>:
+  VcalFibreBundleL11  VcalFibreBundleL9  VcalFibreBundleL7  VcalFibreBundleL5  VcalFibreBundleL3  VcalFibreBundleL1  VcalFibreBundleL10  VcalFibreBundleL8  VcalFibreBundleL6  VcalFibreBundleL4
+  VcalFibreBundleL2  VcalFibreBundleL0  VcalFibreBundleR10  VcalFibreBundleR8  VcalFibreBundleR6  VcalFibreBundleR4  VcalFibreBundleR2  VcalFibreBundleR0  VcalFibreBundleR12  VcalFibreBundleR9
+  VcalFibreBundleR7  VcalFibreBundleR5  VcalFibreBundleR3  VcalFibreBundleR1
+%MSG-i Geometry:  OscarMTProducer:g4SimHits 22-Jul-2020 01:20:16 EDT  Run: 1 Event: 1
+MuonGeometryConstantsESModule::produce(const IdealGeometryRecord& iRecord)
+%MSG
+ of type Endcap <MuonCSCHits> EnergyThresholdForPersistency(GeV) 1e-06 allMuonsPersistent: 1
+ of type unknown <MuonDTHits> EnergyThresholdForPersistency(GeV) 1e-06 allMuonsPersistent: 1
+ of type GEM <MuonGEMHits> EnergyThresholdForPersistency(GeV) 1e-06 allMuonsPersistent: 1
+ of type ME0 <MuonME0Hits> EnergyThresholdForPersistency(GeV) 1e-06 allMuonsPersistent: 1
+ of type RPC <MuonRPCHits> EnergyThresholdForPersistency(GeV) 1e-06 allMuonsPersistent: 1
+ TkAccumulatingSensitiveDetector:  Criteria for Saving Tracker SimTracks: 
+ History: 50 MeV; Persistency: 200 MeV;  TofLimit: 36.18 ns
+ FrameRotation type TrackerFrameRotation rTracker(cm)= 120 zTracker(cm)= 300 allowZeroEnergyLoss: 0 neverAccumulate: 0 printHits: 0
+ TkAccumulatingSensitiveDetector:  Criteria for Saving Tracker SimTracks: 
+ History: 50 MeV; Persistency: 200 MeV;  TofLimit: 36.18 ns
+ FrameRotation type TrackerFrameRotation rTracker(cm)= 120 zTracker(cm)= 300 allowZeroEnergyLoss: 0 neverAccumulate: 0 printHits: 0
+ZdcSD: updates numbering scheme for ZDCHITS
+***************************************************
+*                                                 *
+* Constructing a ZdcSD  with name ZDCHITS   *
+*                                                 *
+***************************************************
+
+Use of shower library is set to 1
+Use of Shower hits method is set to 0
+
+Energy Threshold Cut set to 10 (GeV)
+ RunManagerMTWorker: Sensitive Detector building finished; found 10 Tk type Producers, and 8 Calo type producers 
+RunManagerMTWorker: start initialisation of PhysicsList for the thread
+CMSEmStandardPhysicsLPM: EM physics is instantiated
+ParametrisedEMPhysics::ConstructProcess() started
+ParametrisedEMPhysics::ConstructProcess() is done
+
+====================================================================
+                  HADRONIC PROCESSES SUMMARY (verbose level 1)
+
+---------------------------------------------------
+                           Hadronic Processes for GenericIon
+
+  Process: ionInelastic
+        Model:  Binary Light Ion Cascade: 0 eV /n ---> 6 GeV/n
+        Model:                      FTFP: 3 GeV/n ---> 100 TeV/n
+     Cr_sctns:  Glauber-Gribov Nucl-nucl: 0 eV  ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for He3
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV /n ---> 100 TeV/n
+     Cr_sctns:  Glauber-Gribov Nucl-nucl: 0 eV  ---> 100 TeV
+
+  Process: He3Inelastic
+        Model:  Binary Light Ion Cascade: 0 eV /n ---> 6 GeV/n
+        Model:                      FTFP: 3 GeV/n ---> 100 TeV/n
+     Cr_sctns:  Glauber-Gribov Nucl-nucl: 0 eV  ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for alpha
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV /n ---> 100 TeV/n
+     Cr_sctns:  Glauber-Gribov Nucl-nucl: 0 eV  ---> 100 TeV
+
+  Process: alphaInelastic
+        Model:  Binary Light Ion Cascade: 0 eV /n ---> 6 GeV/n
+        Model:                      FTFP: 3 GeV/n ---> 100 TeV/n
+     Cr_sctns:  Glauber-Gribov Nucl-nucl: 0 eV  ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for anti_He3
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV /n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 eV  ---> 100 TeV
+
+  Process: anti_He3Inelastic
+        Model:                      FTFP: 0 eV /n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 eV  ---> 100 TeV
+
+  Process: hFritiofCaptureAtRest
+
+---------------------------------------------------
+                           Hadronic Processes for anti_alpha
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV /n ---> 100.1 MeV/n
+        Model:              AntiAElastic: 100 MeV/n ---> 100 TeV/n
+     Cr_sctns:              AntiAGlauber: 0 eV  ---> 100 TeV
+
+  Process: anti_protonInelastic
+        Model:                      FTFP: 0 eV  ---> 100 TeV
+     Cr_sctns:            PhotoNuclearXS: 0 eV  ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for kaon+
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV  ---> 100 TeV
+     Cr_sctns:  BarashenkovGlauberGribov: 0 eV  ---> 100 TeV
+
+---------------------------------------------------
+                           Hadronic Processes for triton
+
+  Process: hadElastic
+        Model:              hElasticLHEP: 0 eV /n ---> 100 TeV/n
+in HGCalNumberingInitialization::produce for HGCalHFNoseSensitive
+in HGCalNumberingInitialization::produce for HGCalEESensitive
+in HGCalNumberingInitialization::produce for HGCalHEScintillatorSensitive
+in HGCalNumberingInitialization::produce for HGCalHESiliconSensitive
+SteppingAction:: KillBeamPipe = 1 CriticalDensity = 1e-15 g/cm3; CriticalEnergyForVacuum = 2 Mev; MaxTrackTime = 500 ns
+SteppingAction::MaxTrackTime for ZDCRegion is 2000 ns 
+SteppingAction: Number of DeadRegions where all trackes are killed 2
+SteppingAction: DeadRegion 0.  QuadRegion
+ StackingAction: DeadRegion 1. InterimRegion
+Generator: primary Vertex = (0.0142858, -0.0018785, 5.51332)
+Generator: pdg= 22 status= 1 hasPreDefinedDecay: 0 isExotic: 0 isExoticNotDet: 0 isInTheList: 0
+         (x,y,z,t): (0.0142858,-0.0018785,5.51332,0.337798)
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7124 Pt= 2.99951
+Generator: pdg= 22 status= 1 hasPreDefinedDecay: 0 isExotic: 0 isExoticNotDet: 0 isInTheList: 0
+         (x,y,z,t): (0.0142858,-0.0018785,5.51332,0.337798)
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7124 Pt= 2.99951
+TimingSD : Initialize called for BSCHits time slice factor 1
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsEndcap time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+ TouchableTo History: got 30292 sensitive detectors from GeometricDet.
+ TrackerG4SimHitNumberingScheme: mapped 30292 detectors to Geant4.
+Begin processing the 2nd record. Run 1, Event 2, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:24.404 EDT
+Generator: primary Vertex = (-0.0142147, 0.00906461, -4.65568)
+Generator: pdg= 22 status= 1 hasPreDefinedDecay: 0 isExotic: 0 isExoticNotDet: 0 isInTheList: 0
+         (x,y,z,t): (-0.0142147,0.00906461,-4.65568,-0.238872)
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7022 Pt= 2.99916
+Generator: pdg= 22 status= 1 hasPreDefinedDecay: 0 isExotic: 0 isExoticNotDet: 0 isInTheList: 0
+         (x,y,z,t): (-0.0142147,0.00906461,-4.65568,-0.238872)
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7022 Pt= 2.99916
+TimingSD : Initialize called for BSCHits time slice factor 1
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsEndcap time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+Begin processing the 3rd record. Run 1, Event 3, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:26.213 EDT
+TimingSD : Initialize called for BSCHits time slice factor 1
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+TimingSD : Initialize called for FastTimerHitsEndcap time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+ RunManagerMTWorker::produce: ended Event 3
+Begin processing the 4th record. Run 1, Event 4, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:28.046 EDT
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7297 Pt= 3.00063
+TimingSD : Initialize called for BSCHits time slice factor 1
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+Begin processing the 5th record. Run 1, Event 5, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:29.834 EDT
+Begin processing the 6th record. Run 1, Event 6, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:31.665 EDT
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7078 Pt= 2.99923
+Begin processing the 7th record. Run 1, Event 7, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:33.557 EDT
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+Begin processing the 8th record. Run 1, Event 8, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:35.299 EDT
+Begin processing the 9th record. Run 1, Event 9, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:37.098 EDT
+Begin processing the 10th record. Run 1, Event 10, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:38.877 EDT
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7299 Pt= 3.0004
+TimingSD : Initialize called for FastTimerHitsEndcap time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+ RunManagerMTWorker::produce: ended Event 13
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7197 Pt= 3.00027
+Begin processing the 20th record. Run 1, Event 20, LumiSection 1 on stream 0 at 22-Jul-2020 01:20:56.753 EDT
+Begin processing the 30th record. Run 1, Event 30, LumiSection 1 on stream 0 at 22-Jul-2020 01:21:14.684 EDT
+TimingSD : Initialize called for FastTimerHitsEndcap time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+ RunManagerMTWorker::produce: ended Event 33
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7086 Pt= 2.99968
+Begin processing the 50th record. Run 1, Event 50, LumiSection 1 on stream 0 at 22-Jul-2020 01:21:50.226 EDT
+TimingSD : Initialize called for FastTimerHitsBarrel time slice factor 100
+ MC truth cuts in are 1e+06 GeV and 1e+06 GeV
+Generator: new particle pdg= 22 Ptot(GeV/c)= 49.7024 Pt= 2.99933
+ RunManagerMTWorker::produce: ended Event 73
+CaloSD::ProcessHits: unitID= 0 currUnit=   2198866483 Detector: HGCHitsEE trackID= 76295 e-
+ Edep= 0.0106655 PV: HGCalEESensitive17 PVid= 17 MVid= 1
+Begin processing the 90th record. Run 1, Event 90, LumiSection 1 on stream 0 at 22-Jul-2020 01:23:01.159 EDT
+%MSG-i CondDBESSource:  PostGlobalEndLumi 22-Jul-2020 01:23:20 EDT  PostGlobalEndLumi
+Getting data for record "DTKeyedConfigContainerRcd" to be consumed by run: 1 lumi: 4294967295 event: 18446744073709551615, timestamp: 500000001; from CondDBESSource::setIntervalFor
+%MSG
+%MSG-i CondDBESSource:  PostGlobalEndLumi 22-Jul-2020 01:23:20 EDT  PostGlobalEndLumi
+Processing record "DTKeyedConfigContainerRcd" and label "" for run: 1 lumi: 4294967295 event: 18446744073709551615, timestamp: 500000001; from CondDBESSource::setIntervalFor
+%MSG
+OscarMTMasterThread: Signal master for EndRun
+%MSG-i OscarMTMasterThread:  (NoModuleName) 22-Jul-2020 01:23:20 EDT pre-events
+Master thread: Woke up, state is 2
+%MSG
+Master thread: State loop, notify main thread
+Master thread: State loop, starting wait
+OscarMTMasterThread: finish EndRun
+OscarMTMasterThread::stopTread: stop main thread
+OscarMTMasterThread::stopTread: notify
+%MSG-i OscarMTMasterThread:  (NoModuleName) 22-Jul-2020 01:23:21 EDT pre-events
+Master thread: Woke up, state is 3
+%MSG
+OscarMTMasterThread: start RunManagerMT destruction
+OscarMTMasterThread: Master thread is finished
+OscarMTMasterThread::stopTread: main thread finished
+
+------------------------------------
+GenXsecAnalyzer:
+------------------------------------
+Before Filter: total cross section = 0.000e+00 +- 0.000e+00 pb
+Filter efficiency (taking into account weights)= (100) / (100) = 1.000e+00 +- 0.000e+00
+Filter efficiency (event-level)= (100) / (100) = 1.000e+00 +- 0.000e+00    [TO BE USED IN MCM]
+
+After filter: final cross section = 0.000e+00 +- 0.000e+00 pb
+After filter: final fraction of events with negative weights = 0.000e+00 +- 0.000e+00
+After filter: final equivalent lumi for 1M events (1/fb) = 0.000e+00 +- 0.000e+00
+%MSG-i DDCompactViewImpl:  22-Jul-2020 01:23:21 EDT EndJob
+DDD transient representation has been destructed.
+%MSG
