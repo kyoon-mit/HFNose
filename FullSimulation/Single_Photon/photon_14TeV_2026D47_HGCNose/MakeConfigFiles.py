@@ -366,8 +366,8 @@ process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
-process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
+process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.DigiToRaw_cff')
 process.load('HLTrigger.Configuration.HLT_Fake2_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -484,23 +484,30 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', ''
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi_valid)
-process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.L1TrackTrigger_step = cms.Path(process.L1TrackTrigger)
+process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
+process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.L1TrackTrigger_step,process.digi2raw_step)
+process.schedule = cms.Schedule(process.digitisation_step,process.L1TrackTrigger_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
-
-#Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(1)
-process.options.numberOfStreams=cms.untracked.uint32(0)
-process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 # customisation of the process.
 
@@ -511,6 +518,7 @@ from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
 process = customizeHLTforMC(process)
 
 # End of customisation functions
+
 
 # Customisation from command line
 
@@ -739,7 +747,6 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0)
 )
 
-
 process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
     dataset = cms.untracked.PSet(
         dataTier = cms.untracked.string('DQMIO'),
@@ -799,7 +806,20 @@ process.prevalidation_step3 = cms.Path(process.globalPrevalidationJetMETOnly)
 process.prevalidation_step4 = cms.Path(process.prebTagSequenceMC)
 process.prevalidation_step5 = cms.Path(process.produceDenoms)
 process.prevalidation_step6 = cms.Path(process.globalPrevalidationHCAL)
-process.prevalidation_step7 = cms.Path(process.prevalidationMiniAOD)
+process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
+process.prevalidation_step8 = cms.Path(process.prevalidationMiniAOD)
+process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
 process.validation_step = cms.EndPath(process.baseCommonValidation)
 process.validation_step1 = cms.EndPath(process.globalValidationTrackingOnly)
 process.validation_step2 = cms.EndPath(process.globalValidationMuons)
@@ -835,11 +855,6 @@ process.schedule.associate(process.patTask)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
-#Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(1)
-process.options.numberOfStreams=cms.untracked.uint32(0)
-process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
-
 # customisation of the process.
 
 # Automatic addition of the customisation function from SimGeneral.MixingModule.fullMixCustomize_cff
@@ -851,7 +866,7 @@ process = setCrossingFrameOn(process)
 # End of customisation functions
 #do not add changes to your config after this point (unless you know what you are doing)
 from FWCore.ParameterSet.Utilities import convertToUnscheduled
-process=convertToUnscheduled(process)
+process = convertToUnscheduled(process)
 
 # customisation of the process.
 
