@@ -187,7 +187,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                 )
        ),
        critical_step1     = cms.untracked.PSet(
-                threshold   = cms.untracked.PSet('ERROR')
+                threshold   = cms.untracked.string('ERROR')
        )
 )
 
@@ -394,7 +394,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                 )
        ),
        critical_step2     = cms.untracked.PSet(
-                threshold   = cms.untracked.PSet('ERROR')
+                threshold   = cms.untracked.string('ERROR')
        )
 )
 
@@ -620,7 +620,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                 )
        ),
        critical_step3     = cms.untracked.PSet(
-                threshold   = cms.untracked.PSet('ERROR')
+                threshold   = cms.untracked.string('ERROR')
        )
 )
 
