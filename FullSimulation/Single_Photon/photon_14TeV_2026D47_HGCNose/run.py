@@ -7,7 +7,7 @@ from MakeConfigFiles import *
 set_env()
 
 # Can also set up parser
-nevents = 100
+nevents = 10
 pt_string_list = set_pt('3')
 
 makeStep1ConfigFiles (pt_string_list, nevents)

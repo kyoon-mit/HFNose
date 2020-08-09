@@ -160,11 +160,20 @@ process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
 process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
-process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC14TeV_cfi')
+# process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedFlat_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
+# Vertex smearing
+process.VtxSmeared.MaxX = cms.double(0.0000)
+process.VtxSmeared.MinX = cms.double(-0.0000)
+process.VtxSmeared.MaxY = cms.double(0.0000)
+process.VtxSmeared.MinY = cms.double(-0.0000)
+process.VtxSmeared.MaxZ = cms.double(0.0000)
+process.VtxSmeared.MinZ = cms.double(-0.0000)
 
 process.MessageLogger = cms.Service("MessageLogger",
        destinations   = cms.untracked.vstring(
@@ -256,26 +265,23 @@ process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
-process.generator = cms.EDFilter("Pythia8PtGun",
-        PGunParameters = cms.PSet(
-                AddAntiParticle = cms.bool(True),
-                MaxEta = cms.double(3.5001),
-                MinEta = cms.double(3.4999),
-                MaxPhi = cms.double(3.14159265359),
-                MaxPt = cms.double({0} + 0.001),
-                MinPhi = cms.double(-3.14159265359),
-                MinPt = cms.double({0} - 0.001),
-                ParticleID = cms.vint32(22)
-        ),
-        PythiaParameters = cms.PSet(
-         parameterSets = cms.vstring()
+process.generator = cms.EDProducer("FlatRandomPtGunProducer",
+    AddAntiParticle = cms.bool(True),
+    PGunParameters = cms.PSet(
+        AddAntiParticle = cms.bool(True),
+        MaxEta = cms.double(3.5001),
+        MinEta = cms.double(3.4999),
+        MaxPhi = cms.double(3.14159265359),
+        MinPhi = cms.double(-3.14159265359),
+        MaxPt = cms.double({0} + 0.001),
+        MinPt = cms.double({0} - 0.001),
+        PartID = cms.vint32(22)
     ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
     psethack = cms.string('single gamma pt {0}')
 )
 
-process.ProductionFilterSequence = cms.Sequence(process.generator)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -288,14 +294,9 @@ process.FEVTDEBUGoutput_step = cms.EndPath(process.FEVTDEBUGoutput)
 process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.endjob_step,process.FEVTDEBUGoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
-
-#Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(1)
-process.options.numberOfStreams=cms.untracked.uint32(0)
-process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 # filter all path with the production filter sequence
 for path in process.paths:
-	getattr(process,path).insert(0, process.ProductionFilterSequence)
+	getattr(process,path).insert(0, process.generator)
 
 # Customisation from command line
 
@@ -433,7 +434,7 @@ process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring('ProductNotFound'),
+    SkipEvent = cms.untracked.vstring(),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     emptyRunLumiMode = cms.obsolete.untracked.string,
@@ -639,7 +640,7 @@ process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring('ProductNotFound'),
+    SkipEvent = cms.untracked.vstring(),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     emptyRunLumiMode = cms.obsolete.untracked.string,
@@ -893,6 +894,11 @@ process = miniAOD_customizeAllMC(process)
 
 # Customisation from command line
 
+# TICL
+from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
+process = TICL_iterations_withReco(process)
+process = TICL_iterations(process)
+
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)
@@ -980,7 +986,7 @@ process.source = cms.Source("DQMRootSource",
 process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
-    Rethrow = cms.untracked.vstring('ProductNotFound'),
+    Rethrow = cms.untracked.vstring(),
     SkipEvent = cms.untracked.vstring(),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
