@@ -143,7 +143,7 @@ def makeStep1ConfigFiles (E_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: SingleGammaE35_pythia8_cfi --conditions auto:phase1_2018_realistic -n {1} --era Run2_2018 --eventcontent FEVTDEBUG --relval 9000,50 -s GEN,SIM --datatier GEN-SIM --beamspot Realistic25ns13TeVEarly2018Collision --geometry DB:Extended --fileout file:step1.root
+# with command line options: TTbar_14TeV_TuneCP5_cfi --conditions auto:phase2_realistic_T15 -n 10 --era Phase2C10 --eventcontent FEVTDEBUG --relval 9000,100 -s GEN,SIM --datatier GEN-SIM --beamspot HLLHC14TeV --geometry Extended2026D47 --fileout file:step1.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -160,6 +160,7 @@ process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
 process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
+# process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC_cfi')
 process.load('IOMC.EventVertexGenerators.VtxSmearedFlat_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
@@ -167,10 +168,37 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 # Vertex smearing
-process.VtxSmeared.MaxZ = cms.double(0.)
-process.VtxSmeared.MinZ = cms.double(0.)
-process.VtxSmeared.MaxT = cms.double(0.)
-process.VtxSmeared.MinT = cms.double(0.)
+process.VtxSmeared.MaxX = cms.double(0.0000)
+process.VtxSmeared.MinX = cms.double(-0.0000)
+process.VtxSmeared.MaxY = cms.double(0.0000)
+process.VtxSmeared.MinY = cms.double(-0.0000)
+process.VtxSmeared.MaxZ = cms.double(0.0000)
+process.VtxSmeared.MinZ = cms.double(-0.0000)
+
+process.MessageLogger = cms.Service("MessageLogger",
+       destinations   = cms.untracked.vstring(
+                                                'E{0}_detailedInfo_step1',
+                                                'E{0}_critical_step1'
+        ),
+        E{0}_detailedInfo_step1 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+        ),
+        E{0}_critical_step1     = cms.untracked.PSet(
+                threshold   = cms.untracked.string('ERROR')
+        )
+)
 
 process.maxEvents = cms.untracked.PSet(
         input = cms.untracked.int32({1}),
@@ -178,7 +206,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Input source
-process.source = cms.Source('EmptySource')
+process.source = cms.Source("EmptySource")
 
 process.options = cms.untracked.PSet(
     FailPath = cms.untracked.vstring(),
@@ -190,7 +218,8 @@ process.options = cms.untracked.PSet(
     emptyRunLumiMode = cms.obsolete.untracked.string,
     eventSetup = cms.untracked.PSet(
         forceNumberOfConcurrentIOVs = cms.untracked.PSet(
-                 ),
+
+        ),
         numberOfConcurrentIOVs = cms.untracked.uint32(1)
     ),
     fileMode = cms.untracked.string('FULLMERGE'),
@@ -198,8 +227,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-        numberOfStreams = cms.untracked.uint32(12),
-        numberOfThreads = cms.untracked.uint32(12),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -235,23 +264,21 @@ process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
-process.generator = cms.EDFilter("Pythia8EGun",
-        PGunParameters = cms.PSet(
-                AddAntiParticle = cms.bool(False),
-                MaxEta = cms.double(3.5001),
-                MinEta = cms.double(3.4999),
-                MaxPhi = cms.double(3.14159265359),
-                MaxE = cms.double({0} + 0.001),
-                MinPhi = cms.double(-3.14159265359),
-                MinE = cms.double({0} - 0.001),
-                ParticleID = cms.vint32(11)
-        ),
-        PythiaParameters = cms.PSet(
-                parameterSets = cms.vstring()
-        ),
+process.generator = cms.EDProducer("FlatRandomEGunProducer",
+    AddAntiParticle = cms.bool(True),
+    PGunParameters = cms.PSet(
+        AddAntiParticle = cms.bool(True),
+        MaxEta = cms.double(3.5001),
+        MinEta = cms.double(3.4999),
+        MaxPhi = cms.double(3.14159265359),
+        MinPhi = cms.double(-3.14159265359),
+        MaxE = cms.double({0} + 0.001),
+        MinE = cms.double({0} - 0.001),
+        PartID = cms.vint32(11)
+    ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
-    psethack = cms.string('single gamma E {0}')
+    psethack = cms.string('single electron E {0}')
 )
 
 
@@ -340,12 +367,37 @@ process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
-process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
+process.load('Configuration.StandardSequences.SimL1Emulator_cff')
 process.load('Configuration.StandardSequences.DigiToRaw_cff')
 process.load('HLTrigger.Configuration.HLT_Fake2_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
+process.MessageLogger = cms.Service("MessageLogger",
+        destinations   = cms.untracked.vstring(
+                                                'E{0}_detailedInfo_step2',
+                                                'E{0}_critical_step2'
+        ),
+        E{0}_detailedInfo_step2 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+        ),
+        E{0}_critical_step2     = cms.untracked.PSet(
+                threshold   = cms.untracked.string('ERROR')
+        )
+)
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32({1}),
@@ -397,8 +449,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(12),
-    numberOfThreads = cms.untracked.uint32(12),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -433,14 +485,26 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', ''
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi_valid)
-process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.L1TrackTrigger_step = cms.Path(process.L1TrackTrigger)
+process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
+process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.L1TrackTrigger_step,process.digi2raw_step)
+process.schedule = cms.Schedule(process.digitisation_step,process.L1TrackTrigger_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
@@ -455,6 +519,7 @@ from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
 process = customizeHLTforMC(process)
 
 # End of customisation functions
+
 
 # Customisation from command line
 
@@ -535,6 +600,31 @@ process.load('DQMServices.Core.DQMStoreNonLegacy_cff')
 process.load('DQMOffline.Configuration.DQMOfflineMC_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+process.MessageLogger = cms.Service("MessageLogger",
+        destinations   = cms.untracked.vstring(
+                                                'E{0}_detailedInfo_step3',
+                                                'E{0}_critical_step3'
+        ),
+        E{0}_detailedInfo_step3 = cms.untracked.PSet(
+                threshold   = cms.untracked.string('DEBUG'),
+                default     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(10),
+                                timespan = cms.untracked.int32(60)
+                ),
+                WARNING     = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                ),
+                ERROR       = cms.untracked.PSet(
+                                limit = cms.untracked.int32(100),
+                                timespan = cms.untracked.int32(60)
+                )
+        ),
+        E{0}_critical_step3     = cms.untracked.PSet(
+                threshold   = cms.untracked.string('ERROR')
+        )
+)
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32({1}),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
@@ -565,8 +655,8 @@ process.options = cms.untracked.PSet(
     makeTriggerResults = cms.obsolete.untracked.bool,
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
-    numberOfStreams = cms.untracked.uint32(12),
-    numberOfThreads = cms.untracked.uint32(12),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -717,13 +807,26 @@ process.prevalidation_step3 = cms.Path(process.globalPrevalidationJetMETOnly)
 process.prevalidation_step4 = cms.Path(process.prebTagSequenceMC)
 process.prevalidation_step5 = cms.Path(process.produceDenoms)
 process.prevalidation_step6 = cms.Path(process.globalPrevalidationHCAL)
-process.prevalidation_step7 = cms.Path(process.prevalidationMiniAOD)
+process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
+process.prevalidation_step8 = cms.Path(process.prevalidationMiniAOD)
+process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
 process.validation_step = cms.EndPath(process.baseCommonValidation)
 process.validation_step1 = cms.EndPath(process.globalValidationTrackingOnly)
 process.validation_step2 = cms.EndPath(process.globalValidationMuons)
 process.validation_step3 = cms.EndPath(process.globalValidationJetMETonly)
 process.validation_step4 = cms.EndPath(process.electronValidationSequence)
-process.validation_step5 = cms.EndPath(process.electronValidationSequence)
+process.validation_step5 = cms.EndPath(process.photonValidationSequence)
 process.validation_step6 = cms.EndPath(process.bTagPlotsMCbcl)
 process.validation_step7 = cms.EndPath((process.TauValNumeratorAndDenominatorQCD+process.TauValNumeratorAndDenominatorRealData+process.TauValNumeratorAndDenominatorRealElectronsData+process.TauValNumeratorAndDenominatorRealMuonsData+process.TauValNumeratorAndDenominatorZEE+process.TauValNumeratorAndDenominatorZMM+process.TauValNumeratorAndDenominatorZTT))
 process.validation_step8 = cms.EndPath(process.globalValidationHCAL)
@@ -764,6 +867,19 @@ process = setCrossingFrameOn(process)
 # End of customisation functions
 #do not add changes to your config after this point (unless you know what you are doing)
 from FWCore.ParameterSet.Utilities import convertToUnscheduled
+process = convertToUnscheduled(process)
+
+# customisation of the process.
+
+# Automatic addition of the customisation function from SimGeneral.MixingModule.fullMixCustomize_cff
+from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn 
+
+#call to customisation function setCrossingFrameOn imported from SimGeneral.MixingModule.fullMixCustomize_cff
+process = setCrossingFrameOn(process)
+
+# End of customisation functions
+#do not add changes to your config after this point (unless you know what you are doing)
+from FWCore.ParameterSet.Utilities import convertToUnscheduled
 process=convertToUnscheduled(process)
 
 # customisation of the process.
@@ -777,6 +893,11 @@ process = miniAOD_customizeAllMC(process)
 # End of customisation functions
 
 # Customisation from command line
+
+# TICL
+from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
+process = TICL_iterations_withReco(process)
+process = TICL_iterations(process)
 
 #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands

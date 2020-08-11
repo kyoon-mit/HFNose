@@ -176,11 +176,11 @@ process.VtxSmeared.MaxZ = cms.double(0.0000)
 process.VtxSmeared.MinZ = cms.double(-0.0000)
 
 process.MessageLogger = cms.Service("MessageLogger",
-       destinations   = cms.untracked.vstring(
-                                                'detailedInfo_step1',
-                                                'critical_step1'
+        destinations   = cms.untracked.vstring(
+                                                'pt{0}_detailedInfo_step1',
+                                                'pt{0}_critical_step1'
         ),
-       detailedInfo_step1 = cms.untracked.PSet(
+        pt{0}_detailedInfo_step1 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -195,7 +195,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 timespan = cms.untracked.int32(60)
                 )
        ),
-       critical_step1     = cms.untracked.PSet(
+       pt{0}_critical_step1     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
        )
 )
@@ -228,7 +228,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(1),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -375,11 +375,11 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.MessageLogger = cms.Service("MessageLogger",
-       destinations   = cms.untracked.vstring(
-                                                'detailedInfo_step2',
-                                                'critical_step2'
-       ),
-       detailedInfo_step2 = cms.untracked.PSet(
+        destinations   = cms.untracked.vstring(
+                                                'pt{0}_detailedInfo_step2',
+                                                'pt{0}_critical_step2'
+        ),
+        pt{0}_detailedInfo_step2 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -393,10 +393,10 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 limit = cms.untracked.int32(100),
                                 timespan = cms.untracked.int32(60)
                 )
-       ),
-       critical_step2     = cms.untracked.PSet(
+        ),
+        pt{0}_critical_step2     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
-       )
+        )
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -450,7 +450,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(1),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -602,10 +602,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.MessageLogger = cms.Service("MessageLogger",
        destinations   = cms.untracked.vstring(
-                                                'detailedInfo_step3',
-                                                'critical_step3'
+                                                'pt{0}_detailedInfo_step3',
+                                                'pt{0}_critical_step3'
        ),
-       detailedInfo_step3 = cms.untracked.PSet(
+       pt{0}_detailedInfo_step3 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -620,7 +620,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 timespan = cms.untracked.int32(60)
                 )
        ),
-       critical_step3     = cms.untracked.PSet(
+       pt{0}_critical_step3     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
        )
 )
@@ -656,7 +656,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(1),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
