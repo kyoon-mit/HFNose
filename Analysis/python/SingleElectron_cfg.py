@@ -9,24 +9,19 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
-process = cms.Process('AnalysisHGCNoseERes', Phase2C10)
+process = cms.Process('AnalysisHGCNoseSingleElectron', Phase2C10)
 
 # Varparsing
 options = VarParsing('analysis')
-options.register('pt', '1', VarParsing.multiplicity.singleton, VarParsing.varType.string,
-                    "(type: string) pt value of the photon")
+options.register('E', '50', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+                    "(type: string) E value of the electron")
 options.parseArguments()
-
-#OUTPUT_DIR = '/home/kyoon/CMSSW_11_1_0_pre7_RECHIT/src/HGCNose/Analysis/output/'
-#INPUT_DIR = 'file:/data/t3home000/kyoon/gendata/photon_2026D47/'
-#outputfile = OUTPUT_DIR + 'ERes_pt{}.root'.format(options.pt)
-#inputfile = INPUT_DIR + 'photon_pt{0}/step3_photon_pt{0}.root'.format(options.pt)
 
 # Set output and input paths
 OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output')
-INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47/photon_pt{}'.format(options.pt))
-outputfile = OUTPUT_DIR + '/SinglePhoton_pt{}.root'.format(options.pt)
-inputfile = 'file:' + INPUT_DIR + '/step3_photon_pt{}.root'.format(options.pt)
+INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47/electron_E{}'.format(options.E))
+outputfile = OUTPUT_DIR + '/Single_Electron_E{}.root'.format(options.E)
+inputfile = 'file:' + INPUT_DIR + '/step3_electron_E{}.root'.format(options.E)
 
 # Process load
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -62,7 +57,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Process
-process.Analysis_ERes = cms.EDAnalyzer('EnergyResolution',
+process.Analysis_SingleElectron = cms.EDAnalyzer('SingleElectron',
     # TAG_HGCHFNoseRecHits = cms.untracked.InputTag('HGCalRecHit', 'HGCHFNoseRecHits')
 )
 
@@ -76,4 +71,4 @@ process.Timing = cms.Service("Timing",
   useJobReport = cms.untracked.bool(True)
 )
 
-process.p = cms.Path(process.Analysis_ERes)
+process.p = cms.Path(process.Analysis_SingleElectron)

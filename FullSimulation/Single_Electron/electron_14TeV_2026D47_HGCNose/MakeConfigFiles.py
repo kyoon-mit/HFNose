@@ -865,29 +865,16 @@ from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn
 process = setCrossingFrameOn(process)
 
 # End of customisation functions
-#do not add changes to your config after this point (unless you know what you are doing)
-from FWCore.ParameterSet.Utilities import convertToUnscheduled
-process = convertToUnscheduled(process)
-
-# customisation of the process.
-
-# Automatic addition of the customisation function from SimGeneral.MixingModule.fullMixCustomize_cff
-from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn 
-
-#call to customisation function setCrossingFrameOn imported from SimGeneral.MixingModule.fullMixCustomize_cff
-process = setCrossingFrameOn(process)
-
-# End of customisation functions
-#do not add changes to your config after this point (unless you know what you are doing)
-from FWCore.ParameterSet.Utilities import convertToUnscheduled
-process=convertToUnscheduled(process)
+# do not add changes to your config after this point (unless you know what you are doing)
+# from FWCore.ParameterSet.Utilities import convertToUnscheduled
+# process = convertToUnscheduled(process)
 
 # customisation of the process.
 
 # Automatic addition of the customisation function from PhysicsTools.PatAlgos.slimming.miniAOD_tools
 from PhysicsTools.PatAlgos.slimming.miniAOD_tools import miniAOD_customizeAllMC 
 
-#call to customisation function miniAOD_customizeAllMC imported from PhysicsTools.PatAlgos.slimming.miniAOD_tools
+# call to customisation function miniAOD_customizeAllMC imported from PhysicsTools.PatAlgos.slimming.miniAOD_tools
 process = miniAOD_customizeAllMC(process)
 
 # End of customisation functions
@@ -896,10 +883,10 @@ process = miniAOD_customizeAllMC(process)
 
 # TICL
 from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
-process = TICL_iterations_withReco(process)
+# process = TICL_iterations_withReco(process)
 process = TICL_iterations(process)
 
-#Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
+# Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)
 

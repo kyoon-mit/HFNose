@@ -865,22 +865,9 @@ from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn
 process = setCrossingFrameOn(process)
 
 # End of customisation functions
-#do not add changes to your config after this point (unless you know what you are doing)
-from FWCore.ParameterSet.Utilities import convertToUnscheduled
-process = convertToUnscheduled(process)
-
-# customisation of the process.
-
-# Automatic addition of the customisation function from SimGeneral.MixingModule.fullMixCustomize_cff
-from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn 
-
-#call to customisation function setCrossingFrameOn imported from SimGeneral.MixingModule.fullMixCustomize_cff
-process = setCrossingFrameOn(process)
-
-# End of customisation functions
-#do not add changes to your config after this point (unless you know what you are doing)
-from FWCore.ParameterSet.Utilities import convertToUnscheduled
-process=convertToUnscheduled(process)
+# do not add changes to your config after this point (unless you know what you are doing)
+# from FWCore.ParameterSet.Utilities import convertToUnscheduled
+# process = convertToUnscheduled(process)
 
 # customisation of the process.
 
@@ -896,10 +883,10 @@ process = miniAOD_customizeAllMC(process)
 
 # TICL
 from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
-process = TICL_iterations_withReco(process)
+# process = TICL_iterations_withReco(process)
 process = TICL_iterations(process)
 
-#Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
+# Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)
 
@@ -954,7 +941,7 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step4 --conditions auto:phase2_realistic_T15 -s HARVESTING:@phase2Validation+@phase2+@miniAODValidation+@miniAODDQM --scenario pp --filetype DQM --geometry Extended2026D47 --era Phase2C10 --mc -n 100 --filein file:step3_inDQM.root
+# with command line options: step4 --conditions auto:phase2_realistic_T15 -s HARVESTING:@phase2Validation+@phase2+@miniAODValidation+@miniAODDQM --scenario pp --filetype DQM --geometry Extended2026D47 --era Phase2C10 --mc -n {1} --filein file:step3_inDQM.root --fileout file:step4.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
