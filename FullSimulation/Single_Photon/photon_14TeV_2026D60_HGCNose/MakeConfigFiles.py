@@ -79,7 +79,7 @@ def runSteps (pt_string_list, *steps):
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
-        cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D47_14TeV_photon_pt{2}_eta35_cfg.py".format(dir_run, step, pt) for pt in pt_string_list]
+        cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D60_14TeV_photon_pt{2}_eta35_cfg.py".format(dir_run, step, pt) for pt in pt_string_list]
         bash_command = " & ".join(cmd_list)
         p = subprocess.Popen(bash_command, shell=True)
         p.wait()
@@ -131,7 +131,7 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     dir_step1 = dir_run + '/step1_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60')
     for pt in pt_string_list:
         if not os.path.exists(dir_save + '/photon_pt{}'.format(pt)):
             os.makedirs(dir_save + '/photon_pt{}'.format(pt))
@@ -143,7 +143,7 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TTbar_14TeV_TuneCP5_cfi --conditions auto:phase2_realistic_T15 -n 10 --era Phase2C10 --eventcontent FEVTDEBUG --relval 9000,100 -s GEN,SIM --datatier GEN-SIM --beamspot HLLHC14TeV --geometry Extended2026D47 --fileout file:step1.root
+# with command line options: TTbar_14TeV_TuneCP5_cfi --conditions auto:phase2_realistic_T15 -n 10 --era Phase2C10 --eventcontent FEVTDEBUG --relval 9000,100 -s GEN,SIM --datatier GEN-SIM --beamspot HLLHC14TeV --geometry Extended2026D60 --fileout file:step1.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -156,8 +156,8 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 # process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC_cfi')
@@ -238,7 +238,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step1_2026D47_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step1_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -308,7 +308,7 @@ process = customiseEarlyDelete(process)
     
     # iterate over string-formatted pt values
     for pt in pt_string_list:
-        outfile = dir_step1 + '/step1_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+        outfile = dir_step1 + '/step1_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
             f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
@@ -340,7 +340,7 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
     dir_step2 = dir_run + '/step2_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -351,7 +351,7 @@ def makeStep2ConfigFiles (pt_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n 10 --geometry Extended2026D47 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
+# with command line options: step2 --conditions auto:phase2_realistic_T15 -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 --datatier GEN-SIM-DIGI-RAW -n 10 --geometry Extended2026D60 --era Phase2C10 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -364,7 +364,7 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
 process.load('Configuration.StandardSequences.L1TrackTrigger_cff')
@@ -459,7 +459,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step2_2026D47_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step2_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -484,20 +484,27 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
 # Path and EndPath definitions
+#process.digitisation_step = cms.Path(process.pdigi_valid)
+#process.L1TrackTrigger_step = cms.Path(process.L1TrackTrigger)
+#process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+#process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+#process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+#process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
+#process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+#process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+#process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+#process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+#process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+#process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+#process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+#process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+#process.L1simulation_step = cms.Path(process.SimL1Emulator)
+#process.digi2raw_step = cms.Path(process.DigiToRaw)
+#process.endjob_step = cms.EndPath(process.endOfProcess)
+#process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
+
 process.digitisation_step = cms.Path(process.pdigi_valid)
 process.L1TrackTrigger_step = cms.Path(process.L1TrackTrigger)
-process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
-process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
-process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
-process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
-process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
-process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
-process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
-process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
-process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
-process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
-process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
-process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.digi2raw_step = cms.Path(process.DigiToRaw)
 process.endjob_step = cms.EndPath(process.endOfProcess)
@@ -531,7 +538,7 @@ process = customiseEarlyDelete(process)
     
     # iterate over string-formatted pt values
     for pt in pt_string_list:
-        outfile = dir_step2 + '/step2_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+        outfile = dir_step2 + '/step2_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
             f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
@@ -563,7 +570,7 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
     dir_step3 = dir_run + '/step3_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -574,7 +581,7 @@ def makeStep3ConfigFiles (pt_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --conditions auto:phase2_realistic_T15 -n 10 --era Phase2C10 --eventcontent FEVTDEBUGHLT,MINIAODSIM,DQM --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM --datatier GEN-SIM-RECO,MINIAODSIM,DQMIO --geometry Extended2026D47 --filein file:step2.root --fileout file:step3.root
+# with command line options: step3 --conditions auto:phase2_realistic_T15 -n 10 --era Phase2C10 --eventcontent FEVTDEBUGHLT,MINIAODSIM,DQM --runUnscheduled -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM --datatier GEN-SIM-RECO,MINIAODSIM,DQMIO --geometry Extended2026D60 --filein file:step2.root --fileout file:step3.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -587,7 +594,7 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.L1Reco_cff')
@@ -665,7 +672,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step3_2026D47_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step3_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -769,6 +776,87 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
 # Path and EndPath definitions
+#process.raw2digi_step = cms.Path(process.RawToDigi)
+#process.L1Reco_step = cms.Path(process.L1Reco)
+#process.reconstruction_step = cms.Path(process.reconstruction)
+#process.recosim_step = cms.Path(process.recosim)
+#process.Flag_trackingFailureFilter = cms.Path(process.goodVertices+process.trackingFailureFilter)
+#process.Flag_goodVertices = cms.Path(process.primaryVertexFilter)
+#process.Flag_CSCTightHaloFilter = cms.Path(process.CSCTightHaloFilter)
+#process.Flag_trkPOGFilters = cms.Path(~process.logErrorTooManyClusters)
+#process.Flag_HcalStripHaloFilter = cms.Path(process.HcalStripHaloFilter)
+#process.Flag_trkPOG_logErrorTooManyClusters = cms.Path(~process.logErrorTooManyClusters)
+#process.Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
+#process.Flag_ecalLaserCorrFilter = cms.Path(process.ecalLaserCorrFilter)
+#process.Flag_globalSuperTightHalo2016Filter = cms.Path(process.globalSuperTightHalo2016Filter)
+#process.Flag_eeBadScFilter = cms.Path()
+#process.Flag_METFilters = cms.Path(process.metFilters)
+#process.Flag_chargedHadronTrackResolutionFilter = cms.Path(process.chargedHadronTrackResolutionFilter)
+#process.Flag_globalTightHalo2016Filter = cms.Path(process.globalTightHalo2016Filter)
+#process.Flag_CSCTightHaloTrkMuUnvetoFilter = cms.Path(process.CSCTightHaloTrkMuUnvetoFilter)
+#process.Flag_HBHENoiseIsoFilter = cms.Path()
+#process.Flag_BadChargedCandidateSummer16Filter = cms.Path(process.BadChargedCandidateSummer16Filter)
+#process.Flag_hcalLaserEventFilter = cms.Path(process.hcalLaserEventFilter)
+#process.Flag_BadPFMuonFilter = cms.Path(process.BadPFMuonFilter)
+#process.Flag_ecalBadCalibFilter = cms.Path(process.ecalBadCalibFilter)
+#process.Flag_HBHENoiseFilter = cms.Path()
+#process.Flag_trkPOG_toomanystripclus53X = cms.Path()
+#process.Flag_EcalDeadCellBoundaryEnergyFilter = cms.Path(process.EcalDeadCellBoundaryEnergyFilter)
+#process.Flag_BadChargedCandidateFilter = cms.Path(process.BadChargedCandidateFilter)
+#process.Flag_trkPOG_manystripclus53X = cms.Path()
+#process.Flag_BadPFMuonSummer16Filter = cms.Path(process.BadPFMuonSummer16Filter)
+#process.Flag_muonBadTrackFilter = cms.Path(process.muonBadTrackFilter)
+#process.Flag_CSCTightHalo2015Filter = cms.Path(process.CSCTightHalo2015Filter)
+#process.prevalidation_step = cms.Path(process.baseCommonPreValidation)
+#process.prevalidation_step1 = cms.Path(process.globalPrevalidationTracking)
+#process.prevalidation_step2 = cms.Path(process.globalPrevalidationMuons)
+#process.prevalidation_step3 = cms.Path(process.globalPrevalidationJetMETOnly)
+#process.prevalidation_step4 = cms.Path(process.prebTagSequenceMC)
+#process.prevalidation_step5 = cms.Path(process.produceDenoms)
+#process.prevalidation_step6 = cms.Path(process.globalPrevalidationHCAL)
+#process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
+#process.prevalidation_step8 = cms.Path(process.prevalidationMiniAOD)
+#process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
+#process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
+#process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
+#process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
+#process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
+#process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
+#process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
+#process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
+#process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
+#process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
+#process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
+#process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
+#process.validation_step = cms.EndPath(process.baseCommonValidation)
+#process.validation_step1 = cms.EndPath(process.globalValidationTrackingOnly)
+#process.validation_step2 = cms.EndPath(process.globalValidationMuons)
+#process.validation_step3 = cms.EndPath(process.globalValidationJetMETonly)
+#process.validation_step4 = cms.EndPath(process.electronValidationSequence)
+#process.validation_step5 = cms.EndPath(process.photonValidationSequence)
+#process.validation_step6 = cms.EndPath(process.bTagPlotsMCbcl)
+#process.validation_step7 = cms.EndPath((process.TauValNumeratorAndDenominatorQCD+process.TauValNumeratorAndDenominatorRealData+process.TauValNumeratorAndDenominatorRealElectronsData+process.TauValNumeratorAndDenominatorRealMuonsData+process.TauValNumeratorAndDenominatorZEE+process.TauValNumeratorAndDenominatorZMM+process.TauValNumeratorAndDenominatorZTT))
+#process.validation_step8 = cms.EndPath(process.globalValidationHCAL)
+#process.validation_step9 = cms.EndPath(process.globalValidationHGCal)
+#process.validation_step10 = cms.EndPath(process.globalValidationMTD)
+#process.validation_step11 = cms.EndPath(process.globalValidationOuterTracker)
+#process.validation_step12 = cms.EndPath(process.validationECALPhase2)
+#process.validation_step13 = cms.EndPath(process.trackerphase2ValidationSource)
+#process.validation_step14 = cms.EndPath(process.validationMiniAOD)
+#process.dqmoffline_step = cms.EndPath(process.DQMOfflineTracking)
+#process.dqmoffline_1_step = cms.EndPath(process.DQMOuterTracker)
+#process.dqmoffline_2_step = cms.EndPath(process.DQMOfflineTrackerPhase2)
+#process.dqmoffline_3_step = cms.EndPath(process.DQMOfflineMuon)
+#process.dqmoffline_4_step = cms.EndPath(process.DQMOfflineHcal)
+#process.dqmoffline_5_step = cms.EndPath(process.DQMOfflineHcal2)
+#process.dqmoffline_6_step = cms.EndPath(process.DQMOfflineEGamma)
+#process.dqmoffline_7_step = cms.EndPath(process.DQMOfflineMiniAOD)
+#process.dqmofflineOnPAT_step = cms.EndPath(process.PostDQMOffline)
+#process.dqmofflineOnPAT_1_step = cms.EndPath(process.PostDQMOfflineMiniAOD)
+#process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
+#process.MINIAODSIMoutput_step = cms.EndPath(process.MINIAODSIMoutput)
+#process.DQMoutput_step = cms.EndPath(process.DQMoutput)
+
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
 process.reconstruction_step = cms.Path(process.reconstruction)
@@ -800,6 +888,7 @@ process.Flag_trkPOG_manystripclus53X = cms.Path()
 process.Flag_BadPFMuonSummer16Filter = cms.Path(process.BadPFMuonSummer16Filter)
 process.Flag_muonBadTrackFilter = cms.Path(process.muonBadTrackFilter)
 process.Flag_CSCTightHalo2015Filter = cms.Path(process.CSCTightHalo2015Filter)
+process.Flag_BadPFMuonDzFilter = cms.Path(process.BadPFMuonDzFilter)
 process.prevalidation_step = cms.Path(process.baseCommonPreValidation)
 process.prevalidation_step1 = cms.Path(process.globalPrevalidationTracking)
 process.prevalidation_step2 = cms.Path(process.globalPrevalidationMuons)
@@ -809,18 +898,6 @@ process.prevalidation_step5 = cms.Path(process.produceDenoms)
 process.prevalidation_step6 = cms.Path(process.globalPrevalidationHCAL)
 process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
 process.prevalidation_step8 = cms.Path(process.prevalidationMiniAOD)
-process.pL1TkElectronsEllipticMatchHGC = cms.Path(process.L1TkElectronsEllipticMatchHGC)
-process.pL1TkMuon = cms.Path(process.L1TkMuons+process.L1TkMuonsTP)
-process.pL1TkIsoElectronsHGC = cms.Path(process.L1TkIsoElectronsHGC)
-process.pL1TkIsoElectronsCrystal = cms.Path(process.L1TkIsoElectronsCrystal)
-process.pL1TkPrimaryVertex = cms.Path(process.L1TkPrimaryVertex)
-process.pL1TkElectronsLooseHGC = cms.Path(process.L1TkElectronsLooseHGC)
-process.pL1TkPhotonsCrystal = cms.Path(process.L1TkPhotonsCrystal)
-process.pL1TkElectronsEllipticMatchCrystal = cms.Path(process.L1TkElectronsEllipticMatchCrystal)
-process.pL1TkElectronsHGC = cms.Path(process.L1TkElectronsHGC)
-process.pL1TkPhotonsHGC = cms.Path(process.L1TkPhotonsHGC)
-process.pL1TkElectronsCrystal = cms.Path(process.L1TkElectronsCrystal)
-process.pL1TkElectronsLooseCrystal = cms.Path(process.L1TkElectronsLooseCrystal)
 process.validation_step = cms.EndPath(process.baseCommonValidation)
 process.validation_step1 = cms.EndPath(process.globalValidationTrackingOnly)
 process.validation_step2 = cms.EndPath(process.globalValidationMuons)
@@ -850,8 +927,9 @@ process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 process.MINIAODSIMoutput_step = cms.EndPath(process.MINIAODSIMoutput)
 process.DQMoutput_step = cms.EndPath(process.DQMoutput)
 
+
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.recosim_step,process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.prevalidation_step,process.prevalidation_step1,process.prevalidation_step2,process.prevalidation_step3,process.prevalidation_step4,process.prevalidation_step5,process.prevalidation_step6,process.prevalidation_step7,process.validation_step,process.validation_step1,process.validation_step2,process.validation_step3,process.validation_step4,process.validation_step5,process.validation_step6,process.validation_step7,process.validation_step8,process.validation_step9,process.validation_step10,process.validation_step11,process.validation_step12,process.validation_step13,process.validation_step14,process.dqmoffline_step,process.dqmoffline_1_step,process.dqmoffline_2_step,process.dqmoffline_3_step,process.dqmoffline_4_step,process.dqmoffline_5_step,process.dqmoffline_6_step,process.dqmoffline_7_step,process.dqmofflineOnPAT_step,process.dqmofflineOnPAT_1_step,process.FEVTDEBUGHLToutput_step,process.MINIAODSIMoutput_step,process.DQMoutput_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.recosim_step,process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadPFMuonDzFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.prevalidation_step,process.prevalidation_step1,process.prevalidation_step2,process.prevalidation_step3,process.prevalidation_step4,process.prevalidation_step5,process.prevalidation_step6,process.prevalidation_step7,process.prevalidation_step8,process.validation_step,process.validation_step1,process.validation_step2,process.validation_step3,process.validation_step4,process.validation_step5,process.validation_step6,process.validation_step7,process.validation_step8,process.validation_step9,process.validation_step10,process.validation_step11,process.validation_step12,process.validation_step13,process.validation_step14,process.dqmoffline_step,process.dqmoffline_1_step,process.dqmoffline_2_step,process.dqmoffline_3_step,process.dqmoffline_4_step,process.dqmoffline_5_step,process.dqmoffline_6_step,process.dqmoffline_7_step,process.dqmofflineOnPAT_step,process.dqmofflineOnPAT_1_step,process.FEVTDEBUGHLToutput_step,process.MINIAODSIMoutput_step,process.DQMoutput_step)
 process.schedule.associate(process.patTask)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
@@ -865,9 +943,6 @@ from SimGeneral.MixingModule.fullMixCustomize_cff import setCrossingFrameOn
 process = setCrossingFrameOn(process)
 
 # End of customisation functions
-# do not add changes to your config after this point (unless you know what you are doing)
-# from FWCore.ParameterSet.Utilities import convertToUnscheduled
-# process = convertToUnscheduled(process)
 
 # customisation of the process.
 
@@ -881,12 +956,7 @@ process = miniAOD_customizeAllMC(process)
 
 # Customisation from command line
 
-# TICL
-from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
-# process = TICL_iterations_withReco(process)
-process = TICL_iterations(process)
-
-# Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
+#Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
 from FWCore.Modules.logErrorHarvester_cff import customiseLogErrorHarvesterUsingOutputCommands
 process = customiseLogErrorHarvesterUsingOutputCommands(process)
 
@@ -894,11 +964,16 @@ process = customiseLogErrorHarvesterUsingOutputCommands(process)
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
 # End adding early deletion
+
+# TICL
+from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
+# process = TICL_iterations_withReco(process)
+# process = TICL_iterations(process)
     """
     
     # iterate over string-formatted pt values
     for pt in pt_string_list:
-        outfile = dir_step3 + '/step3_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+        outfile = dir_step3 + '/step3_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
             f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
@@ -930,7 +1005,7 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
     dir_step4 = dir_run + '/step4_config'
     
     # Set output directory to put simulation root files
-    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47')
+    dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     
@@ -941,7 +1016,7 @@ def makeStep4ConfigFiles (pt_string_list, nevents):
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step4 --conditions auto:phase2_realistic_T15 -s HARVESTING:@phase2Validation+@phase2+@miniAODValidation+@miniAODDQM --scenario pp --filetype DQM --geometry Extended2026D47 --era Phase2C10 --mc -n {1} --filein file:step3_inDQM.root --fileout file:step4.root
+# with command line options: step4 --conditions auto:phase2_realistic_T15 -s HARVESTING:@phase2Validation+@phase2+@miniAODValidation+@miniAODDQM --scenario pp --filetype DQM --geometry Extended2026D60 --era Phase2C10 --mc -n {1} --filein file:step3_inDQM.root --fileout file:step4.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -954,7 +1029,7 @@ process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.DQMSaverAtRunEnd_cff')
 process.load('Configuration.StandardSequences.Harvesting_cff')
@@ -999,7 +1074,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step4_2026D47_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step4_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -1067,7 +1142,7 @@ process = customiseEarlyDelete(process)
     
     # iterate over string-formatted pt values
     for pt in pt_string_list:
-        outfile = dir_step4 + '/step4_2026D47_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+        outfile = dir_step4 + '/step4_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
         with open(outfile, 'w') as f:
             f.write(filedump_preformatted.format(pt, nevents, dir_save))
     
