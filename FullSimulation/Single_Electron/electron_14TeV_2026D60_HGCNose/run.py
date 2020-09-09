@@ -6,8 +6,8 @@ from MakeConfigFiles import *
 set_env()
 
 # Can also set up parser
-nevents = 500
-E_string_list = set_E('50')
+nevents = 10
+E_string_list = set_E('50', '500')
 
 makeStep1ConfigFiles (E_string_list, nevents)
 makeStep2ConfigFiles (E_string_list, nevents)
