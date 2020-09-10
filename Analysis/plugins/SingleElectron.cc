@@ -14,7 +14,8 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 // Physics objects
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+// #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 #include "DataFormats/HGCalReco/interface/TICLCandidate.h"
 
 // ROOT headers
@@ -25,7 +26,8 @@ SingleElectron::SingleElectron ( const edm::ParameterSet& iConfig ) :
     // histContainer_ (),
     
     // (tag name, default value (label, instance, process) -- CHECK SPELLING!!!!!!!
-    tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
+    // tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
+    tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth") ) ),
     tag_TICLCandidate_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TICLCandidate", edm::InputTag ("ticlCandidateFromTracksters") ) ),
     
     // Pre-selection parameters
@@ -34,7 +36,8 @@ SingleElectron::SingleElectron ( const edm::ParameterSet& iConfig ) :
     select_EtaHigh_ ( 3.51 )
 {
     // consumes: frequent request of additional data | mayConsume: infrequent
-    token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
+    // token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
+    token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
     token_TICLCandidate_ = consumes<std::vector<TICLCandidate>> ( tag_TICLCandidate_ );
 }
 
@@ -48,19 +51,19 @@ SingleElectron::~SingleElectron ()
 void SingleElectron::analyze ( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {    
     // Get MC truth
-    // edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth_;
-    // iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth_ );
-    edm::Handle<reco::GenParticleCollection> handle_GenParticle;
-    iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
+    // edm::Handle<reco::GenParticleCollection> handle_GenParticle;
+    // iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
+    edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth;
+    iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth );
     
     // Get TICLCandidate
     edm::Handle<std::vector<TICLCandidate>> handle_TICLCandidate;
     iEvent.getByToken ( token_TICLCandidate_, handle_TICLCandidate );
     
-    if ( handle_GenParticle.isValid() && handle_TICLCandidate.isValid() )
+    if ( handle_CaloParticle_MergedCaloTruth.isValid() && handle_TICLCandidate.isValid() )
     {
 
-        const std::vector<math::XYZTLorentzVectorF> truth_container = getTruthP4 ( *handle_GenParticle.product() );
+        const std::vector<math::XYZTLorentzVectorF> truth_container = getTruthP4 ( *handle_CaloParticle_MergedCaloTruth.product() );
         const std::vector<math::XYZTLorentzVectorF> reco_container = getTICLCandidateP4 ( *handle_TICLCandidate.product() );
         
         for ( auto const& truth: truth_container )
@@ -68,7 +71,7 @@ void SingleElectron::analyze ( const edm::Event& iEvent, const edm::EventSetup& 
             // fillHist_HGCalRecHitsEnergy_coneR ( truth, *handle_HGCRecHits.product(), handle_HGCalGeometry.product() );
             // fillHist_CaloClustersEnergy_coneR ( truth, *handle_HGCalLayerClustersHFNose.product() );
             // histContainer_["truthEDist"]->Fill ( truth.energy() );
-            std::cout << "GenParticle mass:" << truth.M() << std::endl;
+            std::cout << "CaloParticle energy:" << truth.energy() << std::endl;
         }
         
         for ( auto const& rc: reco_container )
@@ -81,18 +84,17 @@ void SingleElectron::analyze ( const edm::Event& iEvent, const edm::EventSetup& 
 }
 
 
-std::vector<math::XYZTLorentzVectorF> SingleElectron::getTruthP4 ( const reco::GenParticleCollection & GenParticles )
+std::vector<math::XYZTLorentzVectorF> SingleElectron::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticle )
 {
     std::vector<math::XYZTLorentzVectorF> container;
     
-    for ( auto const& gen: GenParticles )
+    for ( auto const& ct: caloTruthParticle )
     {
-        if ( gen.pdgId() == select_PID_
-                && abs(gen.eta()) > select_EtaLow_
-                && abs(gen.eta()) < select_EtaHigh_ 
-                && gen.isPromptFinalState() ) // Check if genparticle is final state
+        if ( ct.pdgId() == select_PID_
+                && abs(ct.eta()) > select_EtaLow_
+                && abs(ct.eta()) < select_EtaHigh_ )
         {
-            container.push_back ( (math::XYZTLorentzVectorF) gen.p4() );
+            container.push_back ( (math::XYZTLorentzVectorF) ct.p4() );
         }
     }
     

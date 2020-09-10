@@ -19,15 +19,18 @@ options.parseArguments()
 
 # Set output and input paths
 OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output')
-INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D47/electron_E{}'.format(options.E))
+INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/electron_2026D60/electron_E{}'.format(options.E))
 outputfile = OUTPUT_DIR + '/Single_Electron_E{}.root'.format(options.E)
 inputfile = 'file:' + INPUT_DIR + '/step3_electron_E{}.root'.format(options.E)
+
+if not os.path.exists(OUTPUT_DIR):
+    os.makedirs(OUTPUT_DIR)
 
 # Process load
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 
 process.load('Geometry.ForwardCommonData.hfnoseXML_cfi')
 process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi')

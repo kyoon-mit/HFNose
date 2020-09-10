@@ -852,11 +852,6 @@ from PhysicsTools.PatAlgos.slimming.miniAOD_tools import miniAOD_customizeAllMC
 #call to customisation function miniAOD_customizeAllMC imported from PhysicsTools.PatAlgos.slimming.miniAOD_tools
 process = miniAOD_customizeAllMC(process)
 
-# TICL
-from RecoHGCal.TICL.ticl_iterations import TICL_iterations_withReco,TICL_iterations
-process = TICL_iterations_withReco(process)
-# process = TICL_iterations(process)
-
 # End of customisation functions
 
 # Customisation from command line
