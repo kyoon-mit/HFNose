@@ -5,9 +5,10 @@
 <use name="CommonTools/UtilAlgos"/>
 
 <use name="DataFormats/HGCRecHit"/>
+<use name="DataFormats/CaloRecHit"/>
+<use name="DataFormats/HGCalReco"/>
 <use name="DataFormats/ForwardDetId"/>
 <use name="DataFormats/HepMCCandidate"/>
-<use name="DataFormats/CaloRecHit"/>
 <use name="DataFormats/GeometryVector"/>
 
 <use name="SimDataFormats/CaloHit"/>
