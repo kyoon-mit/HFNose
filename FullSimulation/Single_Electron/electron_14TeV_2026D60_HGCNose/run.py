@@ -7,7 +7,7 @@ set_env()
 
 # Can also set up parser
 nevents = 500
-E_string_list = set_E('50', '100', '250', '500')
+E_string_list = set_E('150', '200', '300', '350', '400', '450')
 
 makeStep1ConfigFiles (E_string_list, nevents)
 makeStep2ConfigFiles (E_string_list, nevents)

@@ -166,13 +166,13 @@ void SingleElectron::beginJob ()
     histContainer_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, 3.0, 4.0);
     histContainer_["tracksterRawEDist"] = fs->make<TH1F>("tracksterRawEDist", "Trackster Raw Energy Distribution", 100, 0, 1000);
     histContainer_["tracksterAbsEtaDist"] = fs->make<TH1F>("tracksterAbsEtaDist", "Trackster Absolute Eta Distribution", 40, 3.0, 4.0);
-    histContainer_["tracksterRawEScale"] = fs->make<TH1F>("tracksterRawEScale", "Trackster Raw Energy Scale", 20, 0, 100);
+    histContainer_["tracksterRawEScale"] = fs->make<TH1F>("tracksterRawEScale", "Trackster Raw Energy Scale", 20, 0, 200);
     histContainer_["tracksterAbsEtaScale"] = fs->make<TH1F>("tracksterAbsEtaScale", "Trackster Absolute Eta Scale", 20, 0, 0.5);
     
     // Label axes
     histContainer_["tracksterRawEDist"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
     histContainer_["tracksterAbsEtaDist"]->GetXaxis()->SetTitle("|#eta_{trackster}|");
-    histContainer_["tracksterRawEScale"]->GetXaxis()->SetTitle("E_{trackster}-E_{caloParticle} [GeV/c^{2}]");
+    histContainer_["tracksterRawEScale"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
     histContainer_["tracksterAbsEtaScale"]->GetXaxis()->SetTitle("|#eta_{trackster} - #eta_{caloParticle}| [GeV/c^{2}]");
 }
 
