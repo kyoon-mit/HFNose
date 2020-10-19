@@ -4,6 +4,7 @@
 #include <array>
 
 #include <cmath> // Switch to TMath.h if you need more physics-related functions
+#include "DataFormats/Math/interface/deltaR.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -29,18 +30,21 @@ SingleElectron::SingleElectron ( const edm::ParameterSet& iConfig ) :
     // (tag name, default value (label, instance, process) -- CHECK SPELLING!!!!!!!
     // tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
     tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth") ) ),
-    tag_Trackster_HFNoseTrk_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_Trackster", edm::InputTag ("ticlTrackstersHFNoseTrk") ) ),
+    tag_Trackster_HFNoseTrk_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TracksterHFNoseTrk", edm::InputTag ("ticlTrackstersHFNoseTrk") ) ),
+    tag_Trackster_HFNoseTrkHP_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TracksterHFNoseTrkHighPuritySeed", edm::InputTag ("ticlTrackstersHFNoseTrkHighPuritySeed") ) ),
     // tag_TICLCandidate_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TICLCandidate", edm::InputTag ("ticlCandidateFromTracksters") ) ),
     
-    // Pre-selection parameters
+    // Custom parameters
     select_PID_ ( 11 ),
     select_EtaLow_ ( 3.49 ),
-    select_EtaHigh_ ( 3.51 )
+    select_EtaHigh_ ( 3.51 ),
+    truth_matching_deltaR_ ( 0.2 )
 {
     // consumes: frequent request of additional data | mayConsume: infrequent
     // token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
     token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
     token_Trackster_HFNoseTrk_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_HFNoseTrk_ );
+    token_Trackster_HFNoseTrkHP_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_HFNoseTrkHP_ );
     // token_TICLCandidate_ = consumes<std::vector<TICLCandidate>> ( tag_TICLCandidate_ );
 }
 
@@ -64,14 +68,18 @@ void SingleElectron::analyze ( const edm::Event& iEvent, const edm::EventSetup& 
     // iEvent.getByToken ( token_TICLCandidate_, handle_TICLCandidate );
     
     // Get ticlTrackstersHFNoseTrk
-    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNose_Trk;
-    iEvent.getByToken ( token_Trackster_HFNoseTrk_, handle_Trackster_HFNose_Trk );
+    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNoseTrk;
+    iEvent.getByToken ( token_Trackster_HFNoseTrk_, handle_Trackster_HFNoseTrk );
     
-    if ( handle_CaloParticle_MergedCaloTruth.isValid() && handle_Trackster_HFNose_Trk.isValid() )
+    // Get ticlTrackstersHFNoseTrkHighPuritySeed
+    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNoseTrkHP;
+    iEvent.getByToken ( token_Trackster_HFNoseTrkHP_, handle_Trackster_HFNoseTrkHP );
+    
+    if ( handle_CaloParticle_MergedCaloTruth.isValid() && handle_Trackster_HFNoseTrk.isValid() )
     {
 
         // const std::vector<math::XYZTLorentzVectorF> truth_container = getTruthP4 ( *handle_CaloParticle_MergedCaloTruth.product() );
-        analyzeTICLTrackster ( *handle_CaloParticle_MergedCaloTruth.product(), *handle_Trackster_HFNose_Trk.product() );
+        analyzeTICLTrackster ( *handle_CaloParticle_MergedCaloTruth.product(), *handle_Trackster_HFNoseTrk.product() );
         
         /*for ( auto const& truth: truth_container )
         {            
@@ -113,25 +121,23 @@ void SingleElectron::analyzeTICLTrackster ( const std::vector<CaloParticle> & ca
     {
         Float_t trackster_raw_energy = trs.raw_energy();
         Float_t trackster_eta = trs.barycenter().eta();
+        Float_t trackster_phi = trs.barycenter().phi();
         
         for ( auto const& clt: selected_calotruths )
         {
             histContainer_["truthE"]->Fill( clt.E() );
             histContainer_["truthEta"]->Fill( clt.Eta() );
             
-            if ( clt.Eta() > 0 && trackster_eta > 0 )
+            Float_t dR = reco::deltaR ( trackster_eta, trackster_phi, clt.eta(), clt.phi() );
+
+            // Matched            
+            if ( dR < truth_matching_deltaR_ )
             {
                 histContainer_["tracksterRawEDist"]->Fill( trackster_raw_energy );
                 histContainer_["tracksterAbsEtaDist"]->Fill( abs(trackster_eta) );
                 histContainer_["tracksterRawEScale"]->Fill( clt.E() - trackster_raw_energy );
                 histContainer_["tracksterAbsEtaScale"]->Fill( abs(clt.Eta() - trackster_eta) );
-            }
-            else if ( clt.Eta() < 0 && trackster_eta < 0 )
-            {
-                histContainer_["tracksterRawEDist"]->Fill( trackster_raw_energy );
-                histContainer_["tracksterAbsEtaDist"]->Fill( abs(trackster_eta) );
-                histContainer_["tracksterRawEScale"]->Fill( clt.E() - trackster_raw_energy );
-                histContainer_["tracksterAbsEtaScale"]->Fill( abs(clt.Eta() - trackster_eta) );
+                histContainer_["tracksterAbsRScale"]->Fill( dR );
             }
         }
     }
@@ -168,12 +174,14 @@ void SingleElectron::beginJob ()
     histContainer_["tracksterAbsEtaDist"] = fs->make<TH1F>("tracksterAbsEtaDist", "Trackster Absolute Eta Distribution", 40, 3.0, 4.0);
     histContainer_["tracksterRawEScale"] = fs->make<TH1F>("tracksterRawEScale", "Trackster Raw Energy Scale", 20, 0, 200);
     histContainer_["tracksterAbsEtaScale"] = fs->make<TH1F>("tracksterAbsEtaScale", "Trackster Absolute Eta Scale", 20, 0, 0.5);
+    histContainer_["tracksterAbsRScale"] = fs->make<TH1F>("tracksterAbsRScale", "Trackster Absolute R Scale", 20, 0, 0.5);
     
     // Label axes
     histContainer_["tracksterRawEDist"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
     histContainer_["tracksterAbsEtaDist"]->GetXaxis()->SetTitle("|#eta_{trackster}|");
     histContainer_["tracksterRawEScale"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["tracksterAbsEtaScale"]->GetXaxis()->SetTitle("|#eta_{trackster} - #eta_{caloParticle}| [GeV/c^{2}]");
+    histContainer_["tracksterAbsEtaScale"]->GetXaxis()->SetTitle("|#eta_{trackster} - #eta_{caloParticle}|");
+    histContainer_["tracksterAbsRScale"]->GetXaxis()->SetTitle("|#Delta R_{trackster - caloParticle}|");
 }
 
 

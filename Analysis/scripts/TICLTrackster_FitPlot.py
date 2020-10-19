@@ -182,11 +182,39 @@ def setTGraphStyle (graph, histtitle, preset):
         graph.SetMarkerSize(1)
         graph.SetMarkerStyle(21)
         
+    elif preset=='EFraction_1':
+        graph.SetTitle(histtitle)
+        graph.GetXaxis().SetTitle('E_{caloParticle} [GeV]')
+        graph.GetXaxis().SetLimits(0, 550)
+        graph.GetYaxis().SetTitle('E_{trackster} / E_{caloParticle} [%]')
+        graph.SetMinimum(0)
+        graph.SetMaximum(100)
+        graph.SetLineColor(14)
+        graph.SetMarkerColor(9)
+        graph.SetLineWidth(1)
+        graph.SetLineStyle(1)
+        graph.SetMarkerSize(1)
+        graph.SetMarkerStyle(21)
+        
     elif preset=='EtaScale_1':
         graph.SetTitle(histtitle)
         graph.GetXaxis().SetTitle('E_{caloParticle} [GeV]')
         graph.GetXaxis().SetLimits(0, 550)
-        graph.GetYaxis().SetTitle('|E_{caloParticle} - E_{trackster}| [GeV]')
+        graph.GetYaxis().SetTitle('|#eta_{caloParticle} - #eta_{trackster}| [GeV]')
+        graph.SetMinimum(0)
+        graph.SetMaximum(0.05)
+        graph.SetLineColor(14)
+        graph.SetMarkerColor(9)
+        graph.SetLineWidth(1)
+        graph.SetLineStyle(1)
+        graph.SetMarkerSize(1)
+        graph.SetMarkerStyle(21)
+        
+    elif preset=='RScale_1':
+        graph.SetTitle(histtitle)
+        graph.GetXaxis().SetTitle('E_{caloParticle} [GeV]')
+        graph.GetXaxis().SetLimits(0, 550)
+        graph.GetYaxis().SetTitle('|#Delta R_{caloParticle - trackster}| [GeV]')
         graph.SetMinimum(0)
         graph.SetMaximum(0.05)
         graph.SetLineColor(14)
@@ -209,7 +237,9 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
     truth_E_array = np.zeros(num_points)
     trackster_ERes_array, trackster_ERes_error_array = np.zeros(num_points), np.zeros(num_points)
     trackster_EScale_array, trackster_EScale_error_array = np.zeros(num_points), np.zeros(num_points)
+    trackster_EFraction_array, trackster_EFraction_error_array = np.zeros(num_points), np.zeros(num_points)
     trackster_EtaScale_array = np.zeros(num_points)
+    trackster_RScale_array = np.zeros(num_points)
     
     for i in range(num_points):
     
@@ -225,6 +255,7 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
         tracksterAbsEtaDist = tree.Get('tracksterAbsEtaDist')
         tracksterRawEScale = tree.Get('tracksterRawEScale')
         tracksterAbsEtaScale = tree.Get('tracksterAbsEtaScale')
+        tracksterAbsRScale = tree.Get('tracksterAbsRScale')
         
         # Extend scope of histograms
         truthE.SetDirectory(0)
@@ -233,6 +264,7 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
         tracksterAbsEtaDist.SetDirectory(0)
         tracksterRawEScale.SetDirectory(0)
         tracksterAbsEtaScale.SetDirectory(0)
+        tracksterAbsRScale.SetDirectory(0)
         
         ### Get stats
         
@@ -254,8 +286,15 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
         trackster_EScale_array[i] = trackster_mean_raw_energy_scale
         trackster_EScale_error_array[i] = trackster_sigma_raw_energy_scale
         
+        # Trackster "Raw Energy" / Truth Energy
+        trackster_EFraction_array[i] = trackster_mean_raw_energy / truthE.GetMean(1)
+        trackster_EFraction_error_array[i] = trackster_mean_error_raw_energy / truthE.GetMean(1)
+        
         # Trackster Eta Scale
         trackster_EtaScale_array[i] = tracksterAbsEtaScale.GetMean(1)
+        
+        # Trackster R Scale
+        trackster_RScale_array[i] = tracksterAbsRScale.GetMean(1)
         
         infile.Close()
         
@@ -266,7 +305,11 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
     
     dict_plots['trackster_RawEScale_graph'] = TGraphErrors(num_points, truth_E_array, trackster_EScale_array, np.zeros(num_points), trackster_EScale_error_array)
     
+    dict_plots['trackster_RawEFraction_graph'] = TGraphErrors(num_points, truth_E_array, trackster_EFraction_array*100, np.zeros(num_points), trackster_EFraction_error_array)
+    
     dict_plots['trackster_AbsEtaScale_graph'] = TGraph(num_points, truth_E_array, trackster_EtaScale_array)
+    
+    dict_plots['trackster_AbsRScale_graph'] = TGraph(num_points, truth_E_array, trackster_RScale_array)
     
     return dict_plots
     
@@ -318,9 +361,11 @@ def plotGraphs (dict_plots, top_save_dir):
     if not os.path.exists(top_save_dir + '/SingleElectron_plots'):
         os.makedirs(top_save_dir + '/SingleElectron_plots')
 
-    setTGraphStyle(dict_plots["trackster_RawERes_graph"], "Trackster \"raw energy\" resolution", preset='ERes_1')
-    setTGraphStyle(dict_plots["trackster_RawEScale_graph"], "Trackster \"raw energy\" scale", preset='EScale_1')
+    setTGraphStyle(dict_plots["trackster_RawERes_graph"], "Trackster raw energy resolution", preset='ERes_1')
+    setTGraphStyle(dict_plots["trackster_RawEScale_graph"], "Trackster raw energy scale", preset='EScale_1')
+    setTGraphStyle(dict_plots["trackster_RawEFraction_graph"], "Trackster (raw energy) / (truth energy)", preset='EFraction_1')
     setTGraphStyle(dict_plots["trackster_AbsEtaScale_graph"], "Trackster eta deviation", preset='EtaScale_1')
+    setTGraphStyle(dict_plots["trackster_AbsRScale_graph"], "Trackster R deviation", preset='RScale_1')
     
     c1 = TCanvas("RawERes")
     dict_plots["trackster_RawERes_graph"].Draw('ALP')
@@ -329,13 +374,23 @@ def plotGraphs (dict_plots, top_save_dir):
     c2.cd()
     dict_plots["trackster_RawEScale_graph"].Draw('ALP')
     
-    c3 = TCanvas("AbsEtaScale")
+    c3 = TCanvas("RawEFraction")
     c3.cd()
+    dict_plots["trackster_RawEFraction_graph"].Draw('ALP')
+    
+    c4 = TCanvas("AbsEtaScale")
+    c4.cd()
     dict_plots["trackster_AbsEtaScale_graph"].Draw('ALP')
+    
+    c5 = TCanvas("AbsRScale")
+    c5.cd()
+    dict_plots["trackster_AbsRScale_graph"].Draw('ALP')
     
     c1.SaveAs(top_save_dir + '/SingleElectron_plots/RawERes.png')
     c2.SaveAs(top_save_dir + '/SingleElectron_plots/RawEScale.png')
-    c3.SaveAs(top_save_dir + '/SingleElectron_plots/AbsEtaScale.png')
+    c3.SaveAs(top_save_dir + '/SingleElectron_plots/RawEFraction.png')
+    c4.SaveAs(top_save_dir + '/SingleElectron_plots/AbsEtaScale.png')
+    c5.SaveAs(top_save_dir + '/SingleElectron_plots/AbsRScale.png')
     
     return
 

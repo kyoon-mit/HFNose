@@ -41,7 +41,7 @@ process.load('Geometry.ForwardGeometry.HFNoseGeometryESProducer_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options = cms.untracked.PSet (
     wantSummary = cms.untracked.bool(False),
-    numberOfThreads = cms.untracked.uint32(1),
+    numberOfThreads = cms.untracked.uint32(2),
     numberOfStreams = cms.untracked.uint32(0)
 )
 

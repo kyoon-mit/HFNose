@@ -65,18 +65,21 @@ class SingleElectron : public edm::EDAnalyzer
     // edm::EDGetTokenT<reco::GenParticleCollection> token_GenParticle_;
     edm::EDGetTokenT<std::vector<CaloParticle>> token_CaloParticle_MergedCaloTruth_;
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_HFNoseTrk_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_HFNoseTrkHP_;
     // edm::EDGetTokenT<std::vector<TICLCandidate>> token_TICLCandidate_;
     
     // Input Tags
     // edm::InputTag tag_GenParticle_;
     edm::InputTag tag_CaloParticle_MergedCaloTruth_;
     edm::InputTag tag_Trackster_HFNoseTrk_;
+    edm::InputTag tag_Trackster_HFNoseTrkHP_;
     // edm::InputTag tag_TICLCandidate_;
     
     // Others
     Int_t   select_PID_;
     Float_t select_EtaLow_;
     Float_t select_EtaHigh_;
+    Float_t truth_matching_deltaR_;
 };
 
 #endif
