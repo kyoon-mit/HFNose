@@ -18,11 +18,15 @@
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
+#include "DataFormats/ForwardDetId/interface/HFNoseDetId.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/HGCalReco/interface/Trackster.h"
 // #include "DataFormats/HGCalReco/interface/TICLCandidate.h"
 
 #include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
 #include "Geometry/Records/interface/IdealGeometryRecord.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
 // ROOT headers
 
@@ -237,7 +241,7 @@ void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthP
             const GlobalPoint & hit_globalPosition = geom->getPosition(hit_id);
             Float_t hit_eta = hit_globalPosition.eta();
             Float_t hit_phi = hit_globalPosition.phi();
-        
+
             Float_t dR = reco::deltaR ( hit_eta, hit_phi, truth_eta, truth_phi );
             
             if ( dR < truth_matching_deltaR_ )
