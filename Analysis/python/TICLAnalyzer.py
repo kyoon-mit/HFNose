@@ -33,11 +33,11 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.Geometry.GeometryExtended2026D60_cff')
 process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 
-process.load('Geometry.ForwardCommonData.hfnoseXML_cfi')
-process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi')
-process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi')
-process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi')
-process.load('Geometry.ForwardGeometry.HFNoseGeometryESProducer_cfi')
+#process.load('Geometry.ForwardCommonData.hfnoseXML_cfi')
+#process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi')
+#process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi')
+#process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi')
+#process.load('Geometry.ForwardGeometry.HFNoseGeometryESProducer_cfi')
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options = cms.untracked.PSet (
