@@ -104,8 +104,8 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
 //         handle_SimHits_HFNose.isValid() &&
          handle_RecHits_HFNose.isValid() &&
          handle_LayerClusters_HFNose.isValid() &&
-         handle_Trackster_HFNoseEM.isValid() &&
-         handle_Trackster_HFNoseTrkEM.isValid()
+         handle_Trackster_HFNoseEM.isValid() //&&
+//         handle_Trackster_HFNoseTrkEM.isValid()
        )
     {
 
@@ -113,7 +113,7 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
         const HGCalGeometry* geom = handle_HGCalGeometry.product();
 
         analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseEM.product(), "EMn" );
-        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseTrkEM.product(), "TrkEMn" );
+//        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseTrkEM.product(), "TrkEMn" );
         analyzeRecHits ( caloTruthParticles, *handle_RecHits_HFNose.product(), geom );
         analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters_HFNose.product() );
         
@@ -160,6 +160,21 @@ void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & calo
 
             if ( dR < truth_matching_deltaR_ )
             {
+                /* Add Trackster dissecting code here */
+                
+                // 1. Number of LayerClusters in Trackster, cumulative and per layer
+                int count_total_layerClusters = 0;
+                int count_perLayer_layerClusters[8] = 0;
+                
+                // 2. Cosine of angle between doublets (related to the min_cos_theta cut)
+                
+                // 3. Cosine of pointing angle of outer doublet (related to min_cos_pointing cut)
+                
+                // 4. Number of missing layers
+                
+                // 5. Timing
+            
+            
             
                 if ( tag == "EMn" )
                 {
