@@ -7,12 +7,12 @@ from MakeConfigFiles import *
 set_env()
 
 # Can also set up parser
-nevents = 10
-pt_string_list = set_pt('4')
+nevents = 500
+E_string_list = set_E('10', '50', '100', '200', '300', '400', '500')
 
-makeStep1ConfigFiles (pt_string_list, nevents)
-makeStep2ConfigFiles (pt_string_list, nevents)
-makeStep3ConfigFiles (pt_string_list, nevents)
-makeStep4ConfigFiles (pt_string_list, nevents)
+makeStep1ConfigFiles (E_string_list, nevents)
+makeStep2ConfigFiles (E_string_list, nevents)
+makeStep3ConfigFiles (E_string_list, nevents)
+makeStep4ConfigFiles (E_string_list, nevents)
 
-runSteps(pt_string_list, 3)
+runSteps(E_string_list, 1,2,3)

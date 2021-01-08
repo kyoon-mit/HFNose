@@ -3,29 +3,29 @@
 import os
 import subprocess
 
-# Set list of pt values (must be string) to iterate over
-def set_pt (*args):
-    """ Sets list of pt values in string that will be passed on to the generator.
+# Set list of E values (must be string) to iterate over
+def set_E (*args):
+    """ Sets list of E values in string that will be passed on to the generator.
     
     Parameters
     ----------
     *args
-        Variable length list of pt values in string.  If any of the values entered is not string, it will raise an exception.
+        Variable length list of E values in string.  If any of the values entered is not string, it will raise an exceEion.
     
     Returns
     -------
     list(str)
-        If no value is provided in args, it will return ['.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9'] by default. Otherwise, it will return args in the order the values were provided.
+        If no value is provided in args, it will return ['50', '100', '150', '200', '250', '300', '350', '400', '450', '500'] by default. Otherwise, it will return args in the order the values were provided.
     
     """
     
     if len(args)==0:
-        pt_string_list = ['.33', '.66', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        return pt_string_list
+        E_string_list = ['50', '100', '150', '200', '250', '300', '350', '400', '450', '500']
+        return E_string_list
     else:
         for arg in args:
             if type(arg)!=str:
-                raise Exception("Please provide string only in args.")
+                raise ExceEion("Please provide string only in args.")
         return args
 
 
@@ -33,7 +33,7 @@ def set_pt (*args):
 def set_env ():
     """ Exports environment variables that are needed in this program.
     
-    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. Exception will be raised if it is not set.
+    DIRDATA_HGCNOSE is the directory where the simulation data will be stored. Can be set in config.sh of the top directory. ExceEion will be raised if it is not set.
     
     Parameters
     ----------
@@ -46,22 +46,22 @@ def set_env ():
     """
         
     if not 'DIRDATA_HGCNOSE' in os.environ:
-        raise Exception("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
+        raise ExceEion("Environment variable DIRDATA_HGCNOSE does not exist! This is the top directory where your generated files will be stored. Please set it by editing DIRDATA_HGCNOSE in config.sh and running it.")
     else:
         print "Generated files will be stored in %s" % (os.environ['DIRDATA_HGCNOSE'])
 
     return None
         
         
-def runSteps (pt_string_list, *steps):
+def runSteps (E_string_list, *steps):
     """ Run the step cfg.py files for the step numbers specified.
     
     All config files in the same steps will run in parallel.
     
     Parameters
     ----------
-    pt_string_list: list(str)
-        List of string-formatted pt values to run cfg.py files over.
+    E_string_list: list(str)
+        List of string-formatted E values to run cfg.py files over.
     
     *steps: int or str
         Steps to run. Does not have to be ordered; it will order it for you.
@@ -79,7 +79,7 @@ def runSteps (pt_string_list, *steps):
     steps = sorted(s for s in steps)
     for step in steps:
         dir_cfg = os.path.abspath(dir_run + "/step{}_config".format(step))
-        cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D60_14TeV_photon_pt{2}_eta35_cfg.py".format(dir_run, step, pt) for pt in pt_string_list]
+        cmd_list= ["cmsRun {0}/step{1}_config/step{1}_2026D60_14TeV_photon_E{2}_eta35_cfg.py".format(dir_run, step, E) for E in E_string_list]
         bash_command = " & ".join(cmd_list)
         p = subprocess.Popen(bash_command, shell=True)
         p.wait()
@@ -106,15 +106,15 @@ def purge ():
     return None
 
 
-def makeStep1ConfigFiles (pt_string_list, nevents):
-    """ Generates CMSSW cfg python scripts to run step 1 generation.
+def makeStep1ConfigFiles (E_string_list, nevents):
+    """ Generates CMSSW cfg python scriEs to run step 1 generation.
     
-    If there are N pt values given, N files will be generated in the sub-directory run/step1_config.
+    If there are N E values given, N files will be generated in the sub-directory run/step1_config.
     
     Parameters
     ----------
-    pt_string_list : list(str)
-        List of string-formatted pt values. Ideally, this will be given through the function set_pt(*args).
+    E_string_list : list(str)
+        List of string-formatted E values. Ideally, this will be given through the function set_E(*args).
         
     nevents : int
         Number of events to generate
@@ -132,9 +132,9 @@ def makeStep1ConfigFiles (pt_string_list, nevents):
     
     # Set output directory to put simulation root files
     dir_save = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60')
-    for pt in pt_string_list:
-        if not os.path.exists(dir_save + '/photon_pt{}'.format(pt)):
-            os.makedirs(dir_save + '/photon_pt{}'.format(pt))
+    for E in E_string_list:
+        if not os.path.exists(dir_save + '/photon_E{}'.format(E)):
+            os.makedirs(dir_save + '/photon_E{}'.format(E))
     
     # What to write in file
     filedump_preformatted =\
@@ -176,11 +176,11 @@ process.VtxSmeared.MaxZ = cms.double(0.0000)
 process.VtxSmeared.MinZ = cms.double(-0.0000)
 
 process.MessageLogger = cms.Service("MessageLogger",
-        destinations   = cms.untracked.vstring(
-                                                'pt{0}_detailedInfo_step1',
-                                                'pt{0}_critical_step1'
+       destinations   = cms.untracked.vstring(
+                                                'E{0}_detailedInfo_step1',
+                                                'E{0}_critical_step1'
         ),
-        pt{0}_detailedInfo_step1 = cms.untracked.PSet(
+        E{0}_detailedInfo_step1 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -194,10 +194,10 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 limit = cms.untracked.int32(100),
                                 timespan = cms.untracked.int32(60)
                 )
-       ),
-       pt{0}_critical_step1     = cms.untracked.PSet(
+        ),
+        E{0}_critical_step1     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
-       )
+        )
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -238,7 +238,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step1_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step1_2026D60_14TeV_photon_E{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -253,7 +253,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_E{0}/step1_photon_E{0}.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -265,7 +265,7 @@ process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
-process.generator = cms.EDProducer("FlatRandomPtGunProducer",
+process.generator = cms.EDProducer("FlatRandomEGunProducer",
     AddAntiParticle = cms.bool(True),
     PGunParameters = cms.PSet(
         AddAntiParticle = cms.bool(True),
@@ -273,13 +273,13 @@ process.generator = cms.EDProducer("FlatRandomPtGunProducer",
         MinEta = cms.double(3.4999),
         MaxPhi = cms.double(3.14159265359),
         MinPhi = cms.double(-3.14159265359),
-        MaxPt = cms.double({0} + 0.001),
-        MinPt = cms.double({0} - 0.001),
+        MaxE = cms.double({0} + 0.001),
+        MinE = cms.double({0} - 0.001),
         PartID = cms.vint32(22)
     ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
-    psethack = cms.string('single gamma pt {0}')
+    psethack = cms.string('single electron E {0}')
 )
 
 
@@ -306,24 +306,24 @@ process = customiseEarlyDelete(process)
 # End adding early deletion
     """
     
-    # iterate over string-formatted pt values
-    for pt in pt_string_list:
-        outfile = dir_step1 + '/step1_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+    # iterate over string-formatted E values
+    for E in E_string_list:
+        outfile = dir_step1 + '/step1_2026D60_14TeV_photon_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents, dir_save))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
         
 
-def makeStep2ConfigFiles (pt_string_list, nevents):
-    """ Generates CMSSW cfg python scripts to run step 2 digitization.
+def makeStep2ConfigFiles (E_string_list, nevents):
+    """ Generates CMSSW cfg python scriEs to run step 2 digitization.
     
-    If there are N pt values given, N files will be generated in the sub-directory run/step2_config.
+    If there are N E values given, N files will be generated in the sub-directory run/step2_config.
     
     Parameters
     ----------
-    pt_string_list : list(str)
-        List of string-formatted pt values. Ideally, this will be given through the function set_pt(*args).
+    E_string_list : list(str)
+        List of string-formatted E values. Ideally, this will be given through the function set_E(*args).
         
     nevents : int
         Number of events to process
@@ -376,10 +376,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.MessageLogger = cms.Service("MessageLogger",
         destinations   = cms.untracked.vstring(
-                                                'pt{0}_detailedInfo_step2',
-                                                'pt{0}_critical_step2'
+                                                'E{0}_detailedInfo_step2',
+                                                'E{0}_critical_step2'
         ),
-        pt{0}_detailedInfo_step2 = cms.untracked.PSet(
+        E{0}_detailedInfo_step2 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -394,7 +394,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 timespan = cms.untracked.int32(60)
                 )
         ),
-        pt{0}_critical_step2     = cms.untracked.PSet(
+        E{0}_critical_step2     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
         )
 )
@@ -407,7 +407,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step1_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/photon_E{0}/step1_photon_E{0}.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -423,7 +423,7 @@ process.source = cms.Source("PoolSource",
         'drop *_genCandidatesForMET_*_*', 
         'drop *_genParticlesForMETAllVisible_*_*', 
         'drop *_genMetCalo_*_*', 
-        'drop *_genMetCaloAndNonPrompt_*_*', 
+        'drop *_genMetCaloAndNonPromE_*_*', 
         'drop *_genMetTrue_*_*', 
         'drop *_genMetIC5GenJs_*_*'
     ),
@@ -459,7 +459,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step2_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step2_2026D60_14TeV_photon_E{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -471,7 +471,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_E{0}/step2_photon_E{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -517,24 +517,24 @@ process = customiseEarlyDelete(process)
 # End adding early deletion
     """
     
-    # iterate over string-formatted pt values
-    for pt in pt_string_list:
-        outfile = dir_step2 + '/step2_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+    # iterate over string-formatted E values
+    for E in E_string_list:
+        outfile = dir_step2 + '/step2_2026D60_14TeV_photon_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents, dir_save))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
 
 
-def makeStep3ConfigFiles (pt_string_list, nevents):
-    """ Generates CMSSW cfg python scripts to run step 3 reconstruction.
+def makeStep3ConfigFiles (E_string_list, nevents):
+    """ Generates CMSSW cfg python scriEs to run step 3 reconstruction.
     
-    If there are N pt values given, N files will be generated in the sub-directory run/step3_config.
+    If there are N E values given, N files will be generated in the sub-directory run/step3_config.
     
     Parameters
     ----------
-    pt_string_list : list(str)
-        List of string-formatted pt values. Ideally, this will be given through the function set_pt(*args).
+    E_string_list : list(str)
+        List of string-formatted E values. Ideally, this will be given through the function set_E(*args).
         
     nevents : int
         Number of events to process
@@ -590,10 +590,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.MessageLogger = cms.Service("MessageLogger",
        destinations   = cms.untracked.vstring(
-                                                'pt{0}_detailedInfo_step3',
-                                                'pt{0}_critical_step3'
+                                                'E{0}_detailedInfo_step3',
+                                                'E{0}_critical_step3'
        ),
-       pt{0}_detailedInfo_step3 = cms.untracked.PSet(
+       E{0}_detailedInfo_step3 = cms.untracked.PSet(
                 threshold   = cms.untracked.string('DEBUG'),
                 default     = cms.untracked.PSet(
                                 limit = cms.untracked.int32(10),
@@ -608,7 +608,7 @@ process.MessageLogger = cms.Service("MessageLogger",
                                 timespan = cms.untracked.int32(60)
                 )
        ),
-       pt{0}_critical_step3     = cms.untracked.PSet(
+       E{0}_critical_step3     = cms.untracked.PSet(
                 threshold   = cms.untracked.string('ERROR')
        )
 )
@@ -620,7 +620,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step2_photon_pt{0}.root'),
+    fileNames = cms.untracked.vstring('file:{2}/photon_E{0}/step2_photon_E{0}.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -653,7 +653,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step3_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step3_2026D60_14TeV_photon_E{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -665,7 +665,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RECO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}.root'),
+    fileName = cms.untracked.string('file:{2}/photon_E{0}/step3_photon_E{0}.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -680,7 +680,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}_inMINIAODSIM.root'),
+    fileName = cms.untracked.string('file:{2}/photon_E{0}/step3_photon_E{0}_inMINIAODSIM.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -741,7 +741,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:{2}/photon_pt{0}/step3_photon_pt{0}_inDQM.root'),
+    fileName = cms.untracked.string('file:{2}/photon_E{0}/step3_photon_E{0}_inDQM.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -870,24 +870,24 @@ process = customiseEarlyDelete(process)
 # End adding early deletion
     """
     
-    # iterate over string-formatted pt values
-    for pt in pt_string_list:
-        outfile = dir_step3 + '/step3_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+    # iterate over string-formatted E values
+    for E in E_string_list:
+        outfile = dir_step3 + '/step3_2026D60_14TeV_photon_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents, dir_save))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
 
 
-def makeStep4ConfigFiles (pt_string_list, nevents):
-    """ Generates CMSSW cfg python scripts to run step 4 harvesting.
+def makeStep4ConfigFiles (E_string_list, nevents):
+    """ Generates CMSSW cfg python scriEs to run step 4 harvesting.
     
-    If there are N pt values given, N files will be generated in the sub-directory run/step4_config.
+    If there are N E values given, N files will be generated in the sub-directory run/step4_config.
     
     Parameters
     ----------
-    pt_string_list : list(str)
-        List of string-formatted pt values. Ideally, this will be given through the function set_pt(*args).
+    E_string_list : list(str)
+        List of string-formatted E values. Ideally, this will be given through the function set_E(*args).
         
     nevents : int
         Number of events to process
@@ -941,7 +941,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("DQMRootSource",
-    fileNames = cms.untracked.vstring('file:{2}/photon_pt{0}/step3_photon_pt{0}_inDQM.root')
+    fileNames = cms.untracked.vstring('file:{2}/photon_E{0}/step3_photon_E{0}_inDQM.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -973,7 +973,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('step4_2026D60_14TeV_photon_pt{0}_eta35 nevts:{1}'),
+    annotation = cms.untracked.string('step4_2026D60_14TeV_photon_E{0}_eta35 nevts:{1}'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -1039,10 +1039,10 @@ process = customiseEarlyDelete(process)
 # End adding early deletion
     """
     
-    # iterate over string-formatted pt values
-    for pt in pt_string_list:
-        outfile = dir_step4 + '/step4_2026D60_14TeV_photon_pt{0}_eta35_cfg.py'.format(pt)
+    # iterate over string-formatted E values
+    for E in E_string_list:
+        outfile = dir_step4 + '/step4_2026D60_14TeV_photon_E{0}_eta35_cfg.py'.format(E)
         with open(outfile, 'w') as f:
-            f.write(filedump_preformatted.format(pt, nevents, dir_save))
+            f.write(filedump_preformatted.format(E, nevents, dir_save))
     
     return
