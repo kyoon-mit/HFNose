@@ -37,6 +37,9 @@ class HGCalGeometry;
 
 namespace reco
 {
+    class GenParticle;
+    typedef std::vector<GenParticle> GenParticleCollection;
+    
     class CaloCluster;
 }
 
@@ -59,11 +62,11 @@ class TICLAnalyzer : public edm::EDAnalyzer
     virtual void analyze ( const edm::Event&, const edm::EventSetup & );
     virtual void endJob () override;
   
-    std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const std::vector<CaloParticle> & );
-    void analyzeTICLTrackster ( const std::vector<CaloParticle> &, const std::vector<ticl::Trackster> &, std::string );
+    std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const reco::GenParticleCollection & );
+    void analyzeTICLTrackster ( const reco::GenParticleCollection &, const std::vector<ticl::Trackster> &, std::string );
 /*    void analyzeSimHits ( const std::vector<CaloParticle> &, const edm::PCaloHitContainer &, const HGCalGeometry* );*/
-    void analyzeRecHits ( const std::vector<CaloParticle> &, const HGCRecHitCollection &, const HGCalGeometry* );
-    void analyzeLayerClusters ( const std::vector<CaloParticle> &, const std::vector<reco::CaloCluster> & );
+    void analyzeRecHits ( const reco::GenParticleCollection &, const HGCRecHitCollection &, const HGCalGeometry* );
+    void analyzeLayerClusters ( const reco::GenParticleCollection &, const std::vector<reco::CaloCluster> & );
 
     // Container
     std::map <std::string, TH1F*> histContainer_; // map of histograms
@@ -71,6 +74,8 @@ class TICLAnalyzer : public edm::EDAnalyzer
     // ------ Data members -------
     // Tokens
     edm::EDGetTokenT<std::vector<CaloParticle>> token_CaloParticle_MergedCaloTruth_;
+    edm::EDGetTokenT<reco::GenParticleCollection> token_GenParticle_;
+    
 /*    edm::EDGetTokenT<edm::PCaloHitContainer> token_SimHits_HFNose_;*/
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HFNose_;
     edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_HFNose_;
@@ -80,6 +85,8 @@ class TICLAnalyzer : public edm::EDAnalyzer
     // Input Tags
     // edm::InputTag tag_GenParticle_;
     edm::InputTag tag_CaloParticle_MergedCaloTruth_;
+    edm::InputTag tag_GenParticle_;
+    
 /*    edm::InputTag tag_SimHits_HFNose_;*/
     edm::InputTag tag_RecHits_HFNose_;
     edm::InputTag tag_LayerClusters_HFNose_;

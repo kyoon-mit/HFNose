@@ -17,6 +17,10 @@
 #include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 
+
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+
+
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 #include "DataFormats/ForwardDetId/interface/HFNoseDetId.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
@@ -36,6 +40,8 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     histContainer_ (),
     
     tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth") ) ),
+    tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
+    
     
 //    tag_SimHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_g4SimHitsHFNoseHits", edm::InputTag("g4SimHits","HFNoseHits") ) ),
     tag_RecHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFNoseRecHits", edm::InputTag("HGCalRecHit:HGCHFNoseRecHits") ) ),
@@ -53,6 +59,7 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
 {
     // consumes: frequent request of additional data | mayConsume: infrequent
     token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
+    token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
     
 //    token_SimHits_HFNose_ = mayConsume<edm::PCaloHitContainer> ( tag_SimHits_HFNose_ );
     token_RecHits_HFNose_ = consumes<HGCRecHitCollection> ( tag_RecHits_HFNose_ );
@@ -80,6 +87,9 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth;
     iEvent.getByToken ( token_CaloParticle_MergedCaloTruth_, handle_CaloParticle_MergedCaloTruth );
     
+    edm::Handle<reco::GenParticleCollection> handle_GenParticle;
+    iEvent.getByToken ( token_GenParticle_, handle_GenParticle );
+    
     // Get SimHits
 //    edm::Handle<edm::PCaloHitContainer> handle_SimHits_HFNose;
 //    iEvent.getByToken( token_SimHits_HFNose_, handle_SimHits_HFNose );
@@ -100,7 +110,8 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNoseTrkEM;
     iEvent.getByToken ( token_Trackster_HFNoseTrkEM_, handle_Trackster_HFNoseTrkEM );
     
-    if ( handle_CaloParticle_MergedCaloTruth.isValid() &&
+    if ( //handle_CaloParticle_MergedCaloTruth.isValid() &&
+         handle_GenParticle.isValid() &&
 //         handle_SimHits_HFNose.isValid() &&
          handle_RecHits_HFNose.isValid() &&
          handle_LayerClusters_HFNose.isValid() &&
@@ -109,20 +120,22 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
        )
     {
 
-        const std::vector<CaloParticle> & caloTruthParticles = *handle_CaloParticle_MergedCaloTruth.product();
+        //const std::vector<CaloParticle> & caloTruthParticles = *handle_CaloParticle_MergedCaloTruth.product();
+        const reco::GenParticleCollection & genParticles = *handle_GenParticle.product();
         const HGCalGeometry* geom = handle_HGCalGeometry.product();
 
-        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseEM.product(), "EMn" );
+        analyzeTICLTrackster ( genParticles, *handle_Trackster_HFNoseEM.product(), "EMn" );
 //        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseTrkEM.product(), "TrkEMn" );
-        analyzeRecHits ( caloTruthParticles, *handle_RecHits_HFNose.product(), geom );
-        analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters_HFNose.product() );
+        analyzeRecHits ( genParticles, *handle_RecHits_HFNose.product(), geom );
+        analyzeLayerClusters ( genParticles, *handle_LayerClusters_HFNose.product() );
         
     }
     else std::cout << "Handle(s) invalid!" << std::endl;
 }
 
 
-std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticles )
+//std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticles )
+std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const reco::GenParticleCollection & caloTruthParticles )
 {
     std::vector<math::XYZTLorentzVectorF> container;
     
@@ -133,6 +146,9 @@ std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vect
                 && abs(ct.eta()) < select_EtaHigh_ )
         {
             container.push_back ( (math::XYZTLorentzVectorF) ct.p4() );
+            
+            histContainer_["truthE"]->Fill( ct.energy() );
+            histContainer_["truthEta"]->Fill( ct.eta() );
         }
     }
     
@@ -140,10 +156,11 @@ std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vect
 }
 
 
-void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
+//void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
+void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & GenParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
 {
 
-    const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
+    const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( GenParticles );
 
     for ( auto const& trs: tracksters )
     {
@@ -153,18 +170,15 @@ void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & calo
         
         for ( auto const& truth: selected_calotruths )
         {
-            histContainer_["truthE"]->Fill( truth.E() );
-            histContainer_["truthEta"]->Fill( truth.Eta() );
-            
             Float_t dR = reco::deltaR ( trackster_eta, trackster_phi, truth.eta(), truth.phi() );
 
-            if ( dR < truth_matching_deltaR_ )
+            if ( dR < (truth_matching_deltaR_) )
             {
                 /* Add Trackster dissecting code here */
                 
                 // 1. Number of LayerClusters in Trackster, cumulative and per layer
-                int count_total_layerClusters = 0;
-                int count_perLayer_layerClusters[8] = 0;
+                // int count_total_layerClusters = 0;
+                // int count_perLayer_layerClusters[8] = 0;
                 
                 // 2. Cosine of angle between doublets (related to the min_cos_theta cut)
                 
@@ -236,7 +250,8 @@ void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & calo
 //}
 
 
-void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
+//void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
+void TICLAnalyzer::analyzeRecHits ( const reco::GenParticleCollection & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
 {
 
     const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
@@ -285,7 +300,8 @@ void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthP
 }
 
 
-void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
+//void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
+void TICLAnalyzer::analyzeLayerClusters ( const reco::GenParticleCollection & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
 {
 
     const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
