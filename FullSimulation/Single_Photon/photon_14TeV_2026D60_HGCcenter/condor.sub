@@ -1,0 +1,15 @@
+Universe = vanilla 
+
++JobFlavour = "workday"
+RequestCpus = 8
+should_transfer_files = IF_NEEDED
+executable = condor_exec.sh
+log        = condor/$(ProcId)_output.log
+max_retries = 3
+
+notification = Always
+notify_user = kyungseop.yoon@cern.ch
+
+output = condor/$(ProcId)_output.out
+error = condor/$(ProcId)_output.err
+queue 1
