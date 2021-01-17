@@ -42,20 +42,17 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth") ) ),
     tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
     
-    
-//    tag_SimHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_g4SimHitsHFNoseHits", edm::InputTag("g4SimHits","HFNoseHits") ) ),
+    // tag_SimHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_g4SimHitsHFNoseHits", edm::InputTag("g4SimHits","HFNoseHits") ) ),
     tag_RecHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFNoseRecHits", edm::InputTag("HGCalRecHit:HGCHFNoseRecHits") ) ),
-    
     tag_LayerClusters_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_LayerClustersHFNose", edm::InputTag("hgcalLayerClustersHFNose") ) ),
-    
-    tag_Trackster_HFNoseEM_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TracksterHFNoseEM", edm::InputTag ("ticlTrackstersHFNoseEM") ) ),
-    tag_Trackster_HFNoseTrkEM_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_TracksterHFNoseTrk", edm::InputTag ("ticlTrackstersHFNoseTrkEM") ) ),
+    tag_Trackster_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_Trackster", edm::InputTag ("ticlTrackstersHFNoseEM") ) ),
     
     // Custom parameters
-    select_PID_ ( 22 ),
-    select_EtaLow_ ( 3.49 ),
-    select_EtaHigh_ ( 3.51 ),
-    truth_matching_deltaR_ ( 0.2 )
+    trackster_itername_ ( iConfig.getUntrackedParameter<std::string> ("trackster_itername", "EMn") ),
+    select_PID_ ( iConfig.getUntrackedParameter<int> ("select_PID", 22 ) ),
+    select_EtaLow_ ( iConfig.getUntrackedParameter<double> ("select_EtaLow", 3.49 ) ),
+    select_EtaHigh_ ( iConfig.getUntrackedParameter<double> ("select_EtaHigh", 3.51 ) ),
+    truth_matching_deltaR_ ( iConfig.getUntrackedParameter<double> ("truth_matching_deltaR_", 0.5 ) )
 {
     // consumes: frequent request of additional data | mayConsume: infrequent
     token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
@@ -66,8 +63,7 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     
     token_LayerClusters_HFNose_ = consumes<std::vector<reco::CaloCluster>>( tag_LayerClusters_HFNose_ );
 
-    token_Trackster_HFNoseEM_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_HFNoseEM_ );
-    token_Trackster_HFNoseTrkEM_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_HFNoseTrkEM_ );
+    token_Trackster_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_ );
 }
 
 
@@ -102,40 +98,36 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<std::vector<reco::CaloCluster>> handle_LayerClusters_HFNose;
     iEvent.getByToken( token_LayerClusters_HFNose_, handle_LayerClusters_HFNose );
     
-    // Get ticlTrackstersHFNoseEM
-    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNoseEM;
-    iEvent.getByToken ( token_Trackster_HFNoseEM_, handle_Trackster_HFNoseEM );
+    // Get ticlTracksters
+    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster;
+    iEvent.getByToken ( token_Trackster_, handle_Trackster );
     
-    // Get ticlTrackstersHFNoseTrkEM
-    edm::Handle<std::vector<ticl::Trackster>> handle_Trackster_HFNoseTrkEM;
-    iEvent.getByToken ( token_Trackster_HFNoseTrkEM_, handle_Trackster_HFNoseTrkEM );
-    
-    if ( //handle_CaloParticle_MergedCaloTruth.isValid() &&
-         handle_GenParticle.isValid() &&
+    if ( handle_CaloParticle_MergedCaloTruth.isValid() &&
+         //handle_GenParticle.isValid() &&
 //         handle_SimHits_HFNose.isValid() &&
          handle_RecHits_HFNose.isValid() &&
          handle_LayerClusters_HFNose.isValid() &&
-         handle_Trackster_HFNoseEM.isValid() //&&
-//         handle_Trackster_HFNoseTrkEM.isValid()
+         handle_Trackster.isValid()
        )
     {
 
-        //const std::vector<CaloParticle> & caloTruthParticles = *handle_CaloParticle_MergedCaloTruth.product();
-        const reco::GenParticleCollection & genParticles = *handle_GenParticle.product();
+        const std::vector<CaloParticle> & caloTruthParticles = *handle_CaloParticle_MergedCaloTruth.product();
+        //const reco::GenParticleCollection & genParticles = *handle_GenParticle.product();
         const HGCalGeometry* geom = handle_HGCalGeometry.product();
 
-        analyzeTICLTrackster ( genParticles, *handle_Trackster_HFNoseEM.product(), "EMn" );
+        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster.product(), trackster_itername_ );
+//        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseEM.product(), "EMn" );
 //        analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster_HFNoseTrkEM.product(), "TrkEMn" );
-        analyzeRecHits ( genParticles, *handle_RecHits_HFNose.product(), geom );
-        analyzeLayerClusters ( genParticles, *handle_LayerClusters_HFNose.product() );
+        analyzeRecHits ( caloTruthParticles, *handle_RecHits_HFNose.product(), geom );
+        analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters_HFNose.product() );
         
     }
     else std::cout << "Handle(s) invalid!" << std::endl;
 }
 
 
-//std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticles )
-std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const reco::GenParticleCollection & caloTruthParticles )
+std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticles )
+//std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const reco::GenParticleCollection & caloTruthParticles )
 {
     std::vector<math::XYZTLorentzVectorF> container;
     
@@ -156,11 +148,11 @@ std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const reco::Gen
 }
 
 
-//void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
-void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & GenParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
+void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
+//void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & GenParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
 {
 
-    const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( GenParticles );
+    const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
 
     for ( auto const& trs: tracksters )
     {
@@ -202,7 +194,12 @@ void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & Ge
                     histContainer_["EScale_tracksterHFNoseTrkEM"]->Fill( truth.E() - trackster_raw_energy );
                     histContainer_["DeltaR_tracksterHFNoseTrkEM"]->Fill( dR );
                  }   
-                    // case "EM":
+                 else if ( tag == "EM" )
+                 {
+                    histContainer_["EDist_tracksterEM"]->Fill( trackster_raw_energy );
+                    histContainer_["EScale_tracksterEM"]->Fill( truth.E() - trackster_raw_energy );
+                    histContainer_["DeltaR_tracksterEM"]->Fill( dR );
+                 }
                     
                     // case "TrkEM":                
             }
@@ -250,8 +247,8 @@ void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & Ge
 //}
 
 
-//void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
-void TICLAnalyzer::analyzeRecHits ( const reco::GenParticleCollection & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
+void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
+//void TICLAnalyzer::analyzeRecHits ( const reco::GenParticleCollection & caloTruthParticles, const HGCRecHitCollection & recHits, const HGCalGeometry * geom )
 {
 
     const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
@@ -300,8 +297,8 @@ void TICLAnalyzer::analyzeRecHits ( const reco::GenParticleCollection & caloTrut
 }
 
 
-//void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
-void TICLAnalyzer::analyzeLayerClusters ( const reco::GenParticleCollection & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
+void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
+//void TICLAnalyzer::analyzeLayerClusters ( const reco::GenParticleCollection & caloTruthParticles, const std::vector<reco::CaloCluster> & clusters )
 {
 
     const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
@@ -361,7 +358,7 @@ void TICLAnalyzer::beginJob ()
     
     // CaloTruth
     histContainer_["truthE"] = fs->make<TH1F>("truthE", "Truth Energy Distribution", 100, 0, 1000);
-    histContainer_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, 3.0, 4.0);
+    histContainer_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, (select_EtaLow_ + select_EtaHigh_)/2 - 0.5, (select_EtaLow_ + select_EtaHigh_)/2 + 0.5);
     
     // Tracksters
     histContainer_["EDist_tracksterHFNoseEM"] = fs->make<TH1F>("EDist_tracksterHFNoseEM", "TracksterHFNoseEM  Energy Distribution", 100, 0, 1000);
@@ -379,6 +376,14 @@ void TICLAnalyzer::beginJob ()
     histContainer_["EDist_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
     histContainer_["EScale_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
     histContainer_["DeltaR_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("|#Delta R_{trackster - caloParticle}|");
+    
+    histContainer_["EDist_tracksterEM"] = fs->make<TH1F>("EDist_tracksterEM", "TracksterEM  Energy Distribution", 100, 0, 1000);
+    histContainer_["EScale_tracksterEM"] = fs->make<TH1F>("EScale_tracksterEM", "TracksterEM Energy Scale", 100, 0, 1000);
+    histContainer_["DeltaR_tracksterEM"] = fs->make<TH1F>("DeltaR_tracksterEM", "TracksterEM #Delta R", 20, 0, 0.5);
+    
+    histContainer_["EDist_tracksterEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    histContainer_["EScale_tracksterEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    histContainer_["DeltaR_tracksterEM"]->GetXaxis()->SetTitle("|#Delta R_{trackster - caloParticle}|");
     
     // Clusters
     histContainer_["EDist_layerClusters_scalar_sum"] = fs->make<TH1F>("EDist_layerClusters_scalar_sum", "Energy Distribution (clusters, scaler sum)", 100, 0, 1000);

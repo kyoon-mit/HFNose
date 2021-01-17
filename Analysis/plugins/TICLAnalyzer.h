@@ -62,11 +62,11 @@ class TICLAnalyzer : public edm::EDAnalyzer
     virtual void analyze ( const edm::Event&, const edm::EventSetup & );
     virtual void endJob () override;
   
-    std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const reco::GenParticleCollection & );
-    void analyzeTICLTrackster ( const reco::GenParticleCollection &, const std::vector<ticl::Trackster> &, std::string );
+    std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const std::vector<CaloParticle> & );
+    void analyzeTICLTrackster ( const std::vector<CaloParticle> &, const std::vector<ticl::Trackster> &, std::string );
 /*    void analyzeSimHits ( const std::vector<CaloParticle> &, const edm::PCaloHitContainer &, const HGCalGeometry* );*/
-    void analyzeRecHits ( const reco::GenParticleCollection &, const HGCRecHitCollection &, const HGCalGeometry* );
-    void analyzeLayerClusters ( const reco::GenParticleCollection &, const std::vector<reco::CaloCluster> & );
+    void analyzeRecHits ( const std::vector<CaloParticle> &, const HGCRecHitCollection &, const HGCalGeometry* );
+    void analyzeLayerClusters ( const std::vector<CaloParticle> &, const std::vector<reco::CaloCluster> & );
 
     // Container
     std::map <std::string, TH1F*> histContainer_; // map of histograms
@@ -79,8 +79,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
 /*    edm::EDGetTokenT<edm::PCaloHitContainer> token_SimHits_HFNose_;*/
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HFNose_;
     edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_HFNose_;
-    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_HFNoseEM_;
-    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_HFNoseTrkEM_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_;
     
     // Input Tags
     // edm::InputTag tag_GenParticle_;
@@ -90,14 +89,14 @@ class TICLAnalyzer : public edm::EDAnalyzer
 /*    edm::InputTag tag_SimHits_HFNose_;*/
     edm::InputTag tag_RecHits_HFNose_;
     edm::InputTag tag_LayerClusters_HFNose_;
-    edm::InputTag tag_Trackster_HFNoseEM_;
-    edm::InputTag tag_Trackster_HFNoseTrkEM_;
+    edm::InputTag tag_Trackster_;
     
     // Others
-    Int_t   select_PID_;
-    Float_t select_EtaLow_;
-    Float_t select_EtaHigh_;
-    Float_t truth_matching_deltaR_;
+    std::string trackster_itername_;
+    int   select_PID_;
+    double select_EtaLow_;
+    double select_EtaHigh_;
+    double truth_matching_deltaR_;
 };
 
 #endif
