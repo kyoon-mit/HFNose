@@ -1,16 +1,16 @@
 Universe = vanilla 
 
-+JobFlavour = "longlunch"
++JobFlavour = "workday"
 RequestCpus = 8
 should_transfer_files = IF_NEEDED
-executable = $(DIR)/Single_Photon/photon_14TeV_2026D60_HGCNose/condor_exec.sh
-log        = $(DIR)/Single_Photon/photon_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.log
+executable = condor_exec.sh
+log        = condor/$(ProcId)_output.log
 max_retries = 3
 
 notification = Always
 notify_user = kyungseop.yoon@cern.ch
 
-output = $(DIR)/Single_Photon/photon_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.out
-error = $(DIR)/Single_Photon/photon_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.err
-arguments = $(DIR)
+output = condor/$(ProcId)_output.out
+error = condor/$(ProcId)_output.err
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose
 queue 1

@@ -1,0 +1,4 @@
+condor_exec.exe: line 4: /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose/../config_kyoon.sh: No such file or directory
+condor_exec.exe: line 5: cd: /Single_Photon/photon_14TeV_2026D60_HGCNose/: No such file or directory
+SCRAM fatal: Unable to locate the top of local release. Please run this command from a SCRAM-based area.
+python: can't open file 'run.py': [Errno 2] No such file or directory

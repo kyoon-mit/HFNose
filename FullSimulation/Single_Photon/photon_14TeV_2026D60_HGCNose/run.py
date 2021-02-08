@@ -3,16 +3,12 @@
 # Do python -i run.py to run interactively
 
 from MakeConfigFiles import *
+import os
 
-set_env()
-
-# Can also set up parser
-nevents = 500
-E_string_list = set_E('10', '50', '100', '200', '300', '400', '500')
-
-makeStep1ConfigFiles (E_string_list, nevents)
-makeStep2ConfigFiles (E_string_list, nevents)
-makeStep3ConfigFiles (E_string_list, nevents)
-makeStep4ConfigFiles (E_string_list, nevents)
-
-runSteps(E_string_list, 1,2,3)
+run = RunInstance()
+run.set_E(50)
+run.set_eta(3.5)
+run.set_nevents(500)
+run.set_top_save_dir(os.environ.get('DIRDATA_HGCNOSE') + '/photon_2026D60_HGCNose')
+run.makeAllConfigFiles()
+run.runSteps(3)
