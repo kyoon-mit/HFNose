@@ -387,7 +387,7 @@ void TICLAnalyzer::beginJob ()
     
     // Ratios
     histContainer_["ERatio_recHits_to_truth"] = fs->make<TH1F>("ERatio_recHits_to_truth", "E_{recHits} / E_{truth}", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_to_truth"] = fs->make<TH1F>("ERatio_recHits_to_truth", "E_{layerClusters} / E_{truth}", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_to_truth"] = fs->make<TH1F>("ERatio_layerClusters_to_truth", "E_{layerClusters} / E_{truth}", 100, 0, 1.0);
     
     histContainer_["ERatio_recHits_to_truth"]->GetXaxis()->SetTitle("E_{recHits} / E_{truth}");
     histContainer_["ERatio_layerClusters_to_truth"]->GetXaxis()->SetTitle("E_{layerClusters} / E_{truth}");
