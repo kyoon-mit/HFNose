@@ -21,6 +21,7 @@
 // Other CMSSW includes that are needed in this header
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
+#include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 // Forward declarations
 class TH1F;
@@ -79,6 +80,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HF_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_EE_;
     edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_HFNose_;
+    edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_;
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_;
     
     // Input Tags
@@ -87,9 +89,9 @@ class TICLAnalyzer : public edm::EDAnalyzer
     edm::InputTag tag_GenParticle_;
     // edm::InputTag tag_SimHits_HFNose_;
     edm::InputTag tag_RecHits_HFNose_;
-    edm::InputTag tag_RecHits_HF_;
     edm::InputTag tag_RecHits_EE_;
     edm::InputTag tag_LayerClusters_HFNose_;
+    edm::InputTag tag_LayerClusters_;
     edm::InputTag tag_Trackster_;
     
     // Others
@@ -98,6 +100,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
     double select_EtaHigh_;
     double truth_matching_deltaR_;
     std::string trackster_itername_;
+    hgcal::RecHitTools rhtools_;
 };
 
 #endif

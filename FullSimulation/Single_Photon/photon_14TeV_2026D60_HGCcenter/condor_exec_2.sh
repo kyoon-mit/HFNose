@@ -5,4 +5,4 @@ top_dir=$1
 cd ${DIRSIM_HGCNOSE}/Single_Photon/photon_14TeV_2026D60_HGCcenter/
 eval `scramv1 runtime -sh`
 
-python run_1.py # Modify the run file directly for setting parameters
+python run_2.py # Modify the run file directly for setting parameters

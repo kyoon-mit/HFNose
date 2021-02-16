@@ -13,6 +13,14 @@ process = cms.Process('TICLAnalyzer', Phase2C10)
 
 # Varparsing
 options = VarParsing('analysis')
+options.register('inpath', 'photon_2026D60_HGCNose', VarParsing.multiplicity.singleton,
+                    VarParsing.varType.string,
+                    "last part of input directory path")
+options.register('outpath', 'photon_2026D60_HGCNose', VarParsing.multiplicity.singleton,
+                    VarParsing.varType.string,
+                    "last part of input directory path")
+options.register('outsuffix', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+                    "outfile suffix to put at the very end before the extension")
 options.register('pid', 22, VarParsing.multiplicity.singleton, VarParsing.varType.int,
                     "(type: int) PDG ID of the particle")
 options.register('E', 100, VarParsing.multiplicity.singleton, VarParsing.varType.int,
@@ -26,9 +34,9 @@ options.register('itername', 'EMn', VarParsing.multiplicity.singleton, VarParsin
 options.parseArguments()
 
 # Set output and input paths
-OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output/photon_2026D60_HGCNose/')
-INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D60_HGCNose/')
-outputfile = OUTPUT_DIR + '/Single_Photon_E{0}_eta{1}.root'.format(options.E, options.eta)
+OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output/{}/'.format(options.outpath))
+INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/{}/'.format(options.inpath))
+outputfile = OUTPUT_DIR + '/Single_Photon_E{0}_eta{1}{2}.root'.format(options.E, options.eta, options.outsuffix)
 inputfile = 'file:' + INPUT_DIR + '/photon_E{0}_eta{1}/step3_photon_E{0}_eta{1}.root'.format(options.E, options.eta)
 
 if not os.path.exists(OUTPUT_DIR):

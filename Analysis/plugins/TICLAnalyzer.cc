@@ -18,12 +18,7 @@
 #include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 
-
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
-
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
-#include "DataFormats/ForwardDetId/interface/HFNoseDetId.h"
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/HGCalReco/interface/Trackster.h"
 // #include "DataFormats/HGCalReco/interface/TICLCandidate.h"
@@ -32,6 +27,8 @@
 #include "Geometry/Records/interface/IdealGeometryRecord.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+
+#include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 // ROOT headers
 
@@ -42,11 +39,14 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     
     tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth", "HLT") ) ),
     tag_GenParticle_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_GenParticle", edm::InputTag ("genParticles") ) ),
+    
     // tag_SimHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_g4SimHitsHFNoseHits", edm::InputTag("g4SimHits","HFNoseHits") ) ),
     tag_RecHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFNoseRecHits", edm::InputTag("HGCalRecHit:HGCHFNoseRecHits") ) ),
-    tag_RecHits_HF_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFRecHits", edm::InputTag("HGCalRecHit::HGCHEFRecHits") ) ),
-    tag_RecHits_EE_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFRecHits", edm::InputTag("HGCalRecHit::HGCEERecHits") ) ),
-    tag_LayerClusters_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_LayerClustersHFNose", edm::InputTag("hgcalLayerClustersHFNose") ) ),
+    tag_RecHits_EE_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCEERecHits", edm::InputTag("HGCalRecHit::HGCEERecHits") ) ),
+    
+    tag_LayerClusters_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_LayerClustersHFNose", edm::InputTag("hgcalLayerClusters") ) ),
+    tag_LayerClusters_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_LayerClustersHFNose", edm::InputTag("hgcalLayerClusters") ) ),
+    
     tag_Trackster_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_Trackster", edm::InputTag ("ticlTrackstersHFNoseEM") ) ),
     
     // Custom parameters
@@ -61,10 +61,13 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     token_CaloParticle_MergedCaloTruth_ = mayConsume<std::vector<CaloParticle>> ( tag_CaloParticle_MergedCaloTruth_ );
     token_GenParticle_ = consumes<reco::GenParticleCollection> ( tag_GenParticle_ );
 //    token_SimHits_HFNose_ = mayConsume<edm::PCaloHitContainer> ( tag_SimHits_HFNose_ );
+
     token_RecHits_HFNose_ = consumes<HGCRecHitCollection> ( tag_RecHits_HFNose_ );
-    token_RecHits_HF_ = consumes<HGCRecHitCollection> ( tag_RecHits_HF_ );
     token_RecHits_EE_ = consumes<HGCRecHitCollection> ( tag_RecHits_EE_ );
+    
     token_LayerClusters_HFNose_ = consumes<std::vector<reco::CaloCluster>>( tag_LayerClusters_HFNose_ );
+    token_LayerClusters_ = consumes<std::vector<reco::CaloCluster>>( tag_LayerClusters_ );
+    
     token_Trackster_ = consumes<std::vector<ticl::Trackster>> ( tag_Trackster_ );
 }
 
@@ -78,8 +81,11 @@ TICLAnalyzer::~TICLAnalyzer ()
 void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
     // Get Geometry
-    edm::ESHandle<HGCalGeometry> handle_HGCalGeometry;
-    iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalGeometry );
+    edm::ESHandle<HGCalGeometry> handle_HGCalGeometry_HFNose ;
+    iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalGeometry_HFNose );
+    
+    edm::ESHandle<HGCalGeometry> handle_HGCalGeometry_EE ;
+    iSetup.get<IdealGeometryRecord>().get( "HGCalEESensitive", handle_HGCalGeometry_EE );
 
     // Get CaloTruth
     edm::Handle<std::vector<CaloParticle>> handle_CaloParticle_MergedCaloTruth;
@@ -96,15 +102,15 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<HGCRecHitCollection> handle_RecHits_HFNose;
     iEvent.getByToken( token_RecHits_HFNose_, handle_RecHits_HFNose );
     
-    edm::Handle<HGCRecHitCollection> handle_RecHits_HF;
-    iEvent.getByToken( token_RecHits_HF_, handle_RecHits_HF );
-    
     edm::Handle<HGCRecHitCollection> handle_RecHits_EE;
     iEvent.getByToken( token_RecHits_EE_, handle_RecHits_EE );
     
     // Get LayerClusters
     edm::Handle<std::vector<reco::CaloCluster>> handle_LayerClusters_HFNose;
     iEvent.getByToken( token_LayerClusters_HFNose_, handle_LayerClusters_HFNose );
+    
+    edm::Handle<std::vector<reco::CaloCluster>> handle_LayerClusters;
+    iEvent.getByToken( token_LayerClusters_, handle_LayerClusters );
     
     // Get ticlTracksters
     edm::Handle<std::vector<ticl::Trackster>> handle_Trackster;
@@ -114,18 +120,23 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
          //handle_GenParticle.isValid() &&
          //handle_SimHits_HFNose.isValid() &&
          handle_RecHits_HFNose.isValid() &&
+         handle_RecHits_EE.isValid() &&
          handle_LayerClusters_HFNose.isValid() &&
+         handle_LayerClusters.isValid() &&
          handle_Trackster.isValid()
        )
     {
 
         const std::vector<CaloParticle> & caloTruthParticles = *handle_CaloParticle_MergedCaloTruth.product();
         //const reco::GenParticleCollection & genParticles = *handle_GenParticle.product();
-        const HGCalGeometry* geom = handle_HGCalGeometry.product();
+        const HGCalGeometry* nose_geom = handle_HGCalGeometry_HFNose.product();
+        const HGCalGeometry* EE_geom = handle_HGCalGeometry_EE.product();
 
         analyzeTICLTrackster ( caloTruthParticles, *handle_Trackster.product(), trackster_itername_ );
-        analyzeRecHits ( caloTruthParticles, *handle_RecHits_HFNose.product(), geom );
-        analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters_HFNose.product() );
+        // analyzeRecHits ( caloTruthParticles, *handle_RecHits_HFNose.product(), nose_geom );
+        analyzeRecHits ( caloTruthParticles, *handle_RecHits_EE.product(), EE_geom );
+        //analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters_HFNose.product() );
+        analyzeLayerClusters ( caloTruthParticles, *handle_LayerClusters.product() );
         
     }
     else std::cout << "Handle(s) invalid!" << std::endl;
@@ -133,7 +144,6 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
 
 
 std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vector<CaloParticle> & caloTruthParticles )
-//std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const reco::GenParticleCollection & caloTruthParticles )
 {
     std::vector<math::XYZTLorentzVectorF> container;
     
@@ -152,7 +162,6 @@ std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vect
 
 
 void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<CaloParticle> & caloTruthParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
-//void TICLAnalyzer::analyzeTICLTrackster ( const reco::GenParticleCollection & GenParticles, const std::vector<ticl::Trackster> & tracksters, std::string tag )
 {
 
     const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( caloTruthParticles );
@@ -220,6 +229,7 @@ void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthP
     {
         Float_t truth_eta = truth.eta();
         Float_t truth_phi = truth.phi();
+        Float_t truth_energy = truth.energy();
         
         Float_t hit_sum_energy = 0;
         Float_t hit_sum_energy_layer[8] = {0};
@@ -255,8 +265,17 @@ void TICLAnalyzer::analyzeRecHits ( const std::vector<CaloParticle> & caloTruthP
         histContainer_["EDist_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] );
         histContainer_["EDist_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] );
         histContainer_["EDist_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] );
+
+        histContainer_["ERatio_recHits_to_truth"]->Fill ( hit_sum_energy / truth_energy );
         
-        histContainer_["ERatio_recHits_to_truth"]->Fill ( hit_sum_energy / truth.energy() );
+        histContainer_["ERatio_recHits_layer1"]->Fill ( hit_sum_energy_layer[0] / truth_energy );
+        histContainer_["ERatio_recHits_layer2"]->Fill ( hit_sum_energy_layer[1] / truth_energy );
+        histContainer_["ERatio_recHits_layer3"]->Fill ( hit_sum_energy_layer[2] / truth_energy );
+        histContainer_["ERatio_recHits_layer4"]->Fill ( hit_sum_energy_layer[3] / truth_energy );
+        histContainer_["ERatio_recHits_layer5"]->Fill ( hit_sum_energy_layer[4] / truth_energy );
+        histContainer_["ERatio_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] / truth_energy );
+        histContainer_["ERatio_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] / truth_energy );
+        histContainer_["ERatio_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] / truth_energy );
         
     }
 }
@@ -272,6 +291,7 @@ void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & calo
     {
         Float_t truth_eta = truth.eta();
         Float_t truth_phi = truth.phi();
+        Float_t truth_energy = truth.energy();
         
         Float_t cluster_sum_energy = 0;
         Float_t cluster_sum_energy_layer[8] = {0};
@@ -283,13 +303,24 @@ void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & calo
             
             if ( dR < truth_matching_deltaR_ ) // clusters within cone of truth
             {
-                int cluster_layer = HFNoseDetId(cl.hitsAndFractions().at(0).first).layer();
+                int cluster_layer = rhtools_.getLayer(cl.hitsAndFractions().at(0).first);
+                
+                // Sanity check
+//                for ( int i = 0; int i < size(cl.hitsAndFractions()); ++i )
+//                {
+//                    int cluster_layer = smth ()  cl.hitsAndFractions().at(i).first // layer of
+//                    if ( i == 0 ) first_layer = layer;
+//                    // check if they are all the same
+//                }
                 
                 Float_t cluster_raw_energy = cl.energy();
-                
                 cluster_sum_energy += cluster_raw_energy;
-                cluster_sum_energy_layer[cluster_layer-1] += cluster_raw_energy;
-                cluster_count_layer[cluster_layer-1] ++;
+
+                if ( cluster_layer <= 8 )
+                {
+                    cluster_sum_energy_layer[cluster_layer-1] += cluster_raw_energy;
+                    cluster_count_layer[cluster_layer-1] ++;
+                }
             }
         }
         
@@ -313,7 +344,16 @@ void TICLAnalyzer::analyzeLayerClusters ( const std::vector<CaloParticle> & calo
         histContainer_["Count_layerClusters_layer7"]->Fill( cluster_count_layer[6] );
         histContainer_["Count_layerClusters_layer8"]->Fill( cluster_count_layer[7] );
         
-        histContainer_["ERatio_layerClusters_to_truth"]->Fill ( cluster_sum_energy / truth.energy() );
+        histContainer_["ERatio_layerClusters_to_truth"]->Fill ( cluster_sum_energy / truth_energy );
+        
+        histContainer_["ERatio_layerClusters_layer1"]->Fill ( cluster_sum_energy_layer[0] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer2"]->Fill ( cluster_sum_energy_layer[1] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer3"]->Fill ( cluster_sum_energy_layer[2] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer4"]->Fill ( cluster_sum_energy_layer[3] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer5"]->Fill ( cluster_sum_energy_layer[4] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer6"]->Fill ( cluster_sum_energy_layer[5] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer7"]->Fill ( cluster_sum_energy_layer[6] / truth_energy );
+        histContainer_["ERatio_layerClusters_layer8"]->Fill ( cluster_sum_energy_layer[7] / truth_energy );
     }
 
 }
@@ -391,6 +431,24 @@ void TICLAnalyzer::beginJob ()
     
     histContainer_["ERatio_recHits_to_truth"]->GetXaxis()->SetTitle("E_{recHits} / E_{truth}");
     histContainer_["ERatio_layerClusters_to_truth"]->GetXaxis()->SetTitle("E_{layerClusters} / E_{truth}");
+    
+    histContainer_["ERatio_recHits_layer1"] = fs->make<TH1F>("ERatio_recHits_layer1", "E_{recHits} / E_{truth} Layer 1", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer2"] = fs->make<TH1F>("ERatio_recHits_layer2", "E_{recHits} / E_{truth} Layer 2", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer3"] = fs->make<TH1F>("ERatio_recHits_layer3", "E_{recHits} / E_{truth} Layer 3", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer4"] = fs->make<TH1F>("ERatio_recHits_layer4", "E_{recHits} / E_{truth} Layer 4", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer5"] = fs->make<TH1F>("ERatio_recHits_layer5", "E_{recHits} / E_{truth} Layer 5", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer6"] = fs->make<TH1F>("ERatio_recHits_layer6", "E_{recHits} / E_{truth} Layer 6", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer7"] = fs->make<TH1F>("ERatio_recHits_layer7", "E_{recHits} / E_{truth} Layer 7", 100, 0, 1.0);
+    histContainer_["ERatio_recHits_layer8"] = fs->make<TH1F>("ERatio_recHits_layer8", "E_{recHits} / E_{truth} Layer 8", 100, 0, 1.0);
+    
+    histContainer_["ERatio_layerClusters_layer1"] = fs->make<TH1F>("ERatio_layerClusters_layer1", "E_{layerClusters} / E_{truth} Layer 1", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer2"] = fs->make<TH1F>("ERatio_layerClusters_layer2", "E_{layerClusters} / E_{truth} Layer 2", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer3"] = fs->make<TH1F>("ERatio_layerClusters_layer3", "E_{layerClusters} / E_{truth} Layer 3", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer4"] = fs->make<TH1F>("ERatio_layerClusters_layer4", "E_{layerClusters} / E_{truth} Layer 4", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer5"] = fs->make<TH1F>("ERatio_layerClusters_layer5", "E_{layerClusters} / E_{truth} Layer 5", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer6"] = fs->make<TH1F>("ERatio_layerClusters_layer6", "E_{layerClusters} / E_{truth} Layer 6", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer7"] = fs->make<TH1F>("ERatio_layerClusters_layer7", "E_{layerClusters} / E_{truth} Layer 7", 100, 0, 1.0);
+    histContainer_["ERatio_layerClusters_layer8"] = fs->make<TH1F>("ERatio_layerClusters_layer8", "E_{layerClusters} / E_{truth} Layer 8", 100, 0, 1.0);
     
     // SimHits
 }

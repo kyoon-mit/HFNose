@@ -227,13 +227,13 @@ def setTGraphStyle (graph, histtitle, preset):
     return
 
     
-def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
-    # type: ((str), (str)) -> dict('key': 'TGraph' / 'list(hist)')
+def getPlotsComprehensive (filenames, energies, eta, trackster_name, top_save_dir):
+    # type: ((str), (str)), str) -> dict('key': 'TGraph' / 'TH1')
     " Plot resolution for different energy values. "
     
-    num_points = len(tuple_filenames)
+    num_points = len(filenames)
 
-    # Containers
+    # Containers for graph points
     truth_E_array = np.zeros(num_points)
     trackster_ERes_array, trackster_ERes_error_array = np.zeros(num_points), np.zeros(num_points)
     trackster_EScale_array, trackster_EScale_error_array = np.zeros(num_points), np.zeros(num_points)
@@ -241,30 +241,33 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
     trackster_EtaScale_array = np.zeros(num_points)
     trackster_RScale_array = np.zeros(num_points)
     
+    # Set dictionary for the plots
+    dict_plots = dict()
+    
     for i in range(num_points):
     
-        filename = tuple_filenames[i]
-        E = tuple_E[i]
+        filename = filenames[i]
+        E = energies[i]
         infile = TFile.Open(filename, 'READ')
-        tree = infile.Get('Analysis_SingleElectron')
+        tree = infile.Get('TICLAnalyzer')
         
         ### Get summary histograms
         truthE = tree.Get('truthE')
         truthEta = tree.Get('truthEta')
-        tracksterRawEDist = tree.Get('tracksterRawEDist')
-        tracksterAbsEtaDist = tree.Get('tracksterAbsEtaDist')
-        tracksterRawEScale = tree.Get('tracksterRawEScale')
-        tracksterAbsEtaScale = tree.Get('tracksterAbsEtaScale')
-        tracksterAbsRScale = tree.Get('tracksterAbsRScale')
+        tracksterRawEDist = tree.Get('RawEDist_{}'.format(trackster_name))
+        tracksterRawEScale = tree.Get('RawEScale_{}'.format(trackster_name))
+        tracksterDeltaRDist = tree.Get('DeltaR_{}'.format(trackster_name))
+        clusterSumE = tree.Get('EDist_layerClusters_scalar_sum')
+        recHitsSumE = tree.Get('EDist_recHits')
         
-        # Extend scope of histograms
         truthE.SetDirectory(0)
         truthEta.SetDirectory(0)
         tracksterRawEDist.SetDirectory(0)
         tracksterAbsEtaDist.SetDirectory(0)
         tracksterRawEScale.SetDirectory(0)
-        tracksterAbsEtaScale.SetDirectory(0)
-        tracksterAbsRScale.SetDirectory(0)
+        tracksterDeltaRDist.SetDirectory(0)
+        clusterSumE.SetDirectory(0)
+        recHitsSumE.SetDirectory(0)
         
         ### Get stats
         
@@ -276,13 +279,13 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
         trackster_mean_raw_energy, trackster_mean_error_raw_energy = trackster_raw_energy_stats['mean'], trackster_raw_energy_stats['mean_error']
         trackster_sigma_raw_energy, trackster_sigma_error_raw_energy = trackster_raw_energy_stats['sigma'], trackster_raw_energy_stats['sigma_error']
         
-        trackster_raw_energy_scale_stats = fitGaussian(tracksterRawEScale, mode='num')
-        trackster_mean_raw_energy_scale, trackster_sigma_raw_energy_scale = trackster_raw_energy_scale_stats['mean'], trackster_raw_energy_scale_stats['sigma']
-        
         trackster_ERes_array[i] = trackster_sigma_raw_energy/trackster_mean_raw_energy
         trackster_ERes_error_array[i] = trackster_ERes_array[i] * addQuad(trackster_sigma_error_raw_energy/trackster_sigma_raw_energy, trackster_mean_error_raw_energy/trackster_mean_raw_energy)
         
         # Trackster "Raw Energy" Scale
+        trackster_raw_energy_scale_stats = fitGaussian(tracksterRawEScale, mode='num')
+        trackster_mean_raw_energy_scale, trackster_sigma_raw_energy_scale = trackster_raw_energy_scale_stats['mean'], trackster_raw_energy_scale_stats['sigma']
+        
         trackster_EScale_array[i] = trackster_mean_raw_energy_scale
         trackster_EScale_error_array[i] = trackster_sigma_raw_energy_scale
         
@@ -290,16 +293,14 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
         trackster_EFraction_array[i] = trackster_mean_raw_energy / truthE.GetMean(1)
         trackster_EFraction_error_array[i] = trackster_mean_error_raw_energy / truthE.GetMean(1)
         
-        # Trackster Eta Scale
-        trackster_EtaScale_array[i] = tracksterAbsEtaScale.GetMean(1)
+        # Trackster Delta R Distribution
+        trackster_DeltaR_array[i] = tracksterDeltaRDist.GetMean(1)
         
-        # Trackster R Scale
-        trackster_RScale_array[i] = tracksterAbsRScale.GetMean(1)
+        # RecHits + Clusters + Trackster comparison plots
+        plotEDistHistograms(recHitsSumE, clusterSumE, tracksterRawEDist, E, eta, top_save_dir)
         
         infile.Close()
         
-    # Set dictionary for containing the return plots
-    dict_plots = dict()
     
     dict_plots['trackster_RawERes_graph'] = TGraphErrors(num_points, truth_E_array, trackster_ERes_array*100, np.zeros(num_points), trackster_ERes_error_array*100)
     
@@ -307,49 +308,80 @@ def getPlotsEResolutionComprehensive (tuple_filenames, tuple_E):
     
     dict_plots['trackster_RawEFraction_graph'] = TGraphErrors(num_points, truth_E_array, trackster_EFraction_array*100, np.zeros(num_points), trackster_EFraction_error_array)
     
-    dict_plots['trackster_AbsEtaScale_graph'] = TGraph(num_points, truth_E_array, trackster_EtaScale_array)
-    
-    dict_plots['trackster_AbsRScale_graph'] = TGraph(num_points, truth_E_array, trackster_RScale_array)
+    dict_plots['trackster_DeltaR_graph'] = TGraph(num_points, truth_E_array, trackster_DeltaR_array)
     
     return dict_plots
     
+    
+def plotEDistHistograms (hits_EDist, clusters_EDist, trackster_EDist, E, eta, top_save_dir):
+    # (TH1, TH1, TH1, string) -> None
+    " Plot histograms"
+    
+    if not os.path.exists(top_save_dir + '/EDistribution_plots'):
+        os.makedirs(top_save_dir + '/EDistribution_plots')
+        
+    c = TCanvas("EDistribution_E{}".format(E))
+    hits_EDist.Draw()
+    clusters_EDist.Draw('SAME')
+    trackster_EDist.Draw('SAME')
+    
+    hits_EDist.SetLineColor(kBlue)
+    clusters_EDist.SetLineColor(kGreen+1)
+    trackster_EDist.SetLineColor(kRed+1)
+    
+    c.Update()
+    
+    c.SaveAs(top_save_dir + '/EDistribution_plots/comparison_E{}_eta{}.jpg'.format(E, eta))
+    
+    
 
-def plotEResolutionFit (hits_ERes, clusters_ERes, top_save_dir):
-    # (TGraph, TGraph, string) -> None
+def plotEResolutionFit (hits_EGraph, clusters_EGraph, trackster_EGraph, top_save_dir):
+    # (TGraph, TGraph, TGraph, string) -> None
     " Plot energy resolution + fit"
         
-    if not os.path.exists(top_save_dir + '/ERes_plots'):
-        os.makedirs(top_save_dir + '/ERes_plots')
+    if not os.path.exists(top_save_dir + '/EResolution_plots'):
+        os.makedirs(top_save_dir + '/EResolution_plots')
         
     # Set style
-    group = 1 # group will later disappear
+    group = 1
     
-    setTGraphStyle(hits_ERes, "Energy Resolution (hits): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
-    setTGraphStyle(clusters_ERes, "Energy Resolution (clusters): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
+    setTGraphStyle(hits_EGraph, "Energy Resolution (hits): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
+    setTGraphStyle(clusters_EGraph, "Energy Resolution (clusters): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
+    setTGraphStyle(trackster_EGraph, "Energy Resolution (trackster): HGCNose, single #gamma, |#eta| = 3.5", preset='ERes_%d' % (group))
     
     # Get FitResult
-    clusters_fit = getMathEResolution (clusters_ERes)
+    formula_display_list = []
+    for EGraph in (hits_EGraph, clusters_EGraph, trackster_EGraph):
+        fit = getMathEResolution (EResPlot)
         
-    s, c = clusters_fit['stochastic_term'], clusters_fit['constant_term']   
-    formula_display = TPaveText(.6, .76, .88, .88, 'NDC')
-    formula_display.SetFillColor(kWhite)
-    formula_display.SetTextFont(43)
-    formula_display.SetTextSize(14) # in pixels
-    formula_display.SetTextColor(kRed+1)
-    formula_display.AddText("#frac{#sigma_{E}}{E} = #frac{%.1f%%}{#sqrt{E}} #oplus %.1f%%" % (s, c))
+        s, c = clusters_fit['stochastic_term'], clusters_fit['constant_term']   
+        formula_display = TPaveText(.6, .76, .88, .88, 'NDC')
+        formula_display.SetFillColor(kWhite)
+        formula_display.SetTextFont(43)
+        formula_display.SetTextSize(14) # in pixels
+        formula_display.SetTextColor(kRed+1)
+        formula_display.AddText("#frac{#sigma_{E}}{E} = #frac{%.1f%%}{#sqrt{E}} #oplus %.1f%%" % (s, c))
+        formula_display_list.append(formula_display)
         
     c1 = TCanvas("ERes_hits_TGraphErrors")
     hits_ERes.Draw('AP')
+    formula_display_list[0].Draw('SAME')
     
     c2 = TCanvas("ERes_clusters_TGraphErrors")
     c2.cd()
     clusters_ERes.Draw('AP')
-    #clusters_fit.Draw('SAME')
-    formula_display.Draw('SAME')
+    formula_display_list[1].Draw('SAME')
     c2.Update()
     
-    c1.SaveAs(top_save_dir + '/ERes_plots/EResolution_hits.png')
-    c2.SaveAs(top_save_dir + '/ERes_plots/EResolution_clusters.png')
+    c3 = TCanvas("ERes_trackster_TGraphErrors")
+    c3.cd()
+    clusters_ERes.Draw('AP')
+    formula_display_list[2].Draw('SAME')
+    c3.Update()
+    
+    c1.SaveAs(top_save_dir + '/EResolution_plots/EResolution_hits.jpg')
+    c2.SaveAs(top_save_dir + '/EResolution_plots/EResolution_clusters.jpg')
+    c3.SaveAs(top_save_dir + '/EResolution_plots/EResolution_trackster.jpg')
     
     return
     
@@ -358,14 +390,13 @@ def plotGraphs (dict_plots, top_save_dir):
     # (dict(TGraphs), string) -> None
     " Plot all graphs"
     
-    if not os.path.exists(top_save_dir + '/SingleElectron_plots'):
-        os.makedirs(top_save_dir + '/SingleElectron_plots')
+    if not os.path.exists(top_save_dir + '/TICL_plots'):
+        os.makedirs(top_save_dir + '/TICL_plots')
 
     setTGraphStyle(dict_plots["trackster_RawERes_graph"], "Trackster raw energy resolution", preset='ERes_1')
     setTGraphStyle(dict_plots["trackster_RawEScale_graph"], "Trackster raw energy scale", preset='EScale_1')
     setTGraphStyle(dict_plots["trackster_RawEFraction_graph"], "Trackster (raw energy) / (truth energy)", preset='EFraction_1')
-    setTGraphStyle(dict_plots["trackster_AbsEtaScale_graph"], "Trackster eta deviation", preset='EtaScale_1')
-    setTGraphStyle(dict_plots["trackster_AbsRScale_graph"], "Trackster R deviation", preset='RScale_1')
+    setTGraphStyle(dict_plots["trackster_DeltaR_graph"], "#Delta |R_{caloParticle} - R_{trackster}|", preset='RScale_1')
     
     c1 = TCanvas("RawERes")
     dict_plots["trackster_RawERes_graph"].Draw('ALP')
@@ -378,19 +409,14 @@ def plotGraphs (dict_plots, top_save_dir):
     c3.cd()
     dict_plots["trackster_RawEFraction_graph"].Draw('ALP')
     
-    c4 = TCanvas("AbsEtaScale")
+    c4 = TCanvas("DeltaR")
     c4.cd()
-    dict_plots["trackster_AbsEtaScale_graph"].Draw('ALP')
+    dict_plots["trackster_DeltaR_graph"].Draw('ALP')
     
-    c5 = TCanvas("AbsRScale")
-    c5.cd()
-    dict_plots["trackster_AbsRScale_graph"].Draw('ALP')
-    
-    c1.SaveAs(top_save_dir + '/SingleElectron_plots/RawERes.png')
-    c2.SaveAs(top_save_dir + '/SingleElectron_plots/RawEScale.png')
-    c3.SaveAs(top_save_dir + '/SingleElectron_plots/RawEFraction.png')
-    c4.SaveAs(top_save_dir + '/SingleElectron_plots/AbsEtaScale.png')
-    c5.SaveAs(top_save_dir + '/SingleElectron_plots/AbsRScale.png')
+    c1.SaveAs(top_save_dir + '/graph_plots/RawERes.png')
+    c2.SaveAs(top_save_dir + '/graph_plots/RawEScale.png')
+    c3.SaveAs(top_save_dir + '/graph_plots/RawEFraction.png')
+    c4.SaveAs(top_save_dir + '/graph_plots/DeltaR.png')
     
     return
 
@@ -401,15 +427,17 @@ def main():
     # Set open and save diretories
     if not 'DIRANALYSIS_HGCNOSE' in os.environ:
         raise Exception ('DIRANALYSIS_HGCNOSE not set. Please first run config.sh which is in your top-level directory.')
-    input_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/output'
-    top_save_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/plots/SingleElectron'
+    input_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/output/pid_0.5'
+    top_save_dir = os.environ['DIRANALYSIS_HGCNOSE'] + '/plots/HGCNose'
 
-    # File names
-    tuple_E = ('50', '100', '150', '200', '250', '450', '500')
-    tuple_filenames = tuple(input_dir + '/Single_Electron_E%s.root' % (i) for i in tuple_E)
+    # File names and energies
+    energies = ('10', '50', '100', '200', '300', '400', '500')
+    eta = 3.5
+    filenames = tuple(input_dir + '/Single_Photon_E{}_eta{}.root'.format(E, eta) for E in energies)
         
     # Get the comprehensive dictionary of plots
-    dict_plots = getPlotsEResolutionComprehensive(tuple_filenames, tuple_E)
+    trackster_name = "tracksterHFNoseEM"
+    dict_plots = getPlotsComprehensive(filenames, energies, eta, trackster_name, top_save_dir)
     
     # Save Energy Resolution plots
     plotGraphs (dict_plots, top_save_dir)

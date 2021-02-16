@@ -26,13 +26,14 @@ options.parseArguments()
 OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output')
 INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/photon_2026D47/photon_pt{}'.format(options.pt))
 outputfile = OUTPUT_DIR + '/SinglePhoton_pt{}.root'.format(options.pt)
-inputfile = 'file:' + INPUT_DIR + '/step3_photon_pt{}.root'.format(options.pt)
+#inputfile = 'file:' + INPUT_DIR + '/step3_photon_pt{}.root'.format(options.pt)
+inputfile = 'file:/eos/home-k/kyoon/TICL_11_3_0_pre1_default_pid_0.5/photon_2026D60/photon_E100/step3_photon_E100.root'
 
 # Process load
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-process.load('Configuration.Geometry.GeometryExtended2026D47_cff')
-process.load('Configuration.Geometry.GeometryExtended2026D47Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60_cff')
+process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 
 process.load('Geometry.ForwardCommonData.hfnoseXML_cfi')
 process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi')
