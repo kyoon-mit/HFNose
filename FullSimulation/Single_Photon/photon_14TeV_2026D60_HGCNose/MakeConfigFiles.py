@@ -199,7 +199,7 @@ class RunInstance:
     
         # Set directory to put cfg.py files
         dir_step1 = self.dir_run + '/step1_config'
-        if not os.path.exists(self.dir_run + '/step2_config'):
+        if not os.path.exists(self.dir_run + '/step1_config'):
             os.makedirs(dir_step1)
         
         # Save the cfg file for all E and eta values
@@ -298,7 +298,7 @@ class RunInstance:
     
         # Set directory to put cfg.py files
         dir_step3 = self.dir_run + '/step3_config'
-        if not os.path.exists(self.dir_run + '/step2_config'):
+        if not os.path.exists(self.dir_run + '/step3_config'):
             os.makedirs(dir_step3)
         
         # Save the cfg file for all E and eta values
