@@ -50,12 +50,16 @@ public:
     std::vector<float> xvals;
     std::vector<float> yvals;
     std::vector<float> zvals;
+    std::vector<float> etavals;
+    std::vector<float> phivals;
     for (const auto& obj : *objs) {
       if (cut_(obj)) {
         auto position = positionFromHit(obj);
         xvals.emplace_back(position.x());
         yvals.emplace_back(position.y());
         zvals.emplace_back(position.z());
+        etavals.emplace_back(position.eta());
+        phivals.emplace_back(position.phi());
       }
     }
 
@@ -63,6 +67,8 @@ public:
     tab->addColumn<float>("x", xvals, "x position");
     tab->addColumn<float>("y", yvals, "y position");
     tab->addColumn<float>("z", zvals, "z position");
+    tab->addColumn<float>("eta", etavals, "eta position");
+    tab->addColumn<float>("phi", phivals, "phi position");
 
     iEvent.put(std::move(tab));
   }
