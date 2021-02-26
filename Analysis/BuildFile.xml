@@ -1,27 +1,30 @@
+<use name="CommonTools/UtilAlgos"/>
+
 <use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/ServiceRegistry"/>
-<use name="CommonTools/UtilAlgos"/>
 
-<use name="DataFormats/HGCRecHit"/>
-<use name="DataFormats/ForwardDetId"/>
-<use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/CaloRecHit"/>
+<use name="DataFormats/EgammaReco"/>
+<use name="DataFormats/ForwardDetId"/>
 <use name="DataFormats/GeometryVector"/>
+<use name="DataFormats/HepMCCandidate"/>
+<use name="DataFormats/HGCalReco"/>
+<use name="DataFormats/HGCRecHit"/>
+<use name="DataFormats/Math"/>
 
+<use name="SimDataFormats/CaloAnalysis"/>
 <use name="SimDataFormats/CaloHit"/>
 
-<use name="Geometry/Records"/>
+<use name="Geometry/CaloGeometry"/>
+<use name="Geometry/CaloTopology"/>
 <use name="Geometry/HGCalGeometry"/>
+<use name="Geometry/Records"/>
 
-<use name="DataFormats/EgammaReco"/>
-<use name="DataFormats/Math"/>
 <use name="CondFormats/ESObjects"/>
 <use name="CondFormats/EgammaObjects"/>
 <use name="CondFormats/DataRecord"/>
 <use name="RecoEcal/EgammaCoreTools"/>
-<use name="Geometry/CaloGeometry"/>
-<use name="Geometry/CaloTopology"/>
 <use name="RecoParticleFlow/PFClusterTools"/>
 <use name="clhep"/>
 

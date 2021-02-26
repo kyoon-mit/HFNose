@@ -1,0 +1,16 @@
+Universe = vanilla 
+
++JobFlavour = "longlunch"
+RequestCpus = 8
+should_transfer_files = IF_NEEDED
+executable = condor_exec_3.sh
+log        = condor/$(ProcId)_output.log
+max_retries = 3
+
+notification = Always
+notify_user = kyungseop.yoon@cern.ch
+
+output = condor/$(ProcId)_output.out
+error = condor/$(ProcId)_output.err
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose
+queue 1
