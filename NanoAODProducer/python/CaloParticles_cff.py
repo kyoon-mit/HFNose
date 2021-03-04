@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import CandVars,Var
 
-caloParticleTable = cms.EDProducer("SimpleCaloParticleFlatTableProducer",
+CaloParticleTable = cms.EDProducer("SimpleCaloParticleFlatTableProducer",
     src = cms.InputTag("mix:MergedCaloTruth"),
     cut = cms.string(""), 
     name = cms.string("CaloPart"),

@@ -9,8 +9,12 @@ typedef SimpleFlatTableProducer<CaloRecHit> SimpleCaloRecHitFlatTableProducer;
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 typedef SimpleFlatTableProducer<reco::CaloCluster> SimpleCaloClusterFlatTableProducer;
 
+#include "DataFormats/HGCalReco/interface/Trackster.h"
+typedef SimpleFlatTableProducer<ticl::Trackster> SimpleTracksterFlatTableProducer;
+
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 DEFINE_FWK_MODULE(SimpleCaloParticleFlatTableProducer);
 DEFINE_FWK_MODULE(SimpleCaloRecHitFlatTableProducer);
 DEFINE_FWK_MODULE(SimpleCaloClusterFlatTableProducer);
+DEFINE_FWK_MODULE(SimpleTracksterFlatTableProducer);
