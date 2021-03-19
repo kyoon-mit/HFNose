@@ -6,9 +6,10 @@ from PhysicsTools.NanoAOD.common_cff import *
 from PhysicsTools.NanoAOD.genparticles_cff import genParticleTable
 from PhysicsTools.NanoAOD.genVertex_cff import *
 ###
-from hfnoseRecHits_cff import *
-from caloParticles_cff import *
-from layerClusters_cff import *
+from CaloParticles_cff import CaloParticleTable
+from HGCRecHits_cff import HGCRecHitsSequence
+from HGCLayerClusters_cff import HGCLayerClusterSequence
+from Tracksters_cff import TracksterSequence
 
 nanoMetadata = cms.EDProducer("UniqueStringProducer",
     strings = cms.PSet(
@@ -20,8 +21,9 @@ genParticleTable.src = "genParticles"
 genParticleTable.variables = cms.PSet(genParticleTable.variables,
     charge = CandVars.charge)
 
-nanoHFNoseSequence = cms.Sequence(nanoMetadata+genVertexTables+genParticleTable
-                                  +caloParticleTable
-                                  +hfnoseRecHitsSequence
-                                  +hfnoseLayerClusterSequence
+nanoHGCSequence = cms.Sequence(nanoMetadata+genVertexTables+genParticleTable
+                                  +CaloParticleTable
+                                  +HGCRecHitsSequence
+                                  +HGCLayerClusterSequence
+                                  +TracksterSequence
 )

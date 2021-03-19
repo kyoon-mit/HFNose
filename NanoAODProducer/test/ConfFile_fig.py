@@ -50,13 +50,13 @@ process.output = cms.OutputModule("NanoAODOutputModule",
 #-----------------------------------------
 
 ####
-process.load("HGCNose.NanoAODProducer.nanoHFNose_cff")
+process.load("HGCNose.NanoAODProducer.HGCNanoAOD_cff")
 
-process.hgc = cms.Path(process.nanoHFNoseSequence)
+process.hgc = cms.Path(process.HGCNanoAODSequence)
 
 process.finalize = cms.EndPath(process.output)
 
 process.schedule = cms.Schedule(
-    process.hgc
-    ,process.finalize
+    process.hgc,
+    process.finalize
 )
