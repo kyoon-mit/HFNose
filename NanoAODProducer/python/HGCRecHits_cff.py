@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoAOD.common_cff import Var,P3Vars
 
-HGCEERecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
+HGCEERecHitsTable = cms.EDProducer("SimpleHGCRecHitFlatTableProducer",
     src = cms.InputTag("HGCalRecHit:HGCEERecHits"),
     cut = cms.string(""), 
     name = cms.string("RecHitsHGCEE"),
@@ -10,12 +10,20 @@ HGCEERecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         detId = Var('detid().rawId()', 'int', precision=-1, doc='detId'),
-        energy = Var('energy', 'float', precision=14, doc='energy'),
+        flags = Var('flags', 'int', precision=-1, doc='flag'),
         time = Var('time', 'float', precision=14, doc='hit time'),
+        timeError = Var('timeError', 'float', precision=14, doc='time error'),
+        energy = Var('energy', 'float', precision=14, doc='energy'),
+        isTimeValid = Var('isTimeValid', 'bool', precision=-1, doc='(bool) is time valid'),
+        isTimeErrorValid = Var('isTimeErrorValid', 'bool', precision=-1, doc='(bool) is time error valid'),
+        outOfTimeEnergy = Var('outOfTimeEnergy', 'float', precision=14, doc='(only for out of time events) out of time energy'),
+        chi2 = Var('chi2', 'float', precision=14, doc='chi2'),
+        outOfTimeChi2 = Var('outOfTimeChi2', 'float', precision=14, doc='(only for out of time events) out of time chi2'),
+        signalOverSigmaNoise = Var('signalOverSigmaNoise', 'float', precision=14, doc='signal over sigma noise')
     )
 )
 
-HGCHEFRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
+HGCHEFRecHitsTable = cms.EDProducer("SimpleHGCRecHitFlatTableProducer",
     src = cms.InputTag("HGCalRecHit:HGCHEFRecHits"),
     cut = cms.string(""), 
     name = cms.string("RecHitsHGCHEF"),
@@ -24,12 +32,20 @@ HGCHEFRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         detId = Var('detid().rawId()', 'int', precision=-1, doc='detId'),
-        energy = Var('energy', 'float', precision=14, doc='energy'),
+        flags = Var('flags', 'int', precision=-1, doc='flag'),
         time = Var('time', 'float', precision=14, doc='hit time'),
+        timeError = Var('timeError', 'float', precision=14, doc='time error'),
+        energy = Var('energy', 'float', precision=14, doc='energy'),
+        isTimeValid = Var('isTimeValid', 'bool', precision=-1, doc='(bool) is time valid'),
+        isTimeErrorValid = Var('isTimeErrorValid', 'bool', precision=-1, doc='(bool) is time error valid'),
+        outOfTimeEnergy = Var('outOfTimeEnergy', 'float', precision=14, doc='(only for out of time events) out of time energy'),
+        chi2 = Var('chi2', 'float', precision=14, doc='chi2'),
+        outOfTimeChi2 = Var('outOfTimeChi2', 'float', precision=14, doc='(only for out of time events) out of time chi2'),
+        signalOverSigmaNoise = Var('signalOverSigmaNoise', 'float', precision=14, doc='signal over sigma noise')
     )
 )
 
-HGCHEBRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
+HGCHEBRecHitsTable = cms.EDProducer("SimpleHGCRecHitFlatTableProducer",
     src = cms.InputTag("HGCalRecHit:HGCHEBRecHits"),
     cut = cms.string(""), 
     name = cms.string("RecHitsHGCHEB"),
@@ -38,12 +54,20 @@ HGCHEBRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         detId = Var('detid().rawId()', 'int', precision=-1, doc='detId'),
-        energy = Var('energy', 'float', precision=14, doc='energy'),
+        flags = Var('flags', 'int', precision=-1, doc='flag'),
         time = Var('time', 'float', precision=14, doc='hit time'),
+        timeError = Var('timeError', 'float', precision=14, doc='time error'),
+        energy = Var('energy', 'float', precision=14, doc='energy'),
+        isTimeValid = Var('isTimeValid', 'bool', precision=-1, doc='(bool) is time valid'),
+        isTimeErrorValid = Var('isTimeErrorValid', 'bool', precision=-1, doc='(bool) is time error valid'),
+        outOfTimeEnergy = Var('outOfTimeEnergy', 'float', precision=14, doc='(only for out of time events) out of time energy'),
+        chi2 = Var('chi2', 'float', precision=14, doc='chi2'),
+        outOfTimeChi2 = Var('outOfTimeChi2', 'float', precision=14, doc='(only for out of time events) out of time chi2'),
+        signalOverSigmaNoise = Var('signalOverSigmaNoise', 'float', precision=14, doc='signal over sigma noise')
     )
 )
 
-HFNoseRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
+HFNoseRecHitsTable = cms.EDProducer("SimpleHGCRecHitFlatTableProducer",
     src = cms.InputTag("HGCalRecHit:HGCHFNoseRecHits"),
     cut = cms.string(""), 
     name = cms.string("RecHitsHFNose"),
@@ -52,14 +76,22 @@ HFNoseRecHitsTable = cms.EDProducer("SimpleCaloRecHitFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         detId = Var('detid().rawId()', 'int', precision=-1, doc='detId'),
-        energy = Var('energy', 'float', precision=14, doc='energy'),
+        flags = Var('flags', 'int', precision=-1, doc='flag'),
         time = Var('time', 'float', precision=14, doc='hit time'),
+        timeError = Var('timeError', 'float', precision=14, doc='time error'),
+        energy = Var('energy', 'float', precision=14, doc='energy'),
+        isTimeValid = Var('isTimeValid', 'bool', precision=-1, doc='(bool) is time valid'),
+        isTimeErrorValid = Var('isTimeErrorValid', 'bool', precision=-1, doc='(bool) is time error valid'),
+        outOfTimeEnergy = Var('outOfTimeEnergy', 'float', precision=14, doc='(only for out of time events) out of time energy'),
+        chi2 = Var('chi2', 'float', precision=14, doc='chi2'),
+        outOfTimeChi2 = Var('outOfTimeChi2', 'float', precision=14, doc='(only for out of time events) out of time chi2'),
+        signalOverSigmaNoise = Var('signalOverSigmaNoise', 'float', precision=14, doc='signal over sigma noise')
     )
 )
 
 HGCEERecHitsPositionTable = cms.EDProducer("HGCRecHitPositionFromDetIDTableProducer",
     src = HGCEERecHitsTable.src,
-    cut = HGCEERecHitsTable.cut, 
+    cut = HGCEERecHitsTable.cut,
     name = HGCEERecHitsTable.name,
     doc  = HGCEERecHitsTable.doc,
 )

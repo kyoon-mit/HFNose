@@ -3,8 +3,8 @@
 #include "SimDataFormats/CaloAnalysis/interface/CaloParticle.h"
 typedef SimpleFlatTableProducer<CaloParticle> SimpleCaloParticleFlatTableProducer;
 
-#include "DataFormats/CaloRecHit/interface/CaloRecHit.h"
-typedef SimpleFlatTableProducer<CaloRecHit> SimpleCaloRecHitFlatTableProducer;
+#include "DataFormats/HGCRecHit/interface/HGCRecHit.h"
+typedef SimpleFlatTableProducer<HGCRecHit> SimpleHGCRecHitFlatTableProducer;
 
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 typedef SimpleFlatTableProducer<reco::CaloCluster> SimpleCaloClusterFlatTableProducer;
@@ -15,6 +15,6 @@ typedef SimpleFlatTableProducer<ticl::Trackster> SimpleTracksterFlatTableProduce
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 DEFINE_FWK_MODULE(SimpleCaloParticleFlatTableProducer);
-DEFINE_FWK_MODULE(SimpleCaloRecHitFlatTableProducer);
+DEFINE_FWK_MODULE(SimpleHGCRecHitFlatTableProducer);
 DEFINE_FWK_MODULE(SimpleCaloClusterFlatTableProducer);
 DEFINE_FWK_MODULE(SimpleTracksterFlatTableProducer);

@@ -10,11 +10,11 @@ TracksterEMTable = cms.EDProducer("SimpleTracksterFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         raw_energy = Var('raw_energy', 'float', precision=14, doc='raw energy'),
-        raw_em_energy = Var('raw_em_energy', 'float', precision=14, doc='raw energy'),
+        raw_em_energy = Var('raw_em_energy', 'float', precision=14, doc='raw em energy'),
+        raw_pt = Var('raw_pt', 'float', precision=14, doc='raw pt'),
+        raw_em_pt = Var('raw_em_pt', 'float', precision=14, doc='raw em pt'),
         time = Var('time', 'float', precision=14, doc='time'),
         time_error = Var('timeError', 'float', precision=14, doc='time error'),
-        sigmas = Var('sigmas', 'float', precision=14, doc='raw energy'),
-        # regressed_energy = Var('regressed_energy', 'float', precision=14, doc='regressed energy'),
     )
 )
 
@@ -27,16 +27,34 @@ HFNoseTracksterEMTable = cms.EDProducer("SimpleTracksterFlatTableProducer",
     extension = cms.bool(False), # this is the main table for the muons
     variables = cms.PSet(
         raw_energy = Var('raw_energy', 'float', precision=14, doc='raw energy'),
-        raw_em_energy = Var('raw_em_energy', 'float', precision=14, doc='raw energy'),
+        raw_em_energy = Var('raw_em_energy', 'float', precision=14, doc='raw em energy'),
+        raw_pt = Var('raw_pt', 'float', precision=14, doc='raw pt'),
+        raw_em_pt = Var('raw_em_pt', 'float', precision=14, doc='raw em pt'),
         time = Var('time', 'float', precision=14, doc='time'),
         time_error = Var('timeError', 'float', precision=14, doc='time error'),
-        sigmas = Var('sigmas', 'float', precision=14, doc='raw energy'),
-        # regressed_energy = Var('regressed_energy', 'float', precision=14, doc='regressed energy'),
     )
+)
+
+TracksterEMSigmaTable = cms.EDProducer("TracksterExtensionTableProducer",
+    src = TracksterEMTable.src,
+    cut = TracksterEMTable.cut,
+    name = TracksterEMTable.name,
+    doc  = TracksterEMTable.doc,
+    extension = cms.bool(True)
+)
+
+HFNoseTracksterEMSigmaTable = cms.EDProducer("TracksterExtensionTableProducer",
+    src = HFNoseTracksterEMTable.src,
+    cut = HFNoseTracksterEMTable.cut,
+    name = HFNoseTracksterEMTable.name,
+    doc  = HFNoseTracksterEMTable.doc,
+    extension = cms.bool(True)
 )
 
 TracksterSequence = cms.Sequence(
     TracksterEMTable
     +HFNoseTracksterEMTable
+    +TracksterEMSigmaTable
+    +HFNoseTracksterEMSigmaTable
 )
 

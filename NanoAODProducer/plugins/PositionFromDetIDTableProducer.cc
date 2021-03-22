@@ -32,17 +32,21 @@ public:
     iSetup.get<CaloGeometryRecord>().get(caloGeom_);
   }
 
-  GlobalPoint positionFromHit(const CaloRecHit& hit) {
+  GlobalPoint positionFromHit(const HGCRecHit& hit) {
     return positionFromDetId(hit.detid());
   }
 
   GlobalPoint positionFromDetId(DetId id) {
-
     hgcal::RecHitTools rhtools_;
     rhtools_.setGeometry(*caloGeom_);
     return rhtools_.getPosition(id);
-
   }
+  
+  float layerFromHit(const HGCRecHit& hit) {
+    hgcal::RecHitTools rhtools_;
+    return rhtools_.getLayer(hit.detid());
+  }
+  
   void produce(edm::Event& iEvent, const edm::EventSetup& iSetup) override {
     edm::Handle<T> objs;
     iEvent.getByToken(src_, objs);
@@ -52,6 +56,7 @@ public:
     std::vector<float> zvals;
     std::vector<float> etavals;
     std::vector<float> phivals;
+    std::vector<int> layernums;
     for (const auto& obj : *objs) {
       if (cut_(obj)) {
         auto position = positionFromHit(obj);
@@ -60,6 +65,7 @@ public:
         zvals.emplace_back(position.z());
         etavals.emplace_back(position.eta());
         phivals.emplace_back(position.phi());
+        layernums.emplace_back(layerFromHit(obj));
       }
     }
 
@@ -69,6 +75,7 @@ public:
     tab->addColumn<float>("z", zvals, "z position");
     tab->addColumn<float>("eta", etavals, "eta position");
     tab->addColumn<float>("phi", phivals, "phi position");
+    tab->addColumn<int>("layer", layernums, "layer number");
 
     iEvent.put(std::move(tab));
   }
