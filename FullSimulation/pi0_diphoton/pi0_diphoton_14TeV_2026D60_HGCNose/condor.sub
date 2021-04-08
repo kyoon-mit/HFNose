@@ -1,0 +1,16 @@
+Universe = vanilla 
+
++JobFlavour = "workday"
+RequestCpus = 8
+should_transfer_files = IF_NEEDED
+executable = $(DIR)/pi0_diphoton/pi0_diphoton_14TeV_2026D60_HGCNose/condor_exec.sh
+log        = $(DIR)/pi0_diphoton/pi0_diphoton_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.log
+max_retries = 3
+
+notification = Always
+notify_user = kyungseop.yoon@cern.ch
+
+output = $(DIR)/pi0_diphoton/pi0_diphoton_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.out
+error = $(DIR)/pi0_diphoton/pi0_diphoton_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.err
+arguments = $(DIR)
+queue 1

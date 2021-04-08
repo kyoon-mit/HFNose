@@ -12,25 +12,14 @@ notify_user = kyungseop.yoon@cern.ch
 
 output = condor/$(ProcId)_output.out
 error = condor/$(ProcId)_output.err
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 0 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCNose
-queue
 
 arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 3000 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCNose
-queue
-
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 200 3.5 500 0 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCNose
 queue
 
 arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 200 3.5 500 3000 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCNose
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 1.8 500 0 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCcenter
-queue
-
 arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 1.8 500 3000 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCcenter
-queue
-
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 200 1.8 500 0 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCcenter
 queue
 
 arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 200 1.8 500 3000 /eos/home-k/kyoon/TICL_11_3_0_pre1/muon_2026D60_HGCcenter

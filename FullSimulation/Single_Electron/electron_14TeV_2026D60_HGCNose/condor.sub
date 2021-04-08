@@ -3,14 +3,14 @@ Universe = vanilla
 +JobFlavour = "workday"
 RequestCpus = 8
 should_transfer_files = IF_NEEDED
-executable = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/FullSimulation/Single_Electron/electron_14TeV_2026D60_HGCNose/condor_exec.sh
-log        = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/FullSimulation/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.log
+executable = $(DIRSIM_HGCNOSE)/Single_Electron/electron_14TeV_2026D60_HGCNose/condor_exec.sh
+log        = $(DIRSIM_HGCNOSE)/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.log
 max_retries = 3
 
 notification = Always
 notify_user = kyungseop.yoon@cern.ch
 
-output = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/FullSimulation/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.out
-error = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/FullSimulation/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.err
+output = $(DIRSIM_HGCNOSE)/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.out
+error = $(DIRSIM_HGCNOSE)/Single_Electron/electron_14TeV_2026D60_HGCNose/condor/$(ProcId)_output.err
+arguments = $(DIRSIM_HGCNOSE)
 queue 1
-

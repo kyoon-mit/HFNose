@@ -15,12 +15,12 @@ def set_E (*args):
     Returns
     -------
     list(str)
-        If no value is provided in args, it will return ['7', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '200', '300'] by default. Otherwise, it will return args in the order the values were provided.
+        If no value is provided in args, it will return ['50', '100', '150', '200', '250', '300', '350', '400', '450', '500'] by default. Otherwise, it will return args in the order the values were provided.
     
     """
     
     if len(args)==0:
-        E_string_list = ['7', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '200', '300']
+        E_string_list = ['50', '100', '150', '200', '250', '300', '350', '400', '450', '500']
         return E_string_list
     else:
         for arg in args:
@@ -632,10 +632,11 @@ process.options = cms.untracked.PSet(
     SkipEvent = cms.untracked.vstring(),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
+    deleteNonConsumedUnscheduledModules = cms.untracked.bool(True),
     emptyRunLumiMode = cms.obsolete.untracked.string,
     eventSetup = cms.untracked.PSet(
         forceNumberOfConcurrentIOVs = cms.untracked.PSet(
-
+            allowAnyLabel_=cms.required.untracked.uint32
         ),
         numberOfConcurrentIOVs = cms.untracked.uint32(1)
     ),
@@ -645,7 +646,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(4),
+    numberOfThreads = cms.untracked.uint32(8),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),

@@ -15,5 +15,5 @@ error = condor/$(ProcId)_output.err
 arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 0
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 3000
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 200 3.5 500 0
 queue

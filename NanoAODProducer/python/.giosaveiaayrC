@@ -15,8 +15,8 @@ TracksterEMTable = cms.EDProducer("SimpleTracksterFlatTableProducer",
         raw_em_pt = Var('raw_em_pt', 'float', precision=14, doc='raw em pt'),
         time = Var('time', 'float', precision=14, doc='time'),
         time_error = Var('timeError', 'float', precision=14, doc='time error'),
-        eta = Var('barycenter().eta()', 'float', precision=14, doc='eta'),
-        phi = Var('barycenter().phi()', 'float', precision=14, doc='phi')
+        eta = Var('eta', 'float', precision=14, doc='eta'),
+        phi = Var('phi', 'float', precision=14, doc='phi')
     )
 )
 
@@ -34,8 +34,8 @@ HFNoseTracksterEMTable = cms.EDProducer("SimpleTracksterFlatTableProducer",
         raw_em_pt = Var('raw_em_pt', 'float', precision=14, doc='raw em pt'),
         time = Var('time', 'float', precision=14, doc='time'),
         time_error = Var('timeError', 'float', precision=14, doc='time error'),
-        eta = Var('barycenter().eta()', 'float', precision=14, doc='eta'),
-        phi = Var('barycenter().phi()', 'float', precision=14, doc='phi')
+        eta = Var('eta', 'float', precision=14, doc='eta'),
+        phi = Var('phi', 'float', precision=14, doc='phi')
     )
 )
 
