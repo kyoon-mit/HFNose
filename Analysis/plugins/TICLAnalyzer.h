@@ -37,9 +37,7 @@ class HGCalGeometry;
 
 namespace reco
 {
-    class GenParticle;
-    typedef std::vector<GenParticle> GenParticleCollection;
-    
+    class Track;    
     class CaloCluster;
 }
 
@@ -63,10 +61,12 @@ class TICLAnalyzer : public edm::EDAnalyzer
     virtual void endJob () override;
   
     std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const std::vector<CaloParticle> & );
+    void fillTruthHistograms ( const std::vector<CaloParticle> & );
     void analyzeTICLTrackster ( const std::vector<CaloParticle> &, const std::vector<ticl::Trackster> &, std::string );
     // void analyzeSimHits ( const std::vector<CaloParticle> &, const edm::PCaloHitContainer &, const HGCalGeometry* );
     void analyzeRecHits ( const std::vector<CaloParticle> &, const HGCRecHitCollection &, const HGCalGeometry* );
     void analyzeLayerClusters ( const std::vector<CaloParticle> &, const std::vector<reco::CaloCluster> & );
+    void analyzeTrackPosition ( const std::vector<CaloParticle> &, const std::vector<reco::Track> & );
 
     // Container
     std::map <std::string, TH1F*> histContainer_; // map of histograms
@@ -74,7 +74,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
     // ------ Data members -------
     // Tokens
     edm::EDGetTokenT<std::vector<CaloParticle>> token_CaloParticle_MergedCaloTruth_;
-    edm::EDGetTokenT<reco::GenParticleCollection> token_GenParticle_;
+    edm::EDGetTokenT<std::vector<reco::Track>> token_Tracks_;
     //edm::EDGetTokenT<edm::PCaloHitContainer> token_SimHits_HFNose_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HFNose_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HF_;
@@ -84,10 +84,9 @@ class TICLAnalyzer : public edm::EDAnalyzer
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_;
     
     // Input Tags
-    // edm::InputTag tag_GenParticle_;
     edm::InputTag tag_CaloParticle_MergedCaloTruth_;
-    edm::InputTag tag_GenParticle_;
     // edm::InputTag tag_SimHits_HFNose_;
+    edm::InputTag tag_Tracks_;
     edm::InputTag tag_RecHits_HFNose_;
     edm::InputTag tag_RecHits_EE_;
     edm::InputTag tag_LayerClusters_HFNose_;

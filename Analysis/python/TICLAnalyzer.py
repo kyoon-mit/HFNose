@@ -18,7 +18,7 @@ options.register('inpath', 'photon_2026D60_HGCNose', VarParsing.multiplicity.sin
                     "last part of input directory path")
 options.register('outpath', 'photon_2026D60_HGCNose', VarParsing.multiplicity.singleton,
                     VarParsing.varType.string,
-                    "last part of input directory path")
+                    "last part of output directory path")
 options.register('outsuffix', '', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                     "outfile suffix to put at the very end before the extension")
 options.register('pid', 22, VarParsing.multiplicity.singleton, VarParsing.varType.int,
@@ -29,6 +29,8 @@ options.register('eta', 3.5, VarParsing.multiplicity.singleton, VarParsing.varTy
                     "(type: float) eta value of the particle")
 options.register('deltaR', 0.5, VarParsing.multiplicity.singleton, VarParsing.varType.float,
                     "(type: float) R value of the shower cone")
+options.register('process', 'photon', VarParsing.multiplicity.singleton, VarParsing.varType.string,
+		    "(type: string) process name")
 options.register('itername', 'EMn', VarParsing.multiplicity.singleton, VarParsing.varType.string,
                     "(type: string) itername of the Trackster")
 options.parseArguments()
@@ -36,8 +38,8 @@ options.parseArguments()
 # Set output and input paths
 OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output/{}/'.format(options.outpath))
 INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/{}/'.format(options.inpath))
-outputfile = OUTPUT_DIR + '/Single_Photon_E{0}_eta{1}{2}.root'.format(options.E, options.eta, options.outsuffix)
-inputfile = 'file:' + INPUT_DIR + '/photon_E{0}_eta{1}/step3_photon_E{0}_eta{1}.root'.format(options.E, options.eta)
+outputfile = OUTPUT_DIR + '/{3}_E{0}_eta{1}{2}.root'.format(options.E, options.eta, options.outsuffix, options.process)
+inputfile = 'file:' + INPUT_DIR + '/{2}_E{0}_eta{1}/step3_{2}_E{0}_eta{1}.root'.format(options.E, options.eta, options.process)
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)

@@ -10,6 +10,7 @@
 <use name="DataFormats/ForwardDetId"/>
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/GeometryVector"/>
+<use name="DataFormats/TrackReco"/>
 
 <use name="SimDataFormats/CaloHit"/>
 
