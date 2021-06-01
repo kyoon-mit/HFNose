@@ -12,7 +12,7 @@ class RunInstance:
         self.dir_run = os.path.abspath(__file__ + '/../run/')
         
         self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_electron_E{E}_eta{eta}{suffix}_cfg.py'
-        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron_E{step}_eta:{E} nevts:{eta}\''
+        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron_E{step}_eta:{E} nevts:{nevents}\''
         self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}{suffix}.root\''
         self.preformat_aging = ''
         self.aging_suffix = ''
@@ -249,6 +249,7 @@ class RunInstance:
                 preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
+		preformat_dict['nevents'] = self.nevents
 
                 # Content of cfg file
                 format_dict = dict()
@@ -305,6 +306,7 @@ class RunInstance:
                 preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
+		preformat_dict['nevents'] = self.nevents
             
                 # Content of cfg file
                 format_dict = dict()
@@ -360,6 +362,7 @@ class RunInstance:
                 preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
+		preformat_dict['nevents'] = nevents
             
                 # Content of cfg file
                 format_dict = dict()
@@ -384,4 +387,3 @@ class RunInstance:
                     cfg_file.write(template_text)
                     
         return
-
