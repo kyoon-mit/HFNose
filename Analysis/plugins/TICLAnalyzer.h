@@ -19,21 +19,21 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 
 // Other CMSSW includes that are needed in this header
-#include "DataFormats/Math/interface/LorentzVector.h"
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/HGCRecHit/interface/HGCRecHitCollections.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
 #include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 // Forward declarations
-class TH1F;
 
 class CaloParticle;
+class GeomDet;
+class HGCalDDDConstants;
 class HGCalGeometry;
-
-/*namespace edm*/
-/*{*/
-/*    class PCaloHit;*/
-/*    typedef std::vector<PCaloHit> PCaloHitContainer;*/
-/*}*/
+class MagneticField;
+class Propagator;
+class TH1F;
 
 namespace reco
 {
@@ -61,12 +61,14 @@ class TICLAnalyzer : public edm::EDAnalyzer
     virtual void endJob () override;
   
     std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const std::vector<CaloParticle> & );
-    void fillTruthHistograms ( const std::vector<CaloParticle> & );
-    void analyzeTICLTrackster ( const std::vector<CaloParticle> &, const std::vector<ticl::Trackster> &, std::string );
-    // void analyzeSimHits ( const std::vector<CaloParticle> &, const edm::PCaloHitContainer &, const HGCalGeometry* );
-    void analyzeRecHits ( const std::vector<CaloParticle> &, const HGCRecHitCollection &, const HGCalGeometry* );
-    void analyzeLayerClusters ( const std::vector<CaloParticle> &, const std::vector<reco::CaloCluster> & );
-    void analyzeTrackPosition ( const std::vector<CaloParticle> &, const std::vector<reco::Track> & );
+    std::vector<GlobalPoint> getSimHitGlobalPoint ( const std::vector<CaloParticle> &, const HGCalGeometry * );
+    void fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<GlobalPoint> & );
+    void buildFirstLayers ( const HGCalDDDConstants * );
+    void analyzeTrackPosition ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & );
+    void analyzeTrackPosition ( const std::vector<GlobalPoint> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & ); // overloaded
+    void analyzeRecHits ( const std::vector<math::XYZTLorentzVectorF> &, const HGCRecHitCollection &, const HGCalGeometry * );
+    void analyzeLayerClusters ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::CaloCluster> & );
+    void analyzeTICLTrackster ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<ticl::Trackster> &, std::string );
 
     // Container
     std::map <std::string, TH1F*> histContainer_; // map of histograms
@@ -75,17 +77,18 @@ class TICLAnalyzer : public edm::EDAnalyzer
     // Tokens
     edm::EDGetTokenT<std::vector<CaloParticle>> token_CaloParticle_MergedCaloTruth_;
     edm::EDGetTokenT<std::vector<reco::Track>> token_Tracks_;
-    //edm::EDGetTokenT<edm::PCaloHitContainer> token_SimHits_HFNose_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HFNose_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_HF_;
     edm::EDGetTokenT<HGCRecHitCollection> token_RecHits_EE_;
     edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_HFNose_;
     edm::EDGetTokenT<std::vector<reco::CaloCluster>> token_LayerClusters_;
-    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_Trackster_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseEM_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseTrkEM_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseHAD_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseMIP_;
     
     // Input Tags
     edm::InputTag tag_CaloParticle_MergedCaloTruth_;
-    // edm::InputTag tag_SimHits_HFNose_;
     edm::InputTag tag_Tracks_;
     edm::InputTag tag_RecHits_HFNose_;
     edm::InputTag tag_RecHits_EE_;
@@ -100,6 +103,8 @@ class TICLAnalyzer : public edm::EDAnalyzer
     double truth_matching_deltaR_;
     std::string trackster_itername_;
     hgcal::RecHitTools rhtools_;
+    std::unique_ptr<GeomDet> firstDisk_[2];
+    const StringCutObjectSelector<reco::Track> cutTk_;
 };
 
 #endif
