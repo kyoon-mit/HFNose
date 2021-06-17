@@ -1,11 +1,9 @@
 #include "TICLAnalyzer.h"
 
 #include <iostream>
-#include <array>
-#include <algorithm>
-#include <string>
 
-#include <cmath>
+#include "TH1.h"
+#include "TH2.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -44,7 +42,8 @@
 using namespace edm;
 
 TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
-    histContainer_ (),
+    TH1Container_ (),
+    TH2Container_ (),
     tag_CaloParticle_MergedCaloTruth_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_MergedCaloTruth", edm::InputTag ("mix", "MergedCaloTruth", "HLT") ) ),
     tag_Tracks_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_Tracks", edm::InputTag("generalTracks") ) ),
     tag_RecHits_HFNose_ ( iConfig.getUntrackedParameter<edm::InputTag> ("TAG_HGCHFNoseRecHits", edm::InputTag("HGCalRecHit:HGCHFNoseRecHits") ) ),
@@ -137,7 +136,7 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
         const HGCalDDDConstants* hgcons = handle_HGCalDDDConstants.product();
         
         const std::vector<math::XYZTLorentzVectorF> selected_calotruths = getTruthP4 ( *handle_CaloParticle_MergedCaloTruth.product() );
-        const std::vector<GlobalPoint> simhits_globalpoints = getSimHitGlobalPoint ( *handle_CaloParticle_MergedCaloTruth.product(), nose_geom );
+        const std::vector<std::pair<GlobalPoint, Int_t>> simhits_globalpoints = getSimHitGlobalPoint ( *handle_CaloParticle_MergedCaloTruth.product(), nose_geom );
         fillTruthHistograms ( selected_calotruths, simhits_globalpoints );
         
         buildFirstLayers ( hgcons );
@@ -170,10 +169,10 @@ std::vector<math::XYZTLorentzVectorF> TICLAnalyzer::getTruthP4 ( const std::vect
 }
 
 
-std::vector<GlobalPoint> TICLAnalyzer::getSimHitGlobalPoint ( const std::vector<CaloParticle> & caloTruthParticles, const HGCalGeometry * geom )
-{
+std::vector<std::pair<GlobalPoint, Int_t>> TICLAnalyzer::getSimHitGlobalPoint ( const std::vector<CaloParticle> & caloTruthParticles, const HGCalGeometry * geom )
+{ // SimHit GlobalPoint, number of simclusters
 
-    std::vector<GlobalPoint> container;
+    std::vector<std::pair<GlobalPoint, Int_t>> container;
     
     for ( auto const& ct: caloTruthParticles )
     {
@@ -183,72 +182,59 @@ std::vector<GlobalPoint> TICLAnalyzer::getSimHitGlobalPoint ( const std::vector<
         {
             const SimClusterRefVector & ct_sim_clusters = ct.simClusters();
             
+            Int_t    num_sim_clusters = 0;
             Double_t simhit_max_energy = 0.;
-            DetId simhit_detid;
-            
-//            Double_t simhit_second_max_energy = 0.;
-//            DetId simhit_second_detid;
-//            
-//            Double_t simhit_third_max_energy = 0.;
-//            DetId simhit_third_detid;
+            uint32_t simhit_detid = 0;
             
             for ( auto const& it_sc: ct_sim_clusters )
             {
                 const SimCluster sc = *it_sc;
+                //Int_t first_layer = 99;
+                num_sim_clusters++;
+                
                 for ( auto const & he: sc.hits_and_energies() )
                 {
-                    if ( rhtools_.getLayer(he.first) != 1 ) continue;
+                    if ( rhtools_.getLayer(he.first) != 1 )
+                    {
+                        //first_layer = rhtools_.getLayer(he.first);
+                        continue;
+                    }
                     if ( simhit_max_energy < he.second ) 
                     {
-                        simhit_max_energy = he.second;
                         simhit_detid = he.first;
+                        simhit_max_energy = he.second;
                     }
-//                    else if ( simhit_second_max_energy < he.second )
-//                    {
-//                        simhit_second_max_energy = he.second;
-//                        simhit_second_detid = he.first;
-//                    }
-//                    else if ( simhit_third_max_energy < he.second )
-//                    {
-//                        simhit_third_max_energy = he.second;
-//                        simhit_third_detid = he.first;
-//                    }
+
                 }
             }
-            const GlobalPoint & hit_globalPosition = geom->getPosition(simhit_detid);
-//            const GlobalPoint & hit_second_globalPosition = geom->getPosition(simhit_second_detid);
-//            const GlobalPoint & hit_third_globalPosition = geom->getPosition(simhit_third_detid);
-//            std::cout << "simhit max E: " << simhit_max_energy << std::endl;
-//            std::cout << "simhit z: " << hit_globalPosition.z() << std::endl;
-//            std::cout << "simhit eta: " << hit_globalPosition.eta() << std::endl;
-//            std::cout << "simhit phi: " << hit_globalPosition.phi() << std::endl;
-//            std::cout << "simhit second max E: " << simhit_second_max_energy << std::endl;
-//            std::cout << "simhit second z: " << hit_second_globalPosition.z() << std::endl;
-//            std::cout << "simhit second eta: " << hit_second_globalPosition.eta() << std::endl;
-//            std::cout << "simhit second phi: " << hit_second_globalPosition.phi() << std::endl;
-//            std::cout << "simhit third max E: " << simhit_third_max_energy << std::endl;
-//            std::cout << "simhit third z: " << hit_third_globalPosition.z() << std::endl;
-//            std::cout << "simhit third eta: " << hit_third_globalPosition.eta() << std::endl;
-//            std::cout << "simhit third phi: " << hit_third_globalPosition.phi() << std::endl;
-            container.push_back ( hit_globalPosition );
+            try
+            {
+                const GlobalPoint & hit_globalPosition = geom->getPosition(simhit_detid);
+                container.push_back ( std::make_pair(hit_globalPosition, num_sim_clusters) );
+            }
+            catch ( cms::Exception const& e )
+            {
+                std::cout << e.what() << std::endl;
+            }
         }
     }
     return container;
 }
 
 
-void TICLAnalyzer::fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> & caloTruthP4, const std::vector<GlobalPoint> & simHitsGlobalPoints )
+void TICLAnalyzer::fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> & caloTruthP4, const std::vector<std::pair<GlobalPoint, Int_t>> & simHitsGlobalPoints )
 {
     for ( auto const& truth: caloTruthP4 )
     {
         // Fill truth histograms
-        histContainer_["truthE"]->Fill( truth.energy() );
-        histContainer_["truthEta"]->Fill( truth.eta() );   
+        TH1Container_["truthE"]->Fill( truth.energy() );
+        TH1Container_["truthEta"]->Fill( truth.eta() );   
     }
     for ( auto const& hit_point: simHitsGlobalPoints )
     {
-        histContainer_["first_layer_SimHit_z"]->Fill( hit_point.z() );
-        histContainer_["first_layer_SimHit_eta"]->Fill( hit_point.eta() );
+        TH1Container_["first_layer_SimHit_z"]->Fill( hit_point.first.z() );
+        TH1Container_["first_layer_SimHit_eta"]->Fill( hit_point.first.eta() );
+        TH2Container_["n_SimCluster_SimHitEta"]->Fill( hit_point.second, hit_point.first.eta() );
     }
 }
 
@@ -278,77 +264,12 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<math::XYZTLorentzVec
         Float_t truth_eta = truth.eta();
         Float_t truth_phi = truth.phi();
         
-//        std::cout << truth.z() << std::endl;
+        Float_t min_R = 999.;
+        Float_t truth_prop_dEta = 999.;
+        Float_t truth_prop_dPhi = 999.;
         
-        Float_t min_R = 9999.;
-        Float_t truth_track_dEta = -1.;
-        Float_t truth_track_dPhi = -1.;
-        
-        for ( auto const& track: generalTracks )
-        {
-            if ( !cutTk_(track) )
-            {
-                continue;
-            }
-        
-            FreeTrajectoryState fts = trajectoryStateTransform::outerFreeState(track, BField);
-            int iSide = int(track.eta() > 0);
-            auto begin = std::chrono::high_resolution_clock::now();
-            TrajectoryStateOnSurface tsos = prop.propagate(fts, firstDisk_[iSide]->surface());
-            auto end = std::chrono::high_resolution_clock::now();
-            
-            auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-            
-            std::cout << tsos.isValid() << std::endl;
-            if (tsos.isValid())
-            {
-//                std::cout.precision(6);
-//                std::cout << "surface z: " << firstDisk_[iSide]->surface().position().z() << "\n"
-//                        << "track outer eta: " << track.outerEta() << "\n"
-//                        << "track outer phi: " << track.outerPhi() << "\n"
-//                        << "tsos eta: "   << tsos.globalPosition().eta() << "\n"
-//                        << "tsos phi: " << tsos.globalPosition().phi() << "\n"
-//                        << "tsos r: "   << tsos.globalPosition().perp() << "\n"
-//                        << "tsos z: "   << tsos.globalPosition().z() << "\n"
-//                        << "B Field nominalValue: " << BField->nominalValue() << "\n"
-//                        << "-------" << std::endl;
-            
-                Float_t tsos_eta = tsos.globalPosition().eta();
-                Float_t tsos_phi = tsos.globalPosition().phi();
-                
-                Float_t dR = reco::deltaR ( tsos_eta, tsos_phi, truth_eta, truth_phi );
-
-                if ( dR < truth_matching_deltaR_ && dR < min_R ) // within cone of truth
-                {
-                    min_R = dR;
-                    truth_track_dEta = abs(truth_eta - tsos_eta);
-                    truth_track_dPhi = abs(truth_phi - tsos_phi);
-                }
-            }
-            
-        }
-        
-        if ( min_R < truth_matching_deltaR_ )
-        {
-            histContainer_["dEta_Truth_Track"]->Fill(truth_track_dEta);
-            histContainer_["dPhi_Truth_Track"]->Fill(truth_track_dPhi);
-        }
-    }
-
-}
-
-
-void TICLAnalyzer::analyzeTrackPosition ( const std::vector<GlobalPoint> & simHitsGlobalPoints, const std::vector<reco::Track> & generalTracks, const MagneticField * BField, const Propagator & prop )
-{
-
-    for ( auto const& hit_point: simHitsGlobalPoints )
-    {
-        Float_t truth_eta = hit_point.eta();
-        Float_t truth_phi = hit_point.phi();
-        
-        Float_t min_R = 9999.;
-        Float_t truth_track_dEta = -1.;
-        Float_t truth_track_dPhi = -1.;
+        Float_t track_prop_dEta = 999.;
+        Float_t track_prop_dPhi = 999.;
         
         for ( auto const& track: generalTracks )
         {
@@ -356,12 +277,11 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<GlobalPoint> & simHi
             {
                 continue;
             }
-        
+            
             FreeTrajectoryState fts = trajectoryStateTransform::outerFreeState(track, BField);
             int iSide = int(track.eta() > 0);
             TrajectoryStateOnSurface tsos = prop.propagate(fts, firstDisk_[iSide]->surface());
             
-            std::cout << tsos.isValid() << std::endl;
             if (tsos.isValid())
             {            
                 Float_t tsos_eta = tsos.globalPosition().eta();
@@ -372,8 +292,10 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<GlobalPoint> & simHi
                 if ( dR < truth_matching_deltaR_ && dR < min_R ) // within cone of truth
                 {
                     min_R = dR;
-                    truth_track_dEta = abs(truth_eta - tsos_eta);
-                    truth_track_dPhi = abs(truth_phi - tsos_phi);
+                    truth_prop_dEta = truth_eta - tsos_eta;
+                    truth_prop_dPhi = truth_phi - tsos_phi;
+                    track_prop_dEta = track.outerEta() - tsos_eta;
+                    track_prop_dPhi = track.outerPhi() - tsos_phi;
                 }
             }
             
@@ -381,9 +303,81 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<GlobalPoint> & simHi
         
         if ( min_R < truth_matching_deltaR_ )
         {
-            histContainer_["dEta_Truth_Track"]->Fill(truth_track_dEta);
-            histContainer_["dPhi_Truth_Track"]->Fill(truth_track_dPhi);
-            histContainer_["dR_Truth_Track"]->Fill(min_R);
+            // simhit & propagator histograms
+            TH1Container_["dEta_Truth_Prop"]->Fill(truth_prop_dEta);
+            TH1Container_["dPhi_Truth_Prop"]->Fill(truth_prop_dPhi);
+            TH1Container_["dR_Truth_Prop"]->Fill(min_R);
+            
+            // simhit & track histograms
+            TH1Container_["dEta_Track_Prop"]->Fill(track_prop_dEta);
+            TH1Container_["dPhi_Track_Prop"]->Fill(track_prop_dPhi);
+        }
+    }
+
+}
+
+
+void TICLAnalyzer::analyzeTrackPosition ( const std::vector<std::pair<GlobalPoint, Int_t>> & simHitsGlobalPoints, const std::vector<reco::Track> & generalTracks, const MagneticField * BField, const Propagator & prop )
+{
+
+    for ( auto const& hit_point: simHitsGlobalPoints )
+    {
+        Float_t truth_eta = hit_point.first.eta();
+        Float_t truth_phi = hit_point.first.phi();
+        
+        Float_t min_R = 999.;
+        Float_t truth_prop_dEta = 999.;
+        Float_t truth_prop_dPhi = 999.;
+        
+        Float_t track_prop_dEta = 999.;
+        Float_t track_prop_dPhi = 999.;
+        
+        Int_t num_sim_clusters = 0;
+        
+        for ( auto const& track: generalTracks )
+        {
+            if ( !cutTk_(track) )
+            {
+                continue;
+            }
+            
+            FreeTrajectoryState fts = trajectoryStateTransform::outerFreeState(track, BField);
+            int iSide = int(track.eta() > 0);
+            TrajectoryStateOnSurface tsos = prop.propagate(fts, firstDisk_[iSide]->surface());
+            
+            if (tsos.isValid())
+            {            
+                Float_t tsos_eta = tsos.globalPosition().eta();
+                Float_t tsos_phi = tsos.globalPosition().phi();
+                
+                Float_t dR = reco::deltaR ( tsos_eta, tsos_phi, truth_eta, truth_phi );
+
+                if ( dR < truth_matching_deltaR_ && dR < min_R ) // within cone of truth
+                {
+                    min_R = dR;
+                    truth_prop_dEta = truth_eta - tsos_eta;
+                    truth_prop_dPhi = truth_phi - tsos_phi;
+                    track_prop_dEta = track.outerEta() - tsos_eta;
+                    track_prop_dPhi = track.outerPhi() - tsos_phi;
+                    num_sim_clusters = hit_point.second;
+                }
+            }
+            
+        }
+        
+        if ( min_R < truth_matching_deltaR_ )
+        {
+            // simhit & propagator histograms
+            TH1Container_["dEta_Truth_Prop"]->Fill(truth_prop_dEta);
+            TH1Container_["dPhi_Truth_Prop"]->Fill(truth_prop_dPhi);
+            TH1Container_["dR_Truth_Prop"]->Fill(min_R);
+            TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dEta);
+            TH2Container_["n_SimCluster_dEta_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dPhi);
+            TH2Container_["n_SimCluster_dR_Truth_Prop"]->Fill(num_sim_clusters, min_R);
+            
+            // simhit & track histograms
+            TH1Container_["dEta_Track_Prop"]->Fill(track_prop_dEta);
+            TH1Container_["dPhi_Track_Prop"]->Fill(track_prop_dPhi);
         }
     }
 
@@ -423,27 +417,27 @@ void TICLAnalyzer::analyzeRecHits ( const std::vector<math::XYZTLorentzVectorF> 
             }
         }
         
-        histContainer_["EDist_recHits"]->Fill ( hit_sum_energy );
+        TH1Container_["EDist_recHits"]->Fill ( hit_sum_energy );
         
-        histContainer_["EDist_recHits_layer1"]->Fill ( hit_sum_energy_layer[0] );
-        histContainer_["EDist_recHits_layer2"]->Fill ( hit_sum_energy_layer[1] );
-        histContainer_["EDist_recHits_layer3"]->Fill ( hit_sum_energy_layer[2] );
-        histContainer_["EDist_recHits_layer4"]->Fill ( hit_sum_energy_layer[3] );
-        histContainer_["EDist_recHits_layer5"]->Fill ( hit_sum_energy_layer[4] );
-        histContainer_["EDist_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] );
-        histContainer_["EDist_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] );
-        histContainer_["EDist_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] );
+        TH1Container_["EDist_recHits_layer1"]->Fill ( hit_sum_energy_layer[0] );
+        TH1Container_["EDist_recHits_layer2"]->Fill ( hit_sum_energy_layer[1] );
+        TH1Container_["EDist_recHits_layer3"]->Fill ( hit_sum_energy_layer[2] );
+        TH1Container_["EDist_recHits_layer4"]->Fill ( hit_sum_energy_layer[3] );
+        TH1Container_["EDist_recHits_layer5"]->Fill ( hit_sum_energy_layer[4] );
+        TH1Container_["EDist_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] );
+        TH1Container_["EDist_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] );
+        TH1Container_["EDist_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] );
 
-        histContainer_["ERatio_recHits_to_truth"]->Fill ( hit_sum_energy / truth_energy );
+        TH1Container_["ERatio_recHits_to_truth"]->Fill ( hit_sum_energy / truth_energy );
         
-        histContainer_["ERatio_recHits_layer1"]->Fill ( hit_sum_energy_layer[0] / truth_energy );
-        histContainer_["ERatio_recHits_layer2"]->Fill ( hit_sum_energy_layer[1] / truth_energy );
-        histContainer_["ERatio_recHits_layer3"]->Fill ( hit_sum_energy_layer[2] / truth_energy );
-        histContainer_["ERatio_recHits_layer4"]->Fill ( hit_sum_energy_layer[3] / truth_energy );
-        histContainer_["ERatio_recHits_layer5"]->Fill ( hit_sum_energy_layer[4] / truth_energy );
-        histContainer_["ERatio_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] / truth_energy );
-        histContainer_["ERatio_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] / truth_energy );
-        histContainer_["ERatio_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] / truth_energy );
+        TH1Container_["ERatio_recHits_layer1"]->Fill ( hit_sum_energy_layer[0] / truth_energy );
+        TH1Container_["ERatio_recHits_layer2"]->Fill ( hit_sum_energy_layer[1] / truth_energy );
+        TH1Container_["ERatio_recHits_layer3"]->Fill ( hit_sum_energy_layer[2] / truth_energy );
+        TH1Container_["ERatio_recHits_layer4"]->Fill ( hit_sum_energy_layer[3] / truth_energy );
+        TH1Container_["ERatio_recHits_layer5"]->Fill ( hit_sum_energy_layer[4] / truth_energy );
+        TH1Container_["ERatio_recHits_layer6"]->Fill ( hit_sum_energy_layer[5] / truth_energy );
+        TH1Container_["ERatio_recHits_layer7"]->Fill ( hit_sum_energy_layer[6] / truth_energy );
+        TH1Container_["ERatio_recHits_layer8"]->Fill ( hit_sum_energy_layer[7] / truth_energy );
         
     }
 }
@@ -486,36 +480,36 @@ void TICLAnalyzer::analyzeLayerClusters ( const std::vector<math::XYZTLorentzVec
             }
         }
         
-        histContainer_["EDist_layerClusters_sum"]->Fill ( cluster_sum_energy );
+        TH1Container_["EDist_layerClusters_sum"]->Fill ( cluster_sum_energy );
         
-        histContainer_["EDist_layerClusters_layer1"]->Fill( cluster_sum_energy_layer[0] );
-        histContainer_["EDist_layerClusters_layer2"]->Fill( cluster_sum_energy_layer[1] );
-        histContainer_["EDist_layerClusters_layer3"]->Fill( cluster_sum_energy_layer[2] );
-        histContainer_["EDist_layerClusters_layer4"]->Fill( cluster_sum_energy_layer[3] );
-        histContainer_["EDist_layerClusters_layer5"]->Fill( cluster_sum_energy_layer[4] );
-        histContainer_["EDist_layerClusters_layer6"]->Fill( cluster_sum_energy_layer[5] );
-        histContainer_["EDist_layerClusters_layer7"]->Fill( cluster_sum_energy_layer[6] );
-        histContainer_["EDist_layerClusters_layer8"]->Fill( cluster_sum_energy_layer[7] );
+        TH1Container_["EDist_layerClusters_layer1"]->Fill( cluster_sum_energy_layer[0] );
+        TH1Container_["EDist_layerClusters_layer2"]->Fill( cluster_sum_energy_layer[1] );
+        TH1Container_["EDist_layerClusters_layer3"]->Fill( cluster_sum_energy_layer[2] );
+        TH1Container_["EDist_layerClusters_layer4"]->Fill( cluster_sum_energy_layer[3] );
+        TH1Container_["EDist_layerClusters_layer5"]->Fill( cluster_sum_energy_layer[4] );
+        TH1Container_["EDist_layerClusters_layer6"]->Fill( cluster_sum_energy_layer[5] );
+        TH1Container_["EDist_layerClusters_layer7"]->Fill( cluster_sum_energy_layer[6] );
+        TH1Container_["EDist_layerClusters_layer8"]->Fill( cluster_sum_energy_layer[7] );
         
-        histContainer_["Count_layerClusters_layer1"]->Fill( cluster_count_layer[0] );
-        histContainer_["Count_layerClusters_layer2"]->Fill( cluster_count_layer[1] );
-        histContainer_["Count_layerClusters_layer3"]->Fill( cluster_count_layer[2] );
-        histContainer_["Count_layerClusters_layer4"]->Fill( cluster_count_layer[3] );
-        histContainer_["Count_layerClusters_layer5"]->Fill( cluster_count_layer[4] );
-        histContainer_["Count_layerClusters_layer6"]->Fill( cluster_count_layer[5] );
-        histContainer_["Count_layerClusters_layer7"]->Fill( cluster_count_layer[6] );
-        histContainer_["Count_layerClusters_layer8"]->Fill( cluster_count_layer[7] );
+        TH1Container_["Count_layerClusters_layer1"]->Fill( cluster_count_layer[0] );
+        TH1Container_["Count_layerClusters_layer2"]->Fill( cluster_count_layer[1] );
+        TH1Container_["Count_layerClusters_layer3"]->Fill( cluster_count_layer[2] );
+        TH1Container_["Count_layerClusters_layer4"]->Fill( cluster_count_layer[3] );
+        TH1Container_["Count_layerClusters_layer5"]->Fill( cluster_count_layer[4] );
+        TH1Container_["Count_layerClusters_layer6"]->Fill( cluster_count_layer[5] );
+        TH1Container_["Count_layerClusters_layer7"]->Fill( cluster_count_layer[6] );
+        TH1Container_["Count_layerClusters_layer8"]->Fill( cluster_count_layer[7] );
         
-        histContainer_["ERatio_layerClusters_to_truth"]->Fill ( cluster_sum_energy / truth_energy );
+        TH1Container_["ERatio_layerClusters_to_truth"]->Fill ( cluster_sum_energy / truth_energy );
         
-        histContainer_["ERatio_layerClusters_layer1"]->Fill ( cluster_sum_energy_layer[0] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer2"]->Fill ( cluster_sum_energy_layer[1] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer3"]->Fill ( cluster_sum_energy_layer[2] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer4"]->Fill ( cluster_sum_energy_layer[3] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer5"]->Fill ( cluster_sum_energy_layer[4] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer6"]->Fill ( cluster_sum_energy_layer[5] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer7"]->Fill ( cluster_sum_energy_layer[6] / truth_energy );
-        histContainer_["ERatio_layerClusters_layer8"]->Fill ( cluster_sum_energy_layer[7] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer1"]->Fill ( cluster_sum_energy_layer[0] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer2"]->Fill ( cluster_sum_energy_layer[1] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer3"]->Fill ( cluster_sum_energy_layer[2] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer4"]->Fill ( cluster_sum_energy_layer[3] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer5"]->Fill ( cluster_sum_energy_layer[4] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer6"]->Fill ( cluster_sum_energy_layer[5] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer7"]->Fill ( cluster_sum_energy_layer[6] / truth_energy );
+        TH1Container_["ERatio_layerClusters_layer8"]->Fill ( cluster_sum_energy_layer[7] / truth_energy );
     }
 
 }
@@ -541,33 +535,33 @@ void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<math::XYZTLorentzVec
             
                 if ( tag == "EMn" )
                 {
-                    histContainer_["RawEDist_tracksterHFNoseEM"]->Fill( trackster_raw_energy );
-                    histContainer_["RawEScale_tracksterHFNoseEM"]->Fill( truth.E() - trackster_raw_energy );
-                    histContainer_["DeltaR_tracksterHFNoseEM"]->Fill( dR );
+                    TH1Container_["RawEDist_tracksterHFNoseEM"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterHFNoseEM"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterHFNoseEM"]->Fill( dR );
                 }
                 else if ( tag == "TrkEMn")
                 {
-                    histContainer_["RawEDist_tracksterHFNoseTrkEM"]->Fill( trackster_raw_energy );
-                    histContainer_["RawEScale_tracksterHFNoseTrkEM"]->Fill( truth.E() - trackster_raw_energy );
-                    histContainer_["DeltaR_tracksterHFNoseTrkEM"]->Fill( dR );
+                    TH1Container_["RawEDist_tracksterHFNoseTrkEM"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterHFNoseTrkEM"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterHFNoseTrkEM"]->Fill( dR );
                  }   
                  else if ( tag == "EM" )
                  {
-                    histContainer_["RawEDist_tracksterEM"]->Fill( trackster_raw_energy );
-                    histContainer_["RawEScale_tracksterEM"]->Fill( truth.E() - trackster_raw_energy );
-                    histContainer_["DeltaR_tracksterEM"]->Fill( dR );
+                    TH1Container_["RawEDist_tracksterEM"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterEM"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterEM"]->Fill( dR );
                  }
                  else if ( tag == "HADn" )
                  {
-                    histContainer_["RawEDist_tracksterHFNoseHAD"]->Fill( trackster_raw_energy );
-                    histContainer_["RawEScale_tracksterHFNoseHAD"]->Fill( truth.E() - trackster_raw_energy );
-                    histContainer_["DeltaR_tracksterHFNoseHAD"]->Fill( dR );
+                    TH1Container_["RawEDist_tracksterHFNoseHAD"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterHFNoseHAD"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterHFNoseHAD"]->Fill( dR );
                  }
                  else if ( tag == "MIPn" )
                  {
-                    histContainer_["RawEDist_tracksterHFNoseMIP"]->Fill( trackster_raw_energy );
-                    histContainer_["RawEScale_tracksterHFNoseMIP"]->Fill( truth.E() - trackster_raw_energy );
-                    histContainer_["DeltaR_tracksterHFNoseMIP"]->Fill( dR );
+                    TH1Container_["RawEDist_tracksterHFNoseMIP"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterHFNoseMIP"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterHFNoseMIP"]->Fill( dR );
                  }
                     
             }
@@ -581,123 +575,149 @@ void TICLAnalyzer::beginJob ()
     edm::Service<TFileService> fs;
     
     // ---- CaloTruth ------
-    histContainer_["truthE"] = fs->make<TH1F>("truthE", "Truth Energy Distribution", 100, 0, 500);
-    histContainer_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, (select_EtaLow_ + select_EtaHigh_)/2 - 0.5, (select_EtaLow_ + select_EtaHigh_)/2 + 0.5);
+    TH1Container_["truthE"] = fs->make<TH1F>("truthE", "Truth Energy Distribution", 100, 0, 500);
+    TH1Container_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, (select_EtaLow_ + select_EtaHigh_)/2 - 0.5, (select_EtaLow_ + select_EtaHigh_)/2 + 0.5);
     
     // ---- SimHits ------
-     histContainer_["first_layer_SimHit_z"] = fs->make<TH1F>("first_layer_SimHit_z", "z of highest energy simhit in first layer", 0, 1500, 150);
-      histContainer_["first_layer_SimHit_eta"] = fs->make<TH1F>("first_layer_SimHit_eta", "eta of highest energy simhit in first layer", 3.0, 4.5, 150);
+    TH1Container_["first_layer_SimHit_z"] = fs->make<TH1F>("first_layer_SimHit_z", "z of highest energy simhit in first layer", 0, 1500, 150);
+    TH1Container_["first_layer_SimHit_eta"] = fs->make<TH1F>("first_layer_SimHit_eta", "eta of highest energy simhit in first layer", 3.0, 4.5, 150);
     
-    // ---- Tracks -------
-    histContainer_["dEta_Truth_Track"] = fs->make<TH1F>("dEta_Truth_Track", "#eta difference between reco and sim at HGCal interface", 30, 0, 0.3);
-    histContainer_["dPhi_Truth_Track"] = fs->make<TH1F>("dPhi_Truth_Track", "#phi difference between reco and sim at HGCal interface", 30, 0, 0.3);
-    histContainer_["dR_Truth_Track"] = fs->make<TH1F>("dR_Truth_Track", "#Delta R between reco and sim at HGCal interface", 30, 0, 0.3);
+    TH2Container_["n_SimCluster_SimHitEta"] = fs->make<TH2F>("n_SimCluster_SimHitEta", "# SimClusters vs #eta_{simhit}, per generated particle", 9, 1, 10, 60, -0.3, 0.3);
     
-    histContainer_["dEta_Truth_Track"]->GetXaxis()->SetTitle("|#eta_{sim} - #eta_{reco}|");
-    histContainer_["dPhi_Truth_Track"]->GetXaxis()->SetTitle("|#phi_{sim} - #phi_{reco}|");
-    histContainer_["dR_Truth_Track"]->GetXaxis()->SetTitle("|R_{sim} - R_{reco}|");
+    TH2Container_["n_SimCluster_SimHitEta"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["n_SimCluster_SimHitEta"]->GetYaxis()->SetTitle("#eta_{simhit}");
+    
+    // ---- Propagator & SimHit ------
+    TH1Container_["dEta_Truth_Prop"] = fs->make<TH1F>("dEta_Truth_Prop", "#eta difference between reco and sim at HGCal interface", 600, -0.3, 0.3);
+    TH1Container_["dPhi_Truth_Prop"] = fs->make<TH1F>("dPhi_Truth_Prop", "#phi difference between reco and sim at HGCal interface", 600, -0.3, 0.3);
+    TH1Container_["dR_Truth_Prop"] = fs->make<TH1F>("dR_Truth_Prop", "#Delta R between reco and sim at HGCal interface", 300, 0.0, 0.3);
+    
+    TH2Container_["n_SimCluster_dEta_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dEta_Truth_Prop", "# SimClusters vs (#eta_{simhit} - #eta_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["n_SimCluster_dPhi_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dPhi_Truth_Prop", "# SimClusters vs (#phi_{simhit} - #phi_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["n_SimCluster_dR_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dR_Truth_Prop", "# SimClusters vs #Delta{R}_{simhit, prop}, per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    
+    TH1Container_["dEta_Truth_Prop"]->GetXaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
+    TH1Container_["dPhi_Truth_Prop"]->GetXaxis()->SetTitle("phi_{simhit} - #phi_{prop}");
+    TH1Container_["dR_Truth_Prop"]->GetXaxis()->SetTitle("#Delta{R}_{simhit, prop}");
+     
+    TH2Container_["n_SimCluster_dEta_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["n_SimCluster_dEta_Truth_Prop"]->GetYaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
+    
+    TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->GetYaxis()->SetTitle("#phi_{simhit} - #phi_{prop}");
+     
+    TH2Container_["n_SimCluster_dR_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["n_SimCluster_dR_Truth_Prop"]->GetYaxis()->SetTitle("#Delta{R}_{simhit, prop}");
+    
+    // ---- Propagator & Track ------
+    
+    TH1Container_["dEta_Track_Prop"] = fs->make<TH1F>("dEta_Track_Prop", "#eta difference between #eta_{prop} and #eta_{track, outer}", 600, -0.3, 0.3);
+    TH1Container_["dPhi_Track_Prop"] = fs->make<TH1F>("dPhi_Track_Prop", "#phi difference between #phi_{prop} and #phi_{track, outer}", 600, -0.3, 0.3);
+    
+    TH1Container_["dEta_Truth_Prop"]->GetXaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
+    TH1Container_["dPhi_Truth_Prop"]->GetXaxis()->SetTitle("phi_{simhit} - #phi_{prop}");   
     
     // ---- RecHits ------
-    histContainer_["EDist_recHits"] = fs->make<TH1F>("EDist_recHits", "Energy Distribution (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits"] = fs->make<TH1F>("EDist_recHits", "Energy Distribution (recHits)", 100, 0, 1000);
     
-    histContainer_["EDist_recHits_layer1"] = fs->make<TH1F>("EDist_recHits_layer1", "Energy Distribution Layer 1 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer2"] = fs->make<TH1F>("EDist_recHits_layer2", "Energy Distribution Layer 2 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer3"] = fs->make<TH1F>("EDist_recHits_layer3", "Energy Distribution Layer 3 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer4"] = fs->make<TH1F>("EDist_recHits_layer4", "Energy Distribution Layer 4 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer5"] = fs->make<TH1F>("EDist_recHits_layer5", "Energy Distribution Layer 5 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer6"] = fs->make<TH1F>("EDist_recHits_layer6", "Energy Distribution Layer 6 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer7"] = fs->make<TH1F>("EDist_recHits_layer7", "Energy Distribution Layer 7 (recHits)", 100, 0, 1000);
-    histContainer_["EDist_recHits_layer8"] = fs->make<TH1F>("EDist_recHits_layer8", "Energy Distribution Layer 8 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer1"] = fs->make<TH1F>("EDist_recHits_layer1", "Energy Distribution Layer 1 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer2"] = fs->make<TH1F>("EDist_recHits_layer2", "Energy Distribution Layer 2 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer3"] = fs->make<TH1F>("EDist_recHits_layer3", "Energy Distribution Layer 3 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer4"] = fs->make<TH1F>("EDist_recHits_layer4", "Energy Distribution Layer 4 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer5"] = fs->make<TH1F>("EDist_recHits_layer5", "Energy Distribution Layer 5 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer6"] = fs->make<TH1F>("EDist_recHits_layer6", "Energy Distribution Layer 6 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer7"] = fs->make<TH1F>("EDist_recHits_layer7", "Energy Distribution Layer 7 (recHits)", 100, 0, 1000);
+    TH1Container_["EDist_recHits_layer8"] = fs->make<TH1F>("EDist_recHits_layer8", "Energy Distribution Layer 8 (recHits)", 100, 0, 1000);
     
-    histContainer_["ERatio_recHits_to_truth"] = fs->make<TH1F>("ERatio_recHits_to_truth", "E_{recHits} / E_{truth}", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_to_truth"]->GetXaxis()->SetTitle("E_{recHits} / E_{truth}");
+    TH1Container_["ERatio_recHits_to_truth"] = fs->make<TH1F>("ERatio_recHits_to_truth", "E_{recHits} / E_{truth}", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_to_truth"]->GetXaxis()->SetTitle("E_{recHits} / E_{truth}");
 
-    histContainer_["ERatio_recHits_layer1"] = fs->make<TH1F>("ERatio_recHits_layer1", "E_{recHits} / E_{truth} Layer 1", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer2"] = fs->make<TH1F>("ERatio_recHits_layer2", "E_{recHits} / E_{truth} Layer 2", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer3"] = fs->make<TH1F>("ERatio_recHits_layer3", "E_{recHits} / E_{truth} Layer 3", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer4"] = fs->make<TH1F>("ERatio_recHits_layer4", "E_{recHits} / E_{truth} Layer 4", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer5"] = fs->make<TH1F>("ERatio_recHits_layer5", "E_{recHits} / E_{truth} Layer 5", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer6"] = fs->make<TH1F>("ERatio_recHits_layer6", "E_{recHits} / E_{truth} Layer 6", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer7"] = fs->make<TH1F>("ERatio_recHits_layer7", "E_{recHits} / E_{truth} Layer 7", 100, 0, 1.0);
-    histContainer_["ERatio_recHits_layer8"] = fs->make<TH1F>("ERatio_recHits_layer8", "E_{recHits} / E_{truth} Layer 8", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer1"] = fs->make<TH1F>("ERatio_recHits_layer1", "E_{recHits} / E_{truth} Layer 1", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer2"] = fs->make<TH1F>("ERatio_recHits_layer2", "E_{recHits} / E_{truth} Layer 2", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer3"] = fs->make<TH1F>("ERatio_recHits_layer3", "E_{recHits} / E_{truth} Layer 3", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer4"] = fs->make<TH1F>("ERatio_recHits_layer4", "E_{recHits} / E_{truth} Layer 4", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer5"] = fs->make<TH1F>("ERatio_recHits_layer5", "E_{recHits} / E_{truth} Layer 5", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer6"] = fs->make<TH1F>("ERatio_recHits_layer6", "E_{recHits} / E_{truth} Layer 6", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer7"] = fs->make<TH1F>("ERatio_recHits_layer7", "E_{recHits} / E_{truth} Layer 7", 100, 0, 1.0);
+    TH1Container_["ERatio_recHits_layer8"] = fs->make<TH1F>("ERatio_recHits_layer8", "E_{recHits} / E_{truth} Layer 8", 100, 0, 1.0);
     
     // ---- Clusters ------
-    histContainer_["EDist_layerClusters_sum"] = fs->make<TH1F>("EDist_layerClusters_sum", "Energy Distribution (clusters, summed all layers)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_sum"] = fs->make<TH1F>("EDist_layerClusters_sum", "Energy Distribution (clusters, summed all layers)", 100, 0, 1000);
     
-    histContainer_["ERatio_layerClusters_to_truth"] = fs->make<TH1F>("ERatio_layerClusters_to_truth", "E_{layerClusters} / E_{truth}", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_to_truth"]->GetXaxis()->SetTitle("E_{layerClusters} / E_{truth}");
+    TH1Container_["ERatio_layerClusters_to_truth"] = fs->make<TH1F>("ERatio_layerClusters_to_truth", "E_{layerClusters} / E_{truth}", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_to_truth"]->GetXaxis()->SetTitle("E_{layerClusters} / E_{truth}");
     
-    histContainer_["EDist_layerClusters_layer1"] = fs->make<TH1F>("EDist_layerClusters_layer1", "Energy Distribution Layer 1 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer2"] = fs->make<TH1F>("EDist_layerClusters_layer2", "Energy Distribution Layer 2 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer3"] = fs->make<TH1F>("EDist_layerClusters_layer3", "Energy Distribution Layer 3 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer4"] = fs->make<TH1F>("EDist_layerClusters_layer4", "Energy Distribution Layer 4 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer5"] = fs->make<TH1F>("EDist_layerClusters_layer5", "Energy Distribution Layer 5 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer6"] = fs->make<TH1F>("EDist_layerClusters_layer6", "Energy Distribution Layer 6 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer7"] = fs->make<TH1F>("EDist_layerClusters_layer7", "Energy Distribution Layer 7 (clusters)", 100, 0, 1000);
-    histContainer_["EDist_layerClusters_layer8"] = fs->make<TH1F>("EDist_layerClusters_layer8", "Energy Distribution Layer 8 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer1"] = fs->make<TH1F>("EDist_layerClusters_layer1", "Energy Distribution Layer 1 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer2"] = fs->make<TH1F>("EDist_layerClusters_layer2", "Energy Distribution Layer 2 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer3"] = fs->make<TH1F>("EDist_layerClusters_layer3", "Energy Distribution Layer 3 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer4"] = fs->make<TH1F>("EDist_layerClusters_layer4", "Energy Distribution Layer 4 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer5"] = fs->make<TH1F>("EDist_layerClusters_layer5", "Energy Distribution Layer 5 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer6"] = fs->make<TH1F>("EDist_layerClusters_layer6", "Energy Distribution Layer 6 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer7"] = fs->make<TH1F>("EDist_layerClusters_layer7", "Energy Distribution Layer 7 (clusters)", 100, 0, 1000);
+    TH1Container_["EDist_layerClusters_layer8"] = fs->make<TH1F>("EDist_layerClusters_layer8", "Energy Distribution Layer 8 (clusters)", 100, 0, 1000);
     
-    histContainer_["Count_layerClusters_layer1"] = fs->make<TH1F>("Count_layerClusters_layer1", "Number of Clusters Layer 1", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer2"] = fs->make<TH1F>("Count_layerClusters_layer2", "Number of Clusters Layer 2", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer3"] = fs->make<TH1F>("Count_layerClusters_layer3", "Number of Clusters Layer 3", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer4"] = fs->make<TH1F>("Count_layerClusters_layer4", "Number of Clusters Layer 4", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer5"] = fs->make<TH1F>("Count_layerClusters_layer5", "Number of Clusters Layer 5", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer6"] = fs->make<TH1F>("Count_layerClusters_layer6", "Number of Clusters Layer 6", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer7"] = fs->make<TH1F>("Count_layerClusters_layer7", "Number of Clusters Layer 7", 50, 0, 50);
-    histContainer_["Count_layerClusters_layer8"] = fs->make<TH1F>("Count_layerClusters_layer8", "Number of Clusters Layer 8", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer1"] = fs->make<TH1F>("Count_layerClusters_layer1", "Number of Clusters Layer 1", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer2"] = fs->make<TH1F>("Count_layerClusters_layer2", "Number of Clusters Layer 2", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer3"] = fs->make<TH1F>("Count_layerClusters_layer3", "Number of Clusters Layer 3", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer4"] = fs->make<TH1F>("Count_layerClusters_layer4", "Number of Clusters Layer 4", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer5"] = fs->make<TH1F>("Count_layerClusters_layer5", "Number of Clusters Layer 5", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer6"] = fs->make<TH1F>("Count_layerClusters_layer6", "Number of Clusters Layer 6", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer7"] = fs->make<TH1F>("Count_layerClusters_layer7", "Number of Clusters Layer 7", 50, 0, 50);
+    TH1Container_["Count_layerClusters_layer8"] = fs->make<TH1F>("Count_layerClusters_layer8", "Number of Clusters Layer 8", 50, 0, 50);
     
-    histContainer_["ERatio_layerClusters_layer1"] = fs->make<TH1F>("ERatio_layerClusters_layer1", "E_{layerClusters} / E_{truth} Layer 1", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer2"] = fs->make<TH1F>("ERatio_layerClusters_layer2", "E_{layerClusters} / E_{truth} Layer 2", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer3"] = fs->make<TH1F>("ERatio_layerClusters_layer3", "E_{layerClusters} / E_{truth} Layer 3", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer4"] = fs->make<TH1F>("ERatio_layerClusters_layer4", "E_{layerClusters} / E_{truth} Layer 4", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer5"] = fs->make<TH1F>("ERatio_layerClusters_layer5", "E_{layerClusters} / E_{truth} Layer 5", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer6"] = fs->make<TH1F>("ERatio_layerClusters_layer6", "E_{layerClusters} / E_{truth} Layer 6", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer7"] = fs->make<TH1F>("ERatio_layerClusters_layer7", "E_{layerClusters} / E_{truth} Layer 7", 100, 0, 1.0);
-    histContainer_["ERatio_layerClusters_layer8"] = fs->make<TH1F>("ERatio_layerClusters_layer8", "E_{layerClusters} / E_{truth} Layer 8", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer1"] = fs->make<TH1F>("ERatio_layerClusters_layer1", "E_{layerClusters} / E_{truth} Layer 1", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer2"] = fs->make<TH1F>("ERatio_layerClusters_layer2", "E_{layerClusters} / E_{truth} Layer 2", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer3"] = fs->make<TH1F>("ERatio_layerClusters_layer3", "E_{layerClusters} / E_{truth} Layer 3", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer4"] = fs->make<TH1F>("ERatio_layerClusters_layer4", "E_{layerClusters} / E_{truth} Layer 4", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer5"] = fs->make<TH1F>("ERatio_layerClusters_layer5", "E_{layerClusters} / E_{truth} Layer 5", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer6"] = fs->make<TH1F>("ERatio_layerClusters_layer6", "E_{layerClusters} / E_{truth} Layer 6", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer7"] = fs->make<TH1F>("ERatio_layerClusters_layer7", "E_{layerClusters} / E_{truth} Layer 7", 100, 0, 1.0);
+    TH1Container_["ERatio_layerClusters_layer8"] = fs->make<TH1F>("ERatio_layerClusters_layer8", "E_{layerClusters} / E_{truth} Layer 8", 100, 0, 1.0);
     
     // ---- Tracksters ------
-    histContainer_["RawEDist_tracksterHFNoseEM"] = fs->make<TH1F>("EDist_tracksterHFNoseEM", "TracksterHFNoseEM Raw Energy Distribution", 100, 0, 500);
-    histContainer_["RawEScale_tracksterHFNoseEM"] = fs->make<TH1F>("EScale_tracksterHFNoseEM", "TracksterHFNoseEM Raw Energy Scale", 100, 0, 500);
-    histContainer_["DeltaR_tracksterHFNoseEM"] = fs->make<TH1F>("DeltaR_tracksterHFNoseEM", "TracksterHFNoseEM #Delta R", 20, 0, 0.5);
+    TH1Container_["RawEDist_tracksterHFNoseEM"] = fs->make<TH1F>("EDist_tracksterHFNoseEM", "TracksterHFNoseEM Raw Energy Distribution", 100, 0, 500);
+    TH1Container_["RawEScale_tracksterHFNoseEM"] = fs->make<TH1F>("EScale_tracksterHFNoseEM", "TracksterHFNoseEM Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterHFNoseEM"] = fs->make<TH1F>("DeltaR_tracksterHFNoseEM", "TracksterHFNoseEM #Delta R", 20, 0, 0.5);
     
-    histContainer_["RawEDist_tracksterHFNoseEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
-    histContainer_["RawEScale_tracksterHFNoseEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["DeltaR_tracksterHFNoseEM"]->GetXaxis()->SetTitle("|R_{trackster - caloParticle}|");
-    
-    //
-    histContainer_["RawEDist_tracksterHFNoseTrkEM"] = fs->make<TH1F>("EDist_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM Raw Energy Distribution", 100, 0, 500);
-    histContainer_["RawEScale_tracksterHFNoseTrkEM"] = fs->make<TH1F>("EScale_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM Raw Energy Scale", 100, 0, 500);
-    histContainer_["DeltaR_tracksterHFNoseTrkEM"] = fs->make<TH1F>("DeltaR_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM #Delta R", 20, 0, 0.5);
-    
-    histContainer_["RawEDist_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
-    histContainer_["RawEScale_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["DeltaR_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
+    TH1Container_["RawEDist_tracksterHFNoseEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterHFNoseEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterHFNoseEM"]->GetXaxis()->SetTitle("#Delta{R}_{trackster, caloParticle}");
     
     //
-    histContainer_["RawEDist_tracksterEM"] = fs->make<TH1F>("EDist_tracksterEM", "TracksterEM Raw Energy Distribution", 500, 0, 500);
-    histContainer_["RawEScale_tracksterEM"] = fs->make<TH1F>("EScale_tracksterEM", "TracksterEM Raw Energy Scale", 100, 0, 500);
-    histContainer_["DeltaR_tracksterEM"] = fs->make<TH1F>("DeltaR_tracksterEM", "TracksterEM #Delta R", 20, 0, 0.5);
+    TH1Container_["RawEDist_tracksterHFNoseTrkEM"] = fs->make<TH1F>("EDist_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM Raw Energy Distribution", 100, 0, 500);
+    TH1Container_["RawEScale_tracksterHFNoseTrkEM"] = fs->make<TH1F>("EScale_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterHFNoseTrkEM"] = fs->make<TH1F>("DeltaR_tracksterHFNoseTrkEM", "TracksterHFNoseTrkEM #Delta R", 20, 0, 0.5);
     
-    histContainer_["RawEDist_tracksterEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
-    histContainer_["RawEScale_tracksterEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["DeltaR_tracksterEM"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
-    
-    //
-    histContainer_["RawEDist_tracksterHFNoseHAD"] = fs->make<TH1F>("EDist_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Distribution", 500, 0, 500);
-    histContainer_["RawEScale_tracksterHFNoseHAD"] = fs->make<TH1F>("EScale_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Scale", 100, 0, 500);
-    histContainer_["DeltaR_tracksterHFNoseHAD"] = fs->make<TH1F>("DeltaR_tracksterHFNoseHAD", "TracksterHFNoseHAD #Delta R", 20, 0, 0.5);
-    
-    histContainer_["RawEDist_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
-    histContainer_["RawEScale_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["DeltaR_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
+    TH1Container_["RawEDist_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterHFNoseTrkEM"]->GetXaxis()->SetTitle("#Delta{R}_{trackster, caloParticle}");
     
     //
-    histContainer_["RawEDist_tracksterHFNoseMIP"] = fs->make<TH1F>("EDist_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Distribution", 500, 0, 500);
-    histContainer_["RawEScale_tracksterHFNoseMIP"] = fs->make<TH1F>("EScale_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Scale", 100, 0, 500);
-    histContainer_["DeltaR_tracksterHFNoseMIP"] = fs->make<TH1F>("DeltaR_tracksterHFNoseMIP", "TracksterHFNoseMIP #Delta R", 20, 0, 0.5);
+    TH1Container_["RawEDist_tracksterEM"] = fs->make<TH1F>("EDist_tracksterEM", "TracksterEM Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEScale_tracksterEM"] = fs->make<TH1F>("EScale_tracksterEM", "TracksterEM Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterEM"] = fs->make<TH1F>("DeltaR_tracksterEM", "TracksterEM #Delta R", 20, 0, 0.5);
     
-    histContainer_["RawEDist_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
-    histContainer_["RawEScale_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
-    histContainer_["DeltaR_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
+    TH1Container_["RawEDist_tracksterEM"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterEM"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterEM"]->GetXaxis()->SetTitle("#Delta{R}_{trackster, caloParticle}");
+    
+    //
+    TH1Container_["RawEDist_tracksterHFNoseHAD"] = fs->make<TH1F>("EDist_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEScale_tracksterHFNoseHAD"] = fs->make<TH1F>("EScale_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterHFNoseHAD"] = fs->make<TH1F>("DeltaR_tracksterHFNoseHAD", "TracksterHFNoseHAD #Delta R", 20, 0, 0.5);
+    
+    TH1Container_["RawEDist_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("#Delta{R}_{trackster, caloParticle}");
+    
+    //
+    TH1Container_["RawEDist_tracksterHFNoseMIP"] = fs->make<TH1F>("EDist_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEScale_tracksterHFNoseMIP"] = fs->make<TH1F>("EScale_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterHFNoseMIP"] = fs->make<TH1F>("DeltaR_tracksterHFNoseMIP", "TracksterHFNoseMIP #Delta R", 20, 0, 0.5);
+    
+    TH1Container_["RawEDist_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("#Delta{R}_{trackster, caloParticle}");
 
 }
 
