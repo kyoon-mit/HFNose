@@ -34,6 +34,7 @@ class HGCalGeometry;
 class MagneticField;
 class Propagator;
 class TH1F;
+class TH2F;
 
 namespace reco
 {
@@ -61,17 +62,18 @@ class TICLAnalyzer : public edm::EDAnalyzer
     virtual void endJob () override;
   
     std::vector<math::XYZTLorentzVectorF> getTruthP4 ( const std::vector<CaloParticle> & );
-    std::vector<GlobalPoint> getSimHitGlobalPoint ( const std::vector<CaloParticle> &, const HGCalGeometry * );
-    void fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<GlobalPoint> & );
+    std::vector<std::pair<GlobalPoint, Int_t>> getSimHitGlobalPoint ( const std::vector<CaloParticle> &, const HGCalGeometry * );
+    void fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<std::pair<GlobalPoint, Int_t>> & );
     void buildFirstLayers ( const HGCalDDDConstants * );
     void analyzeTrackPosition ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & );
-    void analyzeTrackPosition ( const std::vector<GlobalPoint> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & ); // overloaded
+    void analyzeTrackPosition ( const std::vector<std::pair<GlobalPoint, Int_t>> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & ); // overloaded
     void analyzeRecHits ( const std::vector<math::XYZTLorentzVectorF> &, const HGCRecHitCollection &, const HGCalGeometry * );
     void analyzeLayerClusters ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::CaloCluster> & );
     void analyzeTICLTrackster ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<ticl::Trackster> &, std::string );
 
     // Container
-    std::map <std::string, TH1F*> histContainer_; // map of histograms
+    std::map <std::string, TH1F*> TH1Container_; // map of TH1 histograms
+    std::map <std::string, TH2F*> TH2Container_; // map of TH2 histograms
 
     // ------ Data members -------
     // Tokens
