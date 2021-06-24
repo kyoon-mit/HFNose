@@ -66,6 +66,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
     void fillTruthHistograms ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<std::pair<GlobalPoint, Int_t>> & );
     void buildFirstLayers ( const HGCalDDDConstants * );
     void analyzeTrackPosition ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & );
+    void propagatorSpeedTest ( const std::vector<reco::Track> &, const MagneticField *, const Propagator &, const Propagator & );
     void analyzeTrackPosition ( const std::vector<std::pair<GlobalPoint, Int_t>> &, const std::vector<reco::Track> &, const MagneticField*, const Propagator & ); // overloaded
     void analyzeRecHits ( const std::vector<math::XYZTLorentzVectorF> &, const HGCRecHitCollection &, const HGCalGeometry * );
     void analyzeLayerClusters ( const std::vector<math::XYZTLorentzVectorF> &, const std::vector<reco::CaloCluster> & );

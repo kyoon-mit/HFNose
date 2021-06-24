@@ -52,8 +52,8 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     
     // Custom parameters
     select_PID_ ( iConfig.getUntrackedParameter<int> ("select_PID", 22) ),
-    select_EtaLow_ ( iConfig.getUntrackedParameter<double> ("select_EtaLow", 3.4) ),
-    select_EtaHigh_ ( iConfig.getUntrackedParameter<double> ("select_EtaHigh", 3.6) ),
+    select_EtaLow_ ( iConfig.getUntrackedParameter<double> ("select_EtaLow", 3.48) ),
+    select_EtaHigh_ ( iConfig.getUntrackedParameter<double> ("select_EtaHigh", 3.52) ),
     truth_matching_deltaR_ ( iConfig.getUntrackedParameter<double> ("truth_matching_deltaR_", 0.5) ),
     trackster_itername_ ( iConfig.getUntrackedParameter<std::string> ("trackster_itername", "EMn") ),
     cutTk_ ( iConfig.getUntrackedParameter<std::string> ("cutTk"))
@@ -92,8 +92,11 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     iSetup.get<IdealGeometryRecord>().get( "HGCalHFNoseSensitive", handle_HGCalDDDConstants );
     
     // Get Propagator
-    edm::ESHandle<Propagator> handle_Propagator;
-    iSetup.get<TrackingComponentsRecord>().get( "RungeKuttaTrackerPropagator", handle_Propagator );
+    edm::ESHandle<Propagator> handle_Propagator1;
+    iSetup.get<TrackingComponentsRecord>().get( "RungeKuttaTrackerPropagator", handle_Propagator1 );
+    
+    edm::ESHandle<Propagator> handle_Propagator2;
+    iSetup.get<TrackingComponentsRecord>().get( "SteppingHelixPropagatorAny", handle_Propagator2 );
     
     // Get Tracks
     edm::Handle<std::vector<reco::Track>> handle_Tracks;
@@ -140,7 +143,8 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
         fillTruthHistograms ( selected_calotruths, simhits_globalpoints );
         
         buildFirstLayers ( hgcons );
-        analyzeTrackPosition ( simhits_globalpoints, *handle_Tracks.product(), b_field, *handle_Propagator );
+        analyzeTrackPosition ( simhits_globalpoints, *handle_Tracks.product(), b_field, *handle_Propagator1 );
+        propagatorSpeedTest ( *handle_Tracks.product(), b_field, *handle_Propagator1, *handle_Propagator2 );
         analyzeRecHits ( selected_calotruths, *handle_RecHits_HFNose.product(), nose_geom );
         analyzeLayerClusters ( selected_calotruths, *handle_LayerClusters_HFNose.product() );
         analyzeTICLTrackster ( selected_calotruths, *handle_TracksterHFNoseEM.product(), "EMn" );
@@ -180,37 +184,53 @@ std::vector<std::pair<GlobalPoint, Int_t>> TICLAnalyzer::getSimHitGlobalPoint ( 
                 && abs(ct.eta()) > select_EtaLow_
                 && abs(ct.eta()) < select_EtaHigh_ )
         {
+        
             const SimClusterRefVector & ct_sim_clusters = ct.simClusters();
             
             Int_t    num_sim_clusters = 0;
             Double_t simhit_max_energy = 0.;
             uint32_t simhit_detid = 0;
+            Int_t    num_sim_clusters_first_layer = 0; // # sim clusters in layer 1
             
             for ( auto const& it_sc: ct_sim_clusters )
             {
                 const SimCluster sc = *it_sc;
                 //Int_t first_layer = 99;
                 num_sim_clusters++;
-                
+                Int_t simcluster_seed_layer = 99; // # layer where it begins
+
                 for ( auto const & he: sc.hits_and_energies() )
                 {
-                    if ( rhtools_.getLayer(he.first) != 1 )
+                    Int_t layer = rhtools_.getLayer(he.first);
+                    if ( layer < simcluster_seed_layer )
                     {
-                        //first_layer = rhtools_.getLayer(he.first);
-                        continue;
+                        simcluster_seed_layer = rhtools_.getLayer(he.first);
                     }
-                    if ( simhit_max_energy < he.second ) 
+                    if ( layer == 1 && simhit_max_energy < he.second ) 
                     {
                         simhit_detid = he.first;
                         simhit_max_energy = he.second;
                     }
-
+                }
+                
+                if ( simcluster_seed_layer < 99 )
+                {
+                    TH1Container_["SimCluster_Seed_Layer"]->Fill( simcluster_seed_layer );
+                    if ( simcluster_seed_layer == 1 ) num_sim_clusters_first_layer++;
                 }
             }
+
+            if ( num_sim_clusters > 1 ) continue;
+            
             try
             {
                 const GlobalPoint & hit_globalPosition = geom->getPosition(simhit_detid);
-                container.push_back ( std::make_pair(hit_globalPosition, num_sim_clusters) );
+                if ( abs(hit_globalPosition.eta()) > select_EtaLow_
+                        && abs(hit_globalPosition.eta()) < select_EtaHigh_ )
+                {
+                    container.push_back ( std::make_pair(hit_globalPosition, num_sim_clusters) );
+                    TH1Container_["nSimClusters_layer1"]->Fill( num_sim_clusters_first_layer );
+                }
             }
             catch ( cms::Exception const& e )
             {
@@ -232,9 +252,9 @@ void TICLAnalyzer::fillTruthHistograms ( const std::vector<math::XYZTLorentzVect
     }
     for ( auto const& hit_point: simHitsGlobalPoints )
     {
-        TH1Container_["first_layer_SimHit_z"]->Fill( hit_point.first.z() );
-        TH1Container_["first_layer_SimHit_eta"]->Fill( hit_point.first.eta() );
-        TH2Container_["n_SimCluster_SimHitEta"]->Fill( hit_point.second, hit_point.first.eta() );
+        TH1Container_["first_layer_SimHit_z"]->Fill( abs(hit_point.first.z()) );
+        TH1Container_["first_layer_SimHit_eta"]->Fill( abs(hit_point.first.eta()) );
+        TH2Container_["nSimCluster_SimHitEta"]->Fill( hit_point.second, abs(hit_point.first.eta()) );
     }
 }
 
@@ -309,9 +329,28 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<math::XYZTLorentzVec
             TH1Container_["dR_Truth_Prop"]->Fill(min_R);
             
             // simhit & track histograms
-            TH1Container_["dEta_Track_Prop"]->Fill(track_prop_dEta);
-            TH1Container_["dPhi_Track_Prop"]->Fill(track_prop_dPhi);
+            TH1Container_["dEta_Track_Prop"]->Fill(abs(track_prop_dEta));
+            TH1Container_["dPhi_Track_Prop"]->Fill(abs(track_prop_dPhi));
         }
+    }
+
+}
+
+
+void TICLAnalyzer::propagatorSpeedTest ( const std::vector<reco::Track> & generalTracks, const MagneticField * BField, const Propagator & prop1, const Propagator & prop2 )
+{
+
+    for ( auto const& track: generalTracks )
+    {
+        if ( !cutTk_(track) )
+        {
+            continue;
+        }
+        
+        FreeTrajectoryState fts = trajectoryStateTransform::outerFreeState(track, BField);
+        int iSide = int(track.eta() > 0);
+        TrajectoryStateOnSurface tsos1 = prop1.propagate(fts, firstDisk_[iSide]->surface());
+        TrajectoryStateOnSurface tsos2 = prop2.propagate(fts, firstDisk_[iSide]->surface());
     }
 
 }
@@ -371,13 +410,13 @@ void TICLAnalyzer::analyzeTrackPosition ( const std::vector<std::pair<GlobalPoin
             TH1Container_["dEta_Truth_Prop"]->Fill(truth_prop_dEta);
             TH1Container_["dPhi_Truth_Prop"]->Fill(truth_prop_dPhi);
             TH1Container_["dR_Truth_Prop"]->Fill(min_R);
-            TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dEta);
-            TH2Container_["n_SimCluster_dEta_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dPhi);
-            TH2Container_["n_SimCluster_dR_Truth_Prop"]->Fill(num_sim_clusters, min_R);
+            TH2Container_["nSimCluster_dPhi_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dPhi);
+            TH2Container_["nSimCluster_dEta_Truth_Prop"]->Fill(num_sim_clusters, truth_prop_dEta);
+            TH2Container_["nSimCluster_dR_Truth_Prop"]->Fill(num_sim_clusters, min_R);
             
             // simhit & track histograms
-            TH1Container_["dEta_Track_Prop"]->Fill(track_prop_dEta);
-            TH1Container_["dPhi_Track_Prop"]->Fill(track_prop_dPhi);
+            TH1Container_["dEta_Track_Prop"]->Fill(abs(track_prop_dEta));
+            TH1Container_["dPhi_Track_Prop"]->Fill(abs(track_prop_dPhi));
         }
     }
 
@@ -576,43 +615,47 @@ void TICLAnalyzer::beginJob ()
     
     // ---- CaloTruth ------
     TH1Container_["truthE"] = fs->make<TH1F>("truthE", "Truth Energy Distribution", 100, 0, 500);
-    TH1Container_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 40, (select_EtaLow_ + select_EtaHigh_)/2 - 0.5, (select_EtaLow_ + select_EtaHigh_)/2 + 0.5);
+    TH1Container_["truthEta"] = fs->make<TH1F>("truthEta", "Truth Eta Distribution", 1000, (select_EtaLow_ + select_EtaHigh_)/2 - 0.5, (select_EtaLow_ + select_EtaHigh_)/2 + 0.5);
     
     // ---- SimHits ------
-    TH1Container_["first_layer_SimHit_z"] = fs->make<TH1F>("first_layer_SimHit_z", "z of highest energy simhit in first layer", 0, 1500, 150);
-    TH1Container_["first_layer_SimHit_eta"] = fs->make<TH1F>("first_layer_SimHit_eta", "eta of highest energy simhit in first layer", 3.0, 4.5, 150);
+    TH1Container_["first_layer_SimHit_z"] = fs->make<TH1F>("first_layer_SimHit_z", "|z| of highest energy simhit in first layer", 150, 0, 1500);
+    TH1Container_["first_layer_SimHit_eta"] = fs->make<TH1F>("first_layer_SimHit_eta", "|eta| of highest energy simhit in first layer", 150, 3.0, 4.5);
     
-    TH2Container_["n_SimCluster_SimHitEta"] = fs->make<TH2F>("n_SimCluster_SimHitEta", "# SimClusters vs #eta_{simhit}, per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["nSimCluster_SimHitEta"] = fs->make<TH2F>("nSimCluster_SimHitEta", "# SimClusters vs |#eta_{simhit}|, per generated particle", 9, 1, 10, 150, 3.0, 4.5);
     
-    TH2Container_["n_SimCluster_SimHitEta"]->GetXaxis()->SetTitle("# SimClusters");
-    TH2Container_["n_SimCluster_SimHitEta"]->GetYaxis()->SetTitle("#eta_{simhit}");
+    TH2Container_["nSimCluster_SimHitEta"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["nSimCluster_SimHitEta"]->GetYaxis()->SetTitle("#eta_{simhit}");
+
+    // ---- SimClusters ------
+    TH1Container_["SimCluster_Seed_Layer"] = fs->make<TH1F>("SimCluster_First_Layer", "starting position layer of simcluster", 8, 1, 9);
+    TH1Container_["nSimClusters_layer1"] = fs->make<TH1F>("nSimClusters_layer1", "number of simclusters in layer 1", 15, 1, 15);
     
     // ---- Propagator & SimHit ------
     TH1Container_["dEta_Truth_Prop"] = fs->make<TH1F>("dEta_Truth_Prop", "#eta difference between reco and sim at HGCal interface", 600, -0.3, 0.3);
     TH1Container_["dPhi_Truth_Prop"] = fs->make<TH1F>("dPhi_Truth_Prop", "#phi difference between reco and sim at HGCal interface", 600, -0.3, 0.3);
     TH1Container_["dR_Truth_Prop"] = fs->make<TH1F>("dR_Truth_Prop", "#Delta R between reco and sim at HGCal interface", 300, 0.0, 0.3);
     
-    TH2Container_["n_SimCluster_dEta_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dEta_Truth_Prop", "# SimClusters vs (#eta_{simhit} - #eta_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
-    TH2Container_["n_SimCluster_dPhi_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dPhi_Truth_Prop", "# SimClusters vs (#phi_{simhit} - #phi_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
-    TH2Container_["n_SimCluster_dR_Truth_Prop"] = fs->make<TH2F>("n_SimCluster_dR_Truth_Prop", "# SimClusters vs #Delta{R}_{simhit, prop}, per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["nSimCluster_dEta_Truth_Prop"] = fs->make<TH2F>("nSimCluster_dEta_Truth_Prop", "# SimClusters vs (#eta_{simhit} - #eta_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["nSimCluster_dPhi_Truth_Prop"] = fs->make<TH2F>("nSimCluster_dPhi_Truth_Prop", "# SimClusters vs (#phi_{simhit} - #phi_{prop}), per generated particle", 9, 1, 10, 60, -0.3, 0.3);
+    TH2Container_["nSimCluster_dR_Truth_Prop"] = fs->make<TH2F>("nSimCluster_dR_Truth_Prop", "# SimClusters vs #Delta{R}_{simhit, prop}, per generated particle", 9, 1, 10, 30, 0, 0.3);
     
     TH1Container_["dEta_Truth_Prop"]->GetXaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
     TH1Container_["dPhi_Truth_Prop"]->GetXaxis()->SetTitle("phi_{simhit} - #phi_{prop}");
     TH1Container_["dR_Truth_Prop"]->GetXaxis()->SetTitle("#Delta{R}_{simhit, prop}");
      
-    TH2Container_["n_SimCluster_dEta_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
-    TH2Container_["n_SimCluster_dEta_Truth_Prop"]->GetYaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
+    TH2Container_["nSimCluster_dEta_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["nSimCluster_dEta_Truth_Prop"]->GetYaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
     
-    TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
-    TH2Container_["n_SimCluster_dPhi_Truth_Prop"]->GetYaxis()->SetTitle("#phi_{simhit} - #phi_{prop}");
+    TH2Container_["nSimCluster_dPhi_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["nSimCluster_dPhi_Truth_Prop"]->GetYaxis()->SetTitle("#phi_{simhit} - #phi_{prop}");
      
-    TH2Container_["n_SimCluster_dR_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
-    TH2Container_["n_SimCluster_dR_Truth_Prop"]->GetYaxis()->SetTitle("#Delta{R}_{simhit, prop}");
+    TH2Container_["nSimCluster_dR_Truth_Prop"]->GetXaxis()->SetTitle("# SimClusters");
+    TH2Container_["nSimCluster_dR_Truth_Prop"]->GetYaxis()->SetTitle("#Delta{R}_{simhit, prop}");
     
     // ---- Propagator & Track ------
     
-    TH1Container_["dEta_Track_Prop"] = fs->make<TH1F>("dEta_Track_Prop", "#eta difference between #eta_{prop} and #eta_{track, outer}", 600, -0.3, 0.3);
-    TH1Container_["dPhi_Track_Prop"] = fs->make<TH1F>("dPhi_Track_Prop", "#phi difference between #phi_{prop} and #phi_{track, outer}", 600, -0.3, 0.3);
+    TH1Container_["dEta_Track_Prop"] = fs->make<TH1F>("dEta_Track_Prop", "#eta difference between #eta_{prop} and #eta_{track, outer}", 300, 0., 0.3);
+    TH1Container_["dPhi_Track_Prop"] = fs->make<TH1F>("dPhi_Track_Prop", "#phi difference between #phi_{prop} and #phi_{track, outer}", 300, 0., 0.3);
     
     TH1Container_["dEta_Truth_Prop"]->GetXaxis()->SetTitle("#eta_{simhit} - #eta_{prop}");
     TH1Container_["dPhi_Truth_Prop"]->GetXaxis()->SetTitle("phi_{simhit} - #phi_{prop}");   
