@@ -1,7 +1,8 @@
 #!/bin/bash
 
-cd /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/FullSimulation/Single_Electron/electron_14TeV_2026D60_HGCNose/
+top_dir=$1
+. ${top_dir}/config_kyoon.sh
+cd ${DIRSIM_HFNOSE}/Single_Electron/electron_14TeV_2026D60/
 eval `scramv1 runtime -sh`
-. /afs/cern.ch/user/k/kyoon/CMSSW_11_3_X_2020-12-18-1100/src/HGCNose/config_kyoon.sh
 
-python run.py
+./run.py -e $2 -y $3 -n $4 -l $5 -d $6 -s 3
