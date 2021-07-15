@@ -6,13 +6,13 @@
 ###### WARNING: DO NOT CHANGE THESE ENVIRONMENT VARIABLES ######
 
 # This is the top directory
-export DIRTOP_HGCNOSE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+export DIRTOP_HFNOSE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 
 # Analysis directory
-export DIRANALYSIS_HGCNOSE=${DIRTOP_HGCNOSE}/Analysis
+export DIRANALYSIS_HFNOSE=${DIRTOP_HFNOSE}/Analysis
 
 # Simulation directory
-export DIRSIM_HGCNOSE=${DIRTOP_HGCNOSE}/FullSimulation
+export DIRSIM_HFNOSE=${DIRTOP_HFNOSE}/FullSimulation
 
 ################################################################
 
@@ -21,6 +21,6 @@ export DIRSIM_HGCNOSE=${DIRTOP_HGCNOSE}/FullSimulation
 ###### YOU MAY CHANGE THESE ENVIRONMENT VARIABLES ##############
 
 # This is the directory where your simulation data files are stored.
-export DIRDATA_HGCNOSE=$PWD
+export DIRDATA_HFNOSE=$PWD
 
 ################################################################
