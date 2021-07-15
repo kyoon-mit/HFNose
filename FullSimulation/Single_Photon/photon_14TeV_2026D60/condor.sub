@@ -1,7 +1,7 @@
 Universe = vanilla 
 
-+JobFlavour = "workday"
-RequestCpus = 8
++MaxRuntime = 20000
+RequestCpus = 4
 should_transfer_files = IF_NEEDED
 executable = condor_exec.sh
 log        = condor/$(ProcId)_output.log
@@ -12,8 +12,21 @@ notify_user = kyungseop.yoon@cern.ch
 
 output = condor/$(ProcId)_output.out
 error = condor/$(ProcId)_output.err
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 0
+
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 50 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre1/src/HGCNose 50 3.5 500 3000
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 100 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+queue
+
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 150 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+queue
+
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 200 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+queue
+
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 250 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+queue
+
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 300 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
 queue
