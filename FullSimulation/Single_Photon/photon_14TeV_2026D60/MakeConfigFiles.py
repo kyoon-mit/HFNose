@@ -15,9 +15,9 @@ class RunInstance:
         self.top_save_dir = os.getcwd()
         self.dir_run = os.path.abspath(__file__ + '/../run/')
         
-        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_electron_E{E}_eta{eta}{suffix}_cfg.py'
-        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron_E{step}_eta:{E} nevts:{nevents}\''
-        self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}{suffix}.root\''
+        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_photon_E{E}_eta{eta}{suffix}_cfg.py'
+        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_photon_E{step}_eta:{E} nevts:{nevents}\''
+        self.preformat_rootfile = '\'file:{save_dir}/step{step}_photon_E{E}_eta{eta}{suffix}.root\''
         self.preformat_aging = ''
         self.aging_suffix = ''
     
@@ -89,9 +89,9 @@ class RunInstance:
         self.doPhi = True
         self.minPhi = phi - 0.00000001
         self.maxPhi = phi + 0.00000001
-        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_electron_E{E}_eta{eta}_phi{phi}{suffix}_cfg.py'
-        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron E:{E} eta:{eta} phi:{phi} nevts:{nevents}\''
-        self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}_phi{phi}{suffix}.root\''
+        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_photon_E{E}_eta{eta}_phi{phi}{suffix}_cfg.py'
+        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_photon E:{E} eta:{eta} phi:{phi} nevts:{nevents}\''
+        self.preformat_rootfile = '\'file:{save_dir}/step{step}_photon_E{E}_eta{eta}_phi{phi}{suffix}.root\''
                 
                 
     def set_nevents (self, nevents):
@@ -278,9 +278,9 @@ class RunInstance:
             
                 preformat_dict = dict()
                 if not self.doPhi:
-                    preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
+                    preformat_dict['save_dir'] = self.top_save_dir + '/photon_E{0}_eta{1}'.format(E, eta)
                 else:
-                    preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}_phi{2}'.format(E, eta, self.Phi)
+                    preformat_dict['save_dir'] = self.top_save_dir + '/photon_E{0}_eta{1}_phi{2}'.format(E, eta, self.Phi)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
@@ -296,7 +296,7 @@ class RunInstance:
                 format_dict['minPhi'] = self.minPhi
                 format_dict['maxE'] = E + 0.001
                 format_dict['minE'] = E - 0.001
-                format_dict['psethack'] = '\'single electron E {0} eta {1}\''.format(E, eta)
+                format_dict['psethack'] = '\'single photon E {0} eta {1}\''.format(E, eta)
                 template_text = template_text.format(**format_dict)
                 
                 # Name of cfg file
@@ -339,7 +339,7 @@ class RunInstance:
             for eta in self.eta_list:
                     
                 preformat_dict = dict()
-                preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
+                preformat_dict['save_dir'] = self.top_save_dir + '/photon_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
@@ -395,7 +395,7 @@ class RunInstance:
             for eta in self.eta_list:
             
                 preformat_dict = dict()
-                preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
+                preformat_dict['save_dir'] = self.top_save_dir + '/photon_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
