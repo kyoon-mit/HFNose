@@ -96,15 +96,35 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     iEvent.getByToken ( token_TracksterHFNoseHAD_, handle_TracksterHFNoseHAD );
     iEvent.getByToken ( token_TracksterHFNoseMIP_, handle_TracksterHFNoseMIP );
 
-    if ( handle_CaloParticle_MergedCaloTruth.isValid() &&
-         handle_RecHits_HFNose.isValid() &&
-         handle_LayerClusters_HFNose.isValid() &&
-         handle_TracksterHFNoseEM.isValid() &&
-         handle_TracksterHFNoseTrkEM.isValid() &&
-	 handle_TracksterHFNoseTrk.isValid() &&
-         handle_TracksterHFNoseHAD.isValid() &&
-         handle_TracksterHFNoseMIP.isValid()
-       )
+    bool handle_status = true;
+
+    if ( !handle_CaloParticle_MergedCaloTruth.isValid() ) {
+      std::cout << "Handle for CaloParticle is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_RecHits_HFNose.isValid() ) {
+      std::cout << "Handle for RecHits is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_LayerClusters_HFNose.isValid() ) {
+      std::cout << "Handle for HFNoseLayerClusters is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_TracksterHFNoseEM.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseEM is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_TracksterHFNoseTrkEM.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseTrkEM is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_TracksterHFNoseTrk.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseTrk is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_TracksterHFNoseHAD.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseHAD is invalid!" << std::endl;
+      handle_status = false;
+    } if ( !handle_TracksterHFNoseMIP.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseMIP is invalid!" << std::endl;
+      handle_status = false;
+    }
+
+    if ( handle_status )
     {
         const HGCalGeometry* nose_geom = handle_HGCalGeometry_HFNose.product();
         
@@ -429,7 +449,7 @@ void TICLAnalyzer::beginJob ()
     TH1Container_["DeltaR_tracksterHFNoseTrk"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
 
     //
-    TH1Container_["RawEDist_tracksterEM"] = fs->make<TH1F>("EDist_tracksterEM", "TracksterEM Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEDist_tracksterEM"] = fs->make<TH1F>("EDist_tracksterEM", "TracksterEM Raw Energy Distribution", 100, 0, 500);
     TH1Container_["RawEScale_tracksterEM"] = fs->make<TH1F>("EScale_tracksterEM", "TracksterEM Raw Energy Scale", 100, 0, 500);
     TH1Container_["DeltaR_tracksterEM"] = fs->make<TH1F>("DeltaR_tracksterEM", "TracksterEM #Delta R", 20, 0, 0.5);
     
@@ -438,7 +458,7 @@ void TICLAnalyzer::beginJob ()
     TH1Container_["DeltaR_tracksterEM"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
     
     //
-    TH1Container_["RawEDist_tracksterHFNoseHAD"] = fs->make<TH1F>("EDist_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEDist_tracksterHFNoseHAD"] = fs->make<TH1F>("EDist_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Distribution", 100, 0, 500);
     TH1Container_["RawEScale_tracksterHFNoseHAD"] = fs->make<TH1F>("EScale_tracksterHFNoseHAD", "TracksterHFNoseHAD Raw Energy Scale", 100, 0, 500);
     TH1Container_["DeltaR_tracksterHFNoseHAD"] = fs->make<TH1F>("DeltaR_tracksterHFNoseHAD", "TracksterHFNoseHAD #Delta R", 20, 0, 0.5);
     
@@ -447,7 +467,7 @@ void TICLAnalyzer::beginJob ()
     TH1Container_["DeltaR_tracksterHFNoseHAD"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
     
     //
-    TH1Container_["RawEDist_tracksterHFNoseMIP"] = fs->make<TH1F>("EDist_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Distribution", 500, 0, 500);
+    TH1Container_["RawEDist_tracksterHFNoseMIP"] = fs->make<TH1F>("EDist_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Distribution", 100, 0, 500);
     TH1Container_["RawEScale_tracksterHFNoseMIP"] = fs->make<TH1F>("EScale_tracksterHFNoseMIP", "TracksterHFNoseMIP Raw Energy Scale", 100, 0, 500);
     TH1Container_["DeltaR_tracksterHFNoseMIP"] = fs->make<TH1F>("DeltaR_tracksterHFNoseMIP", "TracksterHFNoseMIP #Delta R", 20, 0, 0.5);
     

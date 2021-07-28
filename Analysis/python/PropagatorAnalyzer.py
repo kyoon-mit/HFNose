@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-# Configuration file for the TICLAnalyzer.h analysis
+# Configuration file for the PropagatorAnalyzer.h analysis
 
 import os
 
@@ -9,7 +9,7 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
 
-process = cms.Process('TICLAnalyzer', Phase2C10)
+process = cms.Process('PropagatorAnalyzer', Phase2C10)
 
 # Varparsing
 options = VarParsing('analysis')
@@ -37,10 +37,10 @@ options.parseArguments()
 
 # Set output and input paths
 # TODO: make string format more readable
-OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HFNOSE'] + '/output/{}/'.format(options.outpath))
-INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HFNOSE'] + '/{}/'.format(options.inpath))
+OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HGCNOSE'] + '/output/{}/'.format(options.outpath))
+INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HGCNOSE'] + '/{}/'.format(options.inpath))
 outputfile = OUTPUT_DIR + '/{3}_E{0}_eta{1}{2}.root'.format(options.E, options.eta, options.outsuffix, options.process)
-inputfile = 'file:' + INPUT_DIR + '/{2}_E{0}_eta{1}/step3_{2}_E{0}_eta{1}_pset3.root'.format(options.E, options.eta, options.process)
+inputfile = 'file:' + INPUT_DIR + '/{2}_E{0}_eta{1}/step3_{2}_E{0}_eta{1}_mcs3_trk_sm.root'.format(options.E, options.eta, options.process)
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -75,11 +75,14 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Process
-process.Analysis_TICLAnalyzer = cms.EDAnalyzer('TICLAnalyzer',
+process.Analysis_PropagatorAnalyzer = cms.EDAnalyzer('PropagatorAnalyzer',
     TAG_Trackster = cms.untracked.InputTag('ticlTrackstersHFNoseEM'),
     select_PID = cms.untracked.int32(options.pid),
+    select_EtaLow = cms.untracked.double(options.eta - 0.015),
+    select_EtaHigh = cms.untracked.double(options.eta + 0.015),
     truth_matching_deltaR = cms.untracked.double(options.deltaR),
     trackster_itername = cms.untracked.string(options.itername),
+    cutTk = cms.untracked.string('3. < abs(eta) < 4. && pt > 1. && quality("highPurity") && hitPattern().numberOfLostHits("MISSING_OUTER_HITS") < 5')
 )
 
 process.TFileService = cms.Service('TFileService',
@@ -92,4 +95,4 @@ process.Timing = cms.Service("Timing",
   useJobReport = cms.untracked.bool(True)
 )
 
-process.p = cms.Path(process.Analysis_TICLAnalyzer)
+process.p = cms.Path(process.Analysis_PropagatorAnalyzer)

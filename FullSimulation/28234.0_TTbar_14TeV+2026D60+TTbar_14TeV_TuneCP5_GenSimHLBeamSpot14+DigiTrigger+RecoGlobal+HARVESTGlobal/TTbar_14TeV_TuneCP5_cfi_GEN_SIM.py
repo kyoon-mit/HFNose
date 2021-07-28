@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: TTbar_14TeV_TuneCP5_cfi --conditions auto:phase2_realistic_T15 --era Phase2C10 --eventcontent FEVTDEBUG --relval 9000,100 -s GEN,SIM --datatier GEN-SIM --beamspot HLLHC14TeV --geometry Extended2026D60 --fileout file:step1.root
+# with command line options: TTbar_14TeV_TuneCP5_cfi -s GEN,SIM -n 10 --conditions auto:phase2_realistic_T15 --beamspot HLLHC14TeV --datatier GEN-SIM --eventcontent FEVTDEBUG --geometry Extended2026D60 --era Phase2C10 --relval 9000,100 --fileout file:step1.root
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Phase2C10_cff import Phase2C10
@@ -19,23 +19,14 @@ process.load('Configuration.Geometry.GeometryExtended2026D60Reco_cff')
 process.load('Configuration.Geometry.GeometryExtended2026D60_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
-# process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC_cfi')
-process.load('IOMC.EventVertexGenerators.VtxSmearedFlat_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedHLLHC14TeV_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-# Vertex smearing
-process.VtxSmeared.MaxX = cms.double(0.0000)
-process.VtxSmeared.MinX = cms.double(-0.0000)
-process.VtxSmeared.MaxY = cms.double(0.0000)
-process.VtxSmeared.MinY = cms.double(-0.0000)
-process.VtxSmeared.MaxZ = cms.double(0.0000)
-process.VtxSmeared.MinZ = cms.double(-0.0000)
-
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32({0}),
+    input = cms.untracked.int32(10),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
@@ -49,30 +40,31 @@ process.options = cms.untracked.PSet(
     SkipEvent = cms.untracked.vstring(),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
+    deleteNonConsumedUnscheduledModules = cms.untracked.bool(True),
+    dumpOptions = cms.untracked.bool(False),
     emptyRunLumiMode = cms.obsolete.untracked.string,
     eventSetup = cms.untracked.PSet(
         forceNumberOfConcurrentIOVs = cms.untracked.PSet(
-
+            allowAnyLabel_=cms.required.untracked.uint32
         ),
-        numberOfConcurrentIOVs = cms.untracked.uint32(1)
+        numberOfConcurrentIOVs = cms.untracked.uint32(0)
     ),
     fileMode = cms.untracked.string('FULLMERGE'),
     forceEventSetupCacheClearOnNewRun = cms.untracked.bool(False),
     makeTriggerResults = cms.obsolete.untracked.bool,
-    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
+    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(0),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(4),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
     wantSummary = cms.untracked.bool(False)
 )
 
-
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string({1}),
+    annotation = cms.untracked.string('TTbar_14TeV_TuneCP5_cfi nevts:10'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -87,7 +79,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string({2}),
+    fileName = cms.untracked.string('file:step1.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -99,23 +91,61 @@ process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
-process.generator = cms.EDProducer("FlatRandomEGunProducer",
-    AddAntiParticle = cms.bool(True),
-    PGunParameters = cms.PSet(
-        AddAntiParticle = cms.bool(True),
-        MaxEta = cms.double({3}),
-        MinEta = cms.double({4}),
-        MaxPhi = cms.double(3.14159265359),
-        MinPhi = cms.double(-3.14159265359),
-        MaxE = cms.double({5}),
-        MinE = cms.double({6}),
-        PartID = cms.vint32(22)
+process.generator = cms.EDFilter("Pythia8GeneratorFilter",
+    PythiaParameters = cms.PSet(
+        parameterSets = cms.vstring(
+            'pythia8CommonSettings',
+            'pythia8CP5Settings',
+            'processParameters'
+        ),
+        processParameters = cms.vstring(
+            'Top:gg2ttbar = on ',
+            'Top:qqbar2ttbar = on ',
+            '6:m0 = 175 '
+        ),
+        pythia8CP5Settings = cms.vstring(
+            'Tune:pp 14',
+            'Tune:ee 7',
+            'MultipartonInteractions:ecmPow=0.03344',
+            'MultipartonInteractions:bProfile=2',
+            'MultipartonInteractions:pT0Ref=1.41',
+            'MultipartonInteractions:coreRadius=0.7634',
+            'MultipartonInteractions:coreFraction=0.63',
+            'ColourReconnection:range=5.176',
+            'SigmaTotal:zeroAXB=off',
+            'SpaceShower:alphaSorder=2',
+            'SpaceShower:alphaSvalue=0.118',
+            'SigmaProcess:alphaSvalue=0.118',
+            'SigmaProcess:alphaSorder=2',
+            'MultipartonInteractions:alphaSvalue=0.118',
+            'MultipartonInteractions:alphaSorder=2',
+            'TimeShower:alphaSorder=2',
+            'TimeShower:alphaSvalue=0.118',
+            'SigmaTotal:mode = 0',
+            'SigmaTotal:sigmaEl = 21.89',
+            'SigmaTotal:sigmaTot = 100.309',
+            'PDF:pSet=LHAPDF6:NNPDF31_nnlo_as_0118'
+        ),
+        pythia8CommonSettings = cms.vstring(
+            'Tune:preferLHAPDF = 2',
+            'Main:timesAllowErrors = 10000',
+            'Check:epTolErr = 0.01',
+            'Beams:setProductionScalesFromLHEF = off',
+            'SLHA:minMassSM = 1000.',
+            'ParticleDecays:limitTau0 = on',
+            'ParticleDecays:tau0Max = 10',
+            'ParticleDecays:allowPhotonRadiation = on'
+        )
     ),
-    Verbosity = cms.untracked.int32(0),
-    firstRun = cms.untracked.uint32(1),
-    psethack = cms.string({7})
+    comEnergy = cms.double(14000.0),
+    filterEfficiency = cms.untracked.double(1.0),
+    maxEventsToPrint = cms.untracked.int32(0),
+    pythiaHepMCVerbosity = cms.untracked.bool(False),
+    pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
+
+process.ProductionFilterSequence = cms.Sequence(process.generator)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -130,7 +160,9 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 # filter all path with the production filter sequence
 for path in process.paths:
-    getattr(process,path).insert(0, process.generator)
+	getattr(process,path).insert(0, process.ProductionFilterSequence)
+
+
 
 # Customisation from command line
 

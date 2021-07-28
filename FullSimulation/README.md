@@ -1,19 +1,22 @@
-# HGCNose/FullSimulation
+# HGCNose
 
 Author: K.Yoon
 
-## Notes
-The default setting in CMSSW_11_1_0_pre7 will not generate calotruth in HGCNose. In order to properly do so, follow these steps:
-  * `cd $CMSSW_BASE`
-  * `git cms-addpkg SimGeneral/MixingModule`
-  * `cd src`
-  * `mkdir SimGeneral`
-  * `mv MixingModule SimGeneral`
-  * Uncomment lines 44-51 in SimGeneral/MixingModule/python/caloTruthProducer_cfi.py
-  * `cd $CMSSW_BASE/src/SimGeneral`
-  * `scram b`
-  
-You may check that the module has been successfully added by running python and importing the module.
-  * `python`
-  * `import SimGeneral.MixingModule.caloTruthProducer_cfi`
-  * `print (SimGeneral.MixingModule.caloTruthProducer_cfi.__file__)`
+## Setup
+1. Put it in your working directory and build using `scram b`.
+2. Set environment variables: edit `config.sh` to suit your preferences and execute.
+
+## Analysis
+Here is the list of analysis modules.
+* `plugins/TICLAnalyzer.cc` | Generic module for analyzing TICL-related objects, such as Tracksters. Run using `cmsRun python/TICLAnalyzer.py`. (Add: explanation of variables)
+* `plugins/EnergyResolution.cc` | Returns energy resolution for a given PID and eta range. Outputs plots in `output` directory. Run using `cmsRun python/ERes_cfg.py pt=<pt value of photon>`.
+* `plugins/MoliereRadius.cc` | (working) Outputs plots related to Moliere radius
+*
+
+## Plotting
+List of plotting modules.
+* `scripts/TICLAnalyzer.py` | Plots TICL related histograms
+* `scripts/ERes_FitPlot.py` | Plots energy resolution, mean energy, and detector layer-related plots. PNG images are saved in `plots` directory.
+
+## NanoAODProduction
+Flattens EDM-formatted files to NanoAOD Ntuples. Consider this as the data-preprocessing part for ML projects.

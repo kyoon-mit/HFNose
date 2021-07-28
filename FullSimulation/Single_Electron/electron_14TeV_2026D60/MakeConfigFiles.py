@@ -20,7 +20,9 @@ class RunInstance:
         self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}{suffix}.root\''
         self.preformat_aging = ''
         self.aging_suffix = ''
-    
+        self.step3_suffix = ''
+
+
     def set_E (self, *args):
         """ Sets list of E values that will be passed on to the generator.
         
@@ -176,6 +178,23 @@ class RunInstance:
             self.aging_suffix = '_aging_{lumi}{tag}'.format(lumi=lumi, tag=tag)
             with open('cfg_templates/{}'.format(aging_template), 'r') as template_file:
                 self.preformat_aging = template_file.read()
+                
+                
+    def set_step3_rootfile_suffix (self, suffix=''):
+        """ Set suffix for rootfiles created from step3.
+        
+        Parameters
+        ----------
+        suffix
+        
+        Returns
+        -------
+        (none)
+        """
+        if suffix != '':
+            suffix = '_' + suffix
+        
+        self.step3_suffix = suffix
             
             
     def makeAllConfigFiles (self):
@@ -404,11 +423,11 @@ class RunInstance:
                 format_dict = dict()
                 
                 format_dict['maxevents'] = self.nevents
-                format_dict['inputfile'] = self.preformat_rootfile.format(step=2, suffix=self.aging_suffix + '', **preformat_dict)
+                format_dict['inputfile'] = self.preformat_rootfile.format(step=2, suffix=self.aging_suffix, **preformat_dict)
                 format_dict['annotation'] = self.preformat_annotation.format(step=3, **preformat_dict)
-                format_dict['outfile'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '', **preformat_dict)
-                format_dict['outfile_miniaodsim'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '_inMINIAODSIM', **preformat_dict)
-                format_dict['outfile_dqm'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '_inDQM', **preformat_dict)
+                format_dict['outfile'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + self.step3_suffix, **preformat_dict)
+                format_dict['outfile_miniaodsim'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '_inMINIAODSIM' + self.step3_suffix, **preformat_dict)
+                format_dict['outfile_dqm'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '_inDQM' + self.step3_suffix, **preformat_dict)
                 
                 template_text = template_text.format(**format_dict)
                 
