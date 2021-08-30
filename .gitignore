@@ -1,6 +1,8 @@
 config_kyoon.sh
 Analysis/output
 Analysis/plots
+kyoon.cc
+
 *.txt
 *.pyc
 __init__*
@@ -9,3 +11,9 @@ step*cfg.py
 *.root
 .nfs*
 *.log
+*.err
+*.out
+*.log
+
+*~
+\#*#

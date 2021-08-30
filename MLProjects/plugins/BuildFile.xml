@@ -1,0 +1,24 @@
+<use name="CommonTools/UtilAlgos"/>
+
+<use name="FWCore/Framework"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/Utilities"/>
+
+<use name="DataFormats/CaloRecHit"/>
+<use name="DataFormats/DetId"/>
+<use name="DataFormats/HGCalReco"/>
+<use name="DataFormats/HGCRecHit"/>
+<use name="DataFormats/Math"/>
+
+<use name="Geometry/HGCalGeometry"/>
+<use name="Geometry/Records"/>
+
+<use name="RecoLocalCalo/HGCalRecAlgos"/>
+
+<use name="SimDataFormats/CaloAnalysis"/>
+
+<export>
+  <lib name="1"/>
+</export>
+

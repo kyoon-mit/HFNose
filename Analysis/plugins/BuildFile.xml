@@ -2,21 +2,35 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/ServiceRegistry"/>
+
 <use name="CommonTools/UtilAlgos"/>
+<use name="CommonTools/Utils"/>
 
 <use name="DataFormats/HGCRecHit"/>
 <use name="DataFormats/CaloRecHit"/>
 <use name="DataFormats/HGCalReco"/>
 <use name="DataFormats/ForwardDetId"/>
+<use name="DataFormats/GeometrySurface"/>
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/GeometryVector"/>
+<use name="DataFormats/TrackReco"/>
 
+<use name="SimDataFormats/CaloAnalysis"/>
 <use name="SimDataFormats/CaloHit"/>
 
-<use name="Geometry/Records"/>
-<use name="Geometry/HGCalGeometry"/>
+<use name="Geometry/CommonDetUnit"/>
 <use name="Geometry/CaloGeometry"/>
+<use name="Geometry/HGCalCommonData"/>
+<use name="Geometry/HGCalGeometry"/>
+<use name="Geometry/Records"/>
+
+<use name="MagneticField/Engine"/>
+<use name="MagneticField/Records"/>
 
 <use name="RecoLocalCalo/HGCalRecAlgos"/>
+
+<use name="TrackingTools/GeomPropagators"/>
+<use name="TrackingTools/Records"/>
+<use name="TrackingTools/TrajectoryState"/>
 
 <flags EDM_PLUGIN="1"/>

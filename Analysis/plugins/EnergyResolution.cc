@@ -12,8 +12,6 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-
 // Physics objects
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"

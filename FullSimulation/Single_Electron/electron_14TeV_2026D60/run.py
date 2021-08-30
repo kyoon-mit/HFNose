@@ -16,7 +16,7 @@ parser.add_argument('-n', '--nevents', type=int, nargs='?', default=500)
 parser.add_argument('-l', '--lumi', type=int, nargs='?', default=0)
 parser.add_argument('-t', '--agetag', type=str, nargs='?', default='')
 parser.add_argument('-x', '--filesuffix', type=str, nargs='?', default='')
-parser.add_argument('-d', '--savedir', type=str, nargs='?', default=os.environ.get('DIRDATA_HFNOSE') + '/photon_2026D60_HFNose')
+parser.add_argument('-d', '--savedir', type=str, nargs='?', default=os.environ.get('DIRDATA_HFNOSE') + '/electron_2026D60_HFNose')
 parser.add_argument('-s', '--steps', type=int, nargs='+', default=[1,2,3])
 args = parser.parse_args()
 

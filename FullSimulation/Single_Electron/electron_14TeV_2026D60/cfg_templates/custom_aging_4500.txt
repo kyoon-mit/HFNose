@@ -1,0 +1,8 @@
+# customisation of the process.
+
+# Automatic addition of the customisation function from SLHCUpgradeSimulations.Configuration.aging
+from SLHCUpgradeSimulations.Configuration.aging import customise_aging_4500
+
+#call to customisation function customise_aging_4500 imported from SLHCUpgradeSimulations.Configuration.$
+
+process = customise_aging_4500(process)

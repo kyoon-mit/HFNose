@@ -13,20 +13,20 @@ notify_user = kyungseop.yoon@cern.ch
 output = condor/$(ProcId)_output.out
 error = condor/$(ProcId)_output.err
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 50 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 50 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 100 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 100 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 150 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 150 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 200 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 200 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 250 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 250 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue
 
-arguments = /afs/cern.ch/user/k/kyoon/CMSSW_11_3_0_pre5/src/HGCNose 300 3.5 1000 0 /eos/home-k/kyoon/TICL_11_3_0_pre5/photon_2026D60_HFNose
+arguments = /afs/cern.ch/user/k/kyoon/CMSSW_12_0_0_pre4/src/HFNose 300 3.5 1000 0 /eos/home-k/kyoon/DATA_12_0_0_pre4/photon_2026D60_HFNose pset4
 queue

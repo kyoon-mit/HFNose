@@ -7,18 +7,22 @@ class RunInstance:
     def __init__(self):
         self.E_list = [50, 100, 250, 500]
         self.eta_list = [0., 0.6, 1.2, 1.8, 2.4, 3.0, 3.6]
+        self.Phi = 0
+        self.maxPhi = 3.14159265359
+        self.minPhi = -3.14159265359
+        self.doPhi = False
         self.nevents = 500
         self.top_save_dir = os.getcwd()
         self.dir_run = os.path.abspath(__file__ + '/../run/')
         
-        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_charged_pion_E{E}_eta{eta}{suffix}_cfg.py'
-        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_charged_pion_E{step}_eta:{E} nevts:{nevents}\''
-        self.preformat_rootfile = '\'file:{save_dir}/step{step}_charged_pion_E{E}_eta{eta}{suffix}.root\''
+        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_electron_E{E}_eta{eta}{suffix}_cfg.py'
+        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron_E{step}_eta:{E} nevts:{nevents}\''
+        self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}{suffix}.root\''
         self.preformat_aging = ''
         self.aging_suffix = ''
         self.step3_suffix = ''
 
-    
+
     def set_E (self, *args):
         """ Sets list of E values that will be passed on to the generator.
         
@@ -63,6 +67,33 @@ class RunInstance:
             raise Exception("Please provide int or float only in args.")
         elif len(args) != 0:
             self.eta_list = args
+            
+            
+    def set_phi (self, phi):
+        """ Sets phi to pass on to generator.
+        
+        Parameters
+        ----------
+        phi
+	        Phi value to generate
+	        If the value entered is not int or float, it will raise an exception.
+
+        Returns
+        -------
+        (none)
+	        If no value is provided, doPhi = False by default.
+            Otherwise, the phi values will be set and the preformat strings will include phi.
+        """
+        
+        if (type(phi)!=float and type(phi)!=int):
+            raise Exception("Please provide int or float only in arg.")
+            
+        self.doPhi = True
+        self.minPhi = phi - 0.00000001
+        self.maxPhi = phi + 0.00000001
+        self.preformat_cfgfile = '{dir_step}/step{step}_2026D60_14TeV_electron_E{E}_eta{eta}_phi{phi}{suffix}_cfg.py'
+        self.preformat_annotation = '\'step{save_dir}_2026D60_14TeV_electron E:{E} eta:{eta} phi:{phi} nevts:{nevents}\''
+        self.preformat_rootfile = '\'file:{save_dir}/step{step}_electron_E{E}_eta{eta}_phi{phi}{suffix}.root\''
                 
                 
     def set_nevents (self, nevents):
@@ -147,8 +178,8 @@ class RunInstance:
             self.aging_suffix = '_aging_{lumi}{tag}'.format(lumi=lumi, tag=tag)
             with open('cfg_templates/{}'.format(aging_template), 'r') as template_file:
                 self.preformat_aging = template_file.read()
-
-
+                
+                
     def set_step3_rootfile_suffix (self, suffix=''):
         """ Set suffix for rootfiles created from step3.
         
@@ -265,7 +296,10 @@ class RunInstance:
             for eta in self.eta_list:
             
                 preformat_dict = dict()
-                preformat_dict['save_dir'] = self.top_save_dir + '/charged_pion_E{0}_eta{1}'.format(E, eta)
+                if not self.doPhi:
+                    preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
+                else:
+                    preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}_phi{2}'.format(E, eta, self.Phi)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
@@ -277,9 +311,11 @@ class RunInstance:
                 format_dict['outfile'] = self.preformat_rootfile.format(step=1, suffix=self.aging_suffix + '', **preformat_dict)
                 format_dict['maxEta'] = eta + 0.001
                 format_dict['minEta'] = eta - 0.001
+                format_dict['maxPhi'] = self.maxPhi
+                format_dict['minPhi'] = self.minPhi
                 format_dict['maxE'] = E + 0.001
                 format_dict['minE'] = E - 0.001
-                format_dict['psethack'] = '\'single charged_pion E {0} eta {1}\''.format(E, eta)
+                format_dict['psethack'] = '\'single electron E {0} eta {1}\''.format(E, eta)
                 template_text = template_text.format(**format_dict)
                 
                 # Name of cfg file
@@ -322,7 +358,7 @@ class RunInstance:
             for eta in self.eta_list:
                     
                 preformat_dict = dict()
-                preformat_dict['save_dir'] = self.top_save_dir + '/charged_pion_E{0}_eta{1}'.format(E, eta)
+                preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
@@ -378,7 +414,7 @@ class RunInstance:
             for eta in self.eta_list:
             
                 preformat_dict = dict()
-                preformat_dict['save_dir'] = self.top_save_dir + '/charged_pion_E{0}_eta{1}'.format(E, eta)
+                preformat_dict['save_dir'] = self.top_save_dir + '/electron_E{0}_eta{1}'.format(E, eta)
                 preformat_dict['E'] = E
                 preformat_dict['eta'] = eta
                 preformat_dict['nevents'] = self.nevents
@@ -387,7 +423,7 @@ class RunInstance:
                 format_dict = dict()
                 
                 format_dict['maxevents'] = self.nevents
-                format_dict['inputfile'] = self.preformat_rootfile.format(step=2, suffix=self.aging_suffix + '', **preformat_dict)
+                format_dict['inputfile'] = self.preformat_rootfile.format(step=2, suffix=self.aging_suffix, **preformat_dict)
                 format_dict['annotation'] = self.preformat_annotation.format(step=3, **preformat_dict)
                 format_dict['outfile'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + self.step3_suffix, **preformat_dict)
                 format_dict['outfile_miniaodsim'] = self.preformat_rootfile.format(step=3, suffix=self.aging_suffix + '_inMINIAODSIM' + self.step3_suffix, **preformat_dict)
@@ -406,4 +442,3 @@ class RunInstance:
                     cfg_file.write(template_text)
                     
         return
-
