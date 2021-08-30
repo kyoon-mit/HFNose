@@ -31,10 +31,10 @@ options.register('outsuffix',
                             VarParsing.varType.string,
                             "outfile suffix to put at the very end before the file extension")
 options.register ('nThreads',
-		                    1,
-		                    VarParsing.multiplicity.singleton,
-		                    VarParsing.varType.int,
-		                    "Number of threads (also streams)")
+	                        1,
+	                        VarParsing.multiplicity.singleton,
+	                        VarParsing.varType.int,
+	                        "Number of threads (also streams)")
 options.parseArguments()
 
 #-----------------------------------------
@@ -91,7 +91,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', ''
 
 # Process
 process.HFNoseNtuple = cms.EDAnalyzer('HFNoseNtuplizer',
-    InputTag_Tracksters = cms.untracked.InputTag("ticlTrackstersHFNoseEM"),
+    InputTag_Tracksters = cms.untracked.InputTag("ticlTrackstersHFNoseTrkEM"),
     withPU = cms.untracked.bool(False)
 )
 

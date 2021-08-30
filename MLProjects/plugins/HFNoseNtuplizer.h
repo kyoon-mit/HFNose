@@ -2,7 +2,6 @@
 #define HFNOSE_NTUPLIZER_H
 
 /*
-* Original Author: Bruno Alves
 * Original Repo: https://gitlab.cern.ch/gouskos/hgcal_reco_analysis/HGCMLAnalyzer/plugins/Pid.cc
 * Modified By: K. Yoon
 * Modified In: 2021
