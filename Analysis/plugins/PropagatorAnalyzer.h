@@ -26,7 +26,6 @@
 #include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 // Forward declarations
-
 class CaloParticle;
 class GeomDet;
 class HGCalDDDConstants;

@@ -16,8 +16,6 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-
 #include "DataFormats/GeometrySurface/interface/BoundDisk.h"
 #include "DataFormats/HGCalReco/interface/Trackster.h"
 #include "DataFormats/TrackReco/interface/Track.h"

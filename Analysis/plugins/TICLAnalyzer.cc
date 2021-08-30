@@ -57,6 +57,7 @@ TICLAnalyzer::TICLAnalyzer ( const edm::ParameterSet& iConfig ) :
     token_TracksterHFNoseTrk_ = consumes<std::vector<ticl::Trackster>> ( edm::InputTag ("ticlTrackstersHFNoseTrk") );
     token_TracksterHFNoseHAD_ = consumes<std::vector<ticl::Trackster>> ( edm::InputTag ("ticlTrackstersHFNoseHAD") );
     token_TracksterHFNoseMIP_ = consumes<std::vector<ticl::Trackster>> ( edm::InputTag ("ticlTrackstersHFNoseMIP") );
+    token_TracksterHFNoseMerge_ = consumes<std::vector<ticl::Trackster>> ( edm::InputTag ("ticlTrackstersHFNoseMerge") );
 }
 
 
@@ -90,11 +91,13 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     edm::Handle<std::vector<ticl::Trackster>> handle_TracksterHFNoseTrk;
     edm::Handle<std::vector<ticl::Trackster>> handle_TracksterHFNoseHAD;
     edm::Handle<std::vector<ticl::Trackster>> handle_TracksterHFNoseMIP;
+    edm::Handle<std::vector<ticl::Trackster>> handle_TracksterHFNoseMerge;
     iEvent.getByToken ( token_TracksterHFNoseEM_, handle_TracksterHFNoseEM );
     iEvent.getByToken ( token_TracksterHFNoseTrkEM_, handle_TracksterHFNoseTrkEM );
     iEvent.getByToken ( token_TracksterHFNoseTrk_, handle_TracksterHFNoseTrk );
     iEvent.getByToken ( token_TracksterHFNoseHAD_, handle_TracksterHFNoseHAD );
     iEvent.getByToken ( token_TracksterHFNoseMIP_, handle_TracksterHFNoseMIP );
+    iEvent.getByToken ( token_TracksterHFNoseMerge_, handle_TracksterHFNoseMerge );
 
     bool handle_status = true;
 
@@ -122,6 +125,9 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
     } if ( !handle_TracksterHFNoseMIP.isValid() ) {
       std::cout << "Handle for TracksterHFNoseMIP is invalid!" << std::endl;
       handle_status = false;
+    } if ( !handle_TracksterHFNoseMerge.isValid() ) {
+      std::cout << "Handle for TracksterHFNoseMerge is invalid!" << std::endl;
+      handle_status = false;
     }
 
     if ( handle_status )
@@ -139,6 +145,7 @@ void TICLAnalyzer::analyze ( const edm::Event& iEvent, const edm::EventSetup& iS
 	analyzeTICLTrackster ( selected_calotruths, *handle_TracksterHFNoseTrk.product(), "Trkn" );
         analyzeTICLTrackster ( selected_calotruths, *handle_TracksterHFNoseHAD.product(), "HADn" );
         analyzeTICLTrackster ( selected_calotruths, *handle_TracksterHFNoseMIP.product(), "MIPn" );
+        analyzeTICLTrackster ( selected_calotruths, *handle_TracksterHFNoseMerge.product(), "MERGEn" );
     }
     else std::cout << "Handle(s) invalid! Please investigate." << std::endl;
 }
@@ -349,7 +356,12 @@ void TICLAnalyzer::analyzeTICLTrackster ( const std::vector<math::XYZTLorentzVec
                     TH1Container_["RawEScale_tracksterHFNoseMIP"]->Fill( truth.E() - trackster_raw_energy );
                     TH1Container_["DeltaR_tracksterHFNoseMIP"]->Fill( dR );
                 }
-                    
+		else if ( tag == "MERGEn" )
+		{
+                    TH1Container_["RawEDist_tracksterHFNoseMerge"]->Fill( trackster_raw_energy );
+                    TH1Container_["RawEScale_tracksterHFNoseMerge"]->Fill( truth.E() - trackster_raw_energy );
+                    TH1Container_["DeltaR_tracksterHFNoseMerge"]->Fill( dR );
+		}
             }
         }
     }
@@ -475,6 +487,14 @@ void TICLAnalyzer::beginJob ()
     TH1Container_["RawEScale_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
     TH1Container_["DeltaR_tracksterHFNoseMIP"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
 
+    //
+    TH1Container_["RawEDist_tracksterHFNoseMerge"] = fs->make<TH1F>("EDist_tracksterHFNoseMerge", "TracksterHFNoseMerge Raw Energy Distribution", 100, 0, 500);
+    TH1Container_["RawEScale_tracksterHFNoseMerge"] = fs->make<TH1F>("EScale_tracksterHFNoseMerge", "TracksterHFNoseMerge Raw Energy Scale", 100, 0, 500);
+    TH1Container_["DeltaR_tracksterHFNoseMerge"] = fs->make<TH1F>("DeltaR_tracksterHFNoseMerge", "TracksterHFNoseMerge #Delta R", 20, 0, 0.5);
+
+    TH1Container_["RawEDist_tracksterHFNoseMerge"]->GetXaxis()->SetTitle("E_{trackster} [GeV/c^{2}]");
+    TH1Container_["RawEScale_tracksterHFNoseMerge"]->GetXaxis()->SetTitle("E_{caloParticle} - E_{trackster} [GeV/c^{2}]");
+    TH1Container_["DeltaR_tracksterHFNoseMerge"]->GetXaxis()->SetTitle("|R_{trackster} - R_{caloParticle}|");
 }
 
 

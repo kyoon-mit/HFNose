@@ -40,7 +40,7 @@ options.parseArguments()
 OUTPUT_DIR = os.path.abspath(os.environ['DIRANALYSIS_HFNOSE'] + '/output/{}/'.format(options.outpath))
 INPUT_DIR = os.path.abspath(os.environ['DIRDATA_HFNOSE'] + '/{}/'.format(options.inpath))
 outputfile = OUTPUT_DIR + '/{3}_E{0}_eta{1}{2}.root'.format(options.E, options.eta, options.outsuffix, options.process)
-inputfile = 'file:' + INPUT_DIR + '/{2}_E{0}_eta{1}/step3_{2}_E{0}_eta{1}_pset3.root'.format(options.E, options.eta, options.process)
+inputfile = 'file:' + INPUT_DIR + '/{2}_E{0}_eta{1}/step3_{2}_E{0}_eta{1}_pset4.root'.format(options.E, options.eta, options.process)
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)

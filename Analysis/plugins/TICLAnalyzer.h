@@ -79,6 +79,7 @@ class TICLAnalyzer : public edm::EDAnalyzer
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseTrk_;
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseHAD_;
     edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseMIP_;
+    edm::EDGetTokenT<std::vector<ticl::Trackster>> token_TracksterHFNoseMerge_;
     
     // Input Tags
     edm::InputTag tag_CaloParticle_MergedCaloTruth_;
